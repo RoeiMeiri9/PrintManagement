@@ -232,6 +232,5 @@
                 <Frame x:Name="navFrame" Grid.Row="1" />
             </Grid>
         </NavigationView>
-
     </Grid>
 </Window>

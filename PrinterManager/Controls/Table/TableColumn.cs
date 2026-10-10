@@ -19,6 +19,7 @@ namespace PrinterManager.Controls.Table
 
     public partial class TableColumn : INotifyPropertyChanged
     {
+
         private double _width = 150;
         private bool _isVisible = true;
         private TableSortDirection _sortDirection = TableSortDirection.None;
@@ -27,8 +28,6 @@ namespace PrinterManager.Controls.Table
         public event PropertyChangedEventHandler? PropertyChanged;
         private void Raise([CallerMemberName] string? n = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
-
-        // ---------- definition (same as before) ----------
 
         /// <summary>Text shown in the header.</summary>
         public string Header { get; set; } = "";

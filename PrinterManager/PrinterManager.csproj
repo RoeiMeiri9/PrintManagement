@@ -45,6 +45,8 @@
     <None Remove="Assets\Icons\Square44x44Logo.targetsize-48_altform-unplated.png" />
     <None Remove="Controls\DataTable.xaml" />
     <None Remove="CustomFiltersPage.xaml" />
+    <None Remove="Pages\CustomFilterPage\SubPages\DriversFilter.xaml" />
+    <None Remove="Pages\CustomFilterPage\SubPages\PrintersFilter.xaml" />
     <None Remove="Pages\CustomFiltersPage.xaml" />
   </ItemGroup>
 
@@ -120,6 +122,12 @@
     <None Update="Assets\Icons\IconGroup51.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Page Update="Pages\CustomFilterPage\SubPages\DriversFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\CustomFilterPage\SubPages\PrintersFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Resources\Fonts.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

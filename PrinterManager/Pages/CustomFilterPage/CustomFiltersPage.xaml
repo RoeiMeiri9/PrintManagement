@@ -5,22 +5,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:CommunityToolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:converters="using:PrinterManager.Pages.CustomFilterPage"
-    xmlns:ctl="using:PrinterManager.Controls.Table"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:PrinterManager.Pages.CustomFilterPage"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prim="using:Microsoft.UI.Xaml.Controls.Primitives"
     xmlns:res="using:PrinterManager.Resources"
     xmlns:tvf="using:PrinterManager.Pages.CustomFilterPage.Components.TreeViewLeaf"
-    xmlns:vm="using:PrinterManager.Pages.CustomFilterPage"
     x:Name="PageRoot"
-    d:DataContext="{d:DesignInstance Type=converters:PrinterFilterModel}"
+    Loaded="Page_Loaded"
     mc:Ignorable="d">
-
-    <Page.Resources>
-        <converters:StatusConverter x:Key="StatusToBrushConverter" />
-    </Page.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -38,7 +31,10 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Padding="8">
-                <TreeView x:Name="FiltersTree" ItemsSource="{x:Bind FiltersList}">
+                <TreeView
+                    x:Name="FiltersTree"
+                    ItemsSource="{x:Bind FiltersList}"
+                    SelectionChanged="FiltersTree_SelectionChanged">
                     <TreeView.ItemTemplate>
                         <DataTemplate x:DataType="tvf:FilterLeaf">
                             <TreeViewItem Padding="-4,0,8,0" ItemsSource="{x:Bind Children}">
@@ -60,7 +56,7 @@
                                         <TextBlock
                                             Grid.Column="1"
                                             VerticalAlignment="Center"
-                                            Text="{Binding Name}"
+                                            Text="{Binding DisplayName}"
                                             TextTrimming="CharacterEllipsis" />
                                     </Grid>
                                     <TextBlock
@@ -85,76 +81,10 @@
                 ResizeBehavior="PreviousAndNext"
                 ResizeDirection="Columns" />
 
-            <ctl:DataTable
-                x:Name="PrintersTable"
-                Grid.Column="2"
-                ItemsSource="{x:Bind PrinterFiltersList}">
-
-                <ctl:TableColumn
-                    Width="250"
-                    Header="Printer Name"
-                    SortDirection="Ascending"
-                    SortPath="Name">
-                    <ctl:TableColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:PrinterFilterModel">
-                            <Grid ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <FontIcon
-                                    Grid.Column="0"
-                                    FontSize="16"
-                                    Glyph="{x:Bind res:Icons.Printer.Glyph}" />
-
-                                <TextBlock
-                                    Grid.Column="1"
-                                    VerticalAlignment="Center"
-                                    FontWeight="SemiBold"
-                                    Text="{x:Bind Name, Mode=OneWay}"
-                                    TextTrimming="CharacterEllipsis" />
-                            </Grid>
-                        </DataTemplate>
-                    </ctl:TableColumn.CellTemplate>
-                </ctl:TableColumn>
-
-                <ctl:TableColumn
-                    Width="180"
-                    Header="Server / IP"
-                    Path="ServerName" />
-
-                <ctl:TableColumn
-                    Width="120"
-                    Header="Status"
-                    SortPath="Status">
-                    <ctl:TableColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:PrinterFilterModel">
-                            <Border
-                                Margin="-4,0,0,0"
-                                Padding="8,3"
-                                HorizontalAlignment="Left"
-                                Background="{x:Bind Status, Mode=OneWay, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Background}"
-                                CornerRadius="12">
-                                <TextBlock
-                                    FontSize="12"
-                                    Foreground="{x:Bind Status, Mode=OneWay, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Foreground}"
-                                    Text="{x:Bind Status, Mode=OneWay}" />
-                            </Border>
-                        </DataTemplate>
-                    </ctl:TableColumn.CellTemplate>
-                </ctl:TableColumn>
-
-                <ctl:TableColumn
-                    Width="220"
-                    Header="Driver"
-                    Path="DriverName" />
-
-                <ctl:TableColumn
-                    Width="220"
-                    Header="Port"
-                    Path="Port" />
-            </ctl:DataTable>
+            <Frame
+                x:Name="FilterSubPage"
+                Grid.Row="1"
+                Grid.Column="2" />
         </Grid>
     </Grid>
 </Page>

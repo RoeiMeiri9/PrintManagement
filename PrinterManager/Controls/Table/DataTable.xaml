@@ -116,7 +116,8 @@
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Style="{StaticResource CaptionTextBlockStyle}"
                                         Text="{x:Bind Header}"
-                                        TextTrimming="CharacterEllipsis" />
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="NoWrap" />
 
                                     <FontIcon
                                         Grid.Column="1"
@@ -137,6 +138,7 @@
                                 HorizontalAlignment="Right"
                                 local:ThumbCursor.ResizeCursor="True"
                                 Background="Transparent"
+                                DoubleTapped="Thumb_DoubleTapped"
                                 DragDelta="Thumb_DragDelta" />
                         </Grid>
                     </DataTemplate>

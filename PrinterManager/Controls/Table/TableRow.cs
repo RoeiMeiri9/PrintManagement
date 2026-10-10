@@ -15,7 +15,7 @@ public sealed class TableRow
     {
         Table = table;
         Item = item;
-        Cells = table.Columns.Select(c => new TableCell(c, item)).ToArray();
+        Cells = [.. table.Columns.Select(c => new TableCell(c, item))];
     }
 
     public DataTable Table { get; }

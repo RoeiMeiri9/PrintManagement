@@ -1,17 +1,17 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using PrinterManager.Pages.CustomFilterPage;
 using PrinterManager.Pages.CustomFilterPage.Components.TreeViewLeaf;
+using PrinterManager.Pages.CustomFilterPage.SubPages;
 using PrinterManager.Resources;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 
 
 namespace PrinterManager.Pages
 {
     public sealed partial class CustomFiltersPage : Page
     {
-        public ObservableCollection<PrinterFilterModel> PrinterFiltersList { get; } = [];
 
         public List<FilterLeaf> FiltersList = [];
 
@@ -19,145 +19,110 @@ namespace PrinterManager.Pages
         {
             InitializeComponent();
             LoadFilters();
-            LoadInitialPrinters();
+            FilterSubPage.Navigate(typeof(DriversFilter));
         }
 
         private void LoadFilters()
         {
-            var printersRoot = new FilterLeaf { Name = "Printers", LeafIcon = Icons.Printer };
-            printersRoot.Children.Add(new FilterLeaf { Name = "All Printers", LeafIcon = Icons.Filter, DisplayTotalItems = Visibility.Visible, TotalItems = 2 });
-            printersRoot.Children.Add(new FilterLeaf { Name = "Printers Nor Ready", LeafIcon = Icons.Filter });
-            printersRoot.Children.Add(new FilterLeaf { Name = "Printers With Jobs", LeafIcon = Icons.Filter });
+            // --- Printers Root Leaf ---
+            var printersRoot = new FilterLeaf
+            {
+                Name = "Printers",
+                DisplayName = "Printers",
+                LeafIcon = Icons.Printer,
+                FilterPage = FilterPages.PrinterPage
+            };
+
+            // Adding sub leafs
+
+            printersRoot.Children.Add(new FilterLeaf
+            {
+                Name = "AllPrinters",
+                DisplayName = "All Printers",
+                LeafIcon = Icons.Filter,
+                DisplayTotalItems = Visibility.Visible,
+                TotalItems = 2,
+                FilterPage = FilterPages.PrinterPage
+            });
+            printersRoot.Children.Add(new FilterLeaf
+            {
+                Name = "PrintersNorReady",
+                DisplayName = "Printers Nor Ready",
+                LeafIcon = Icons.Filter,
+                FilterPage = FilterPages.PrinterPage
+
+            });
+            printersRoot.Children.Add(new FilterLeaf
+            {
+                Name = "PrintersWithJobs",
+                DisplayName = "Printers With Jobs",
+                LeafIcon = Icons.Filter,
+                FilterPage = FilterPages.PrinterPage
+
+            });
+
             FiltersList.Add(printersRoot);
 
-            var driversRoot = new FilterLeaf { Name = "Drivers", LeafIcon = Icons.Driver };
-            driversRoot.Children.Add(new FilterLeaf { Name = "All Drivers", LeafIcon = Icons.Filter, DisplayTotalItems = Visibility.Visible, TotalItems = 7 });
+            // --- Drivers Root Leaf ---
+            var driversRoot = new FilterLeaf
+            {
+                Name = "Drivers",
+                DisplayName = "Drivers",
+                LeafIcon = Icons.Driver,
+                FilterPage = FilterPages.DriverPage
+            };
+
+            // Adding sub leafs
+
+            driversRoot.Children.Add(new FilterLeaf
+            {
+                Name = "AllDrivers",
+                DisplayName = "All Drivers",
+                LeafIcon = Icons.Filter,
+                DisplayTotalItems = Visibility.Visible,
+                TotalItems = 7,
+                FilterPage = FilterPages.DriverPage
+            });
+
             FiltersList.Add(driversRoot);
         }
 
-        private void LoadInitialPrinters()
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-
-            //PrintersTable.Columns.Add(new TableColumn { Header = "Port", Path = "PortName", Width = 100 });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
+            // 1. מחפשים את הפריט הרצוי מתוך הרשימה שלך (לפי שם או מפתח)
+            FilterLeaf? printersRoot = FiltersList.FirstOrDefault(f => f.Name == "Printers");
+            if (printersRoot != null)
             {
-                Name = "Office-HP-LaserJet",
-                ServerName = "192.168.1.100",
-                Status = "Ready",
-                DriverName = "HP Universal Printing PCL 6",
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
+                var container = FiltersTree.ContainerFromItem(printersRoot) as TreeViewItem;
+                if (container != null)
+                {
+                    container.IsExpanded = true;
+                }
+            }
+            FilterLeaf? defaultLeaf = printersRoot?.Children.FirstOrDefault(c => c.FilterPage == FilterPages.PrinterPage);
+            if (defaultLeaf != null)
             {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Pending",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
-
-            PrinterFiltersList.Add(new PrinterFilterModel
-            {
-                Name = "Warehouse-Zebra-Label",
-                ServerName = "192.168.1.105",
-                Status = "Offline",
-                DriverName = "Zebra ZPL Driver"
-            });
+                FiltersTree.SelectedItem = defaultLeaf;
+            }
         }
-        //private void SubNavListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (SubNavListView.SelectedItem is ListViewItem selectedItem)
-        //    {
-        //    }
-        //}
 
+        private void FiltersTree_SelectionChanged(TreeView sender, TreeViewSelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.FirstOrDefault() is FilterLeaf leaf)
+            {
+
+                Type? pageType = leaf.FilterPage switch
+                {
+                    FilterPages.PrinterPage => typeof(PrintersFilter),
+                    FilterPages.DriverPage => typeof(DriversFilter),
+                    _ => null
+                };
+
+                if (pageType != null)
+                {
+                    FilterSubPage.Navigate(pageType, leaf);
+                }
+            }
+        }
     }
 }
