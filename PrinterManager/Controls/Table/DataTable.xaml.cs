@@ -316,6 +316,11 @@ public sealed partial class DataTable : UserControl
 
         if (mouseWheelDelta != 0 && sender is ScrollViewer scroller)
         {
+            var modifiers = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
+            bool isCtrlPressed = (modifiers & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
+
+            if (!isCtrlPressed) return;
+
             double scrollFactor = 0.4;
             double currentOffset = scroller.HorizontalOffset;
 
