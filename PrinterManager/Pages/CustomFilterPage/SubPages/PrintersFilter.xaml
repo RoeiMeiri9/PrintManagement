@@ -100,8 +100,8 @@
 
         <ctl:TableColumn
             Width="112"
-            Header="Comment"
-            Path="Comment" />
+            Header="Comments"
+            Path="Comments" />
 
         <ctl:TableColumn
             Width="112"

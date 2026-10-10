@@ -49,7 +49,6 @@ public sealed partial class DriversFilter : Page
             OEMURL = "",
             Shareable = false,
             Type = "Type 3 - User Mode"
-
         });
 
         DriverFiltersList.Add(new DriversFilterModel

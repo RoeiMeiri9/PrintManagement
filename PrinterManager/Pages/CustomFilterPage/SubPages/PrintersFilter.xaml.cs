@@ -57,7 +57,181 @@ namespace PrinterManager.Pages.CustomFilterPage.SubPages
                 DriverName = "Zebra ZPL Driver"
             });
 
-
+            PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            }); PrinterFiltersList.Add(new PrinterFilterModel
+            {
+                PrinterName = "Warehouse-Zebra-Label",
+                ServerName = "192.168.1.105",
+                QueueStatus = "Offline",
+                DriverName = "Zebra ZPL Driver"
+            });
         }
     }
 }

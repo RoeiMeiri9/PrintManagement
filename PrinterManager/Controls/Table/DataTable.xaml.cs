@@ -290,9 +290,55 @@ public sealed partial class DataTable : UserControl
     {
         if (_listScroller != null) return;
         _listScroller = FindDescendant<ScrollViewer>(RowsList);
+
         if (_listScroller != null)
+        {
             _listScroller.ViewChanged += (_, _) =>
                 HeaderScroller.ChangeView(_listScroller.HorizontalOffset, null, null, true);
+
+            _listScroller.PointerWheelChanged += OnScrollPointerWheelChanged;
+        }
+    }
+
+
+    private void HeaderList_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (HeaderScroller != null)
+        {
+            HeaderScroller.PointerWheelChanged += OnScrollPointerWheelChanged;
+        }
+    }
+
+    private void OnScrollPointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        var pointerPoint = e.GetCurrentPoint(null);
+        var mouseWheelDelta = pointerPoint.Properties.MouseWheelDelta;
+
+        if (mouseWheelDelta != 0 && sender is ScrollViewer scroller)
+        {
+            double scrollFactor = 0.4;
+            double currentOffset = scroller.HorizontalOffset;
+
+            // כיוון הגלגלת הפוך בין ציר Y לX, לכן מינוס
+            double targetOffset = currentOffset - (mouseWheelDelta * scrollFactor);
+
+            targetOffset = Math.Max(0, Math.Min(targetOffset, scroller.ScrollableWidth));
+
+            // הפעלת ChangeView עם פרמטרים חלקים
+            scroller.ChangeView(targetOffset, scroller.VerticalOffset, null, true);
+
+            // סינכרון מיידי אבל רך לרכיב השני
+            if (scroller == HeaderScroller && _listScroller != null)
+            {
+                _listScroller.ChangeView(targetOffset, _listScroller.VerticalOffset, null, true);
+            }
+            else if (scroller == _listScroller && HeaderScroller != null)
+            {
+                HeaderScroller.ChangeView(targetOffset, HeaderScroller.VerticalOffset, null, true);
+            }
+
+            e.Handled = true;
+        }
     }
 
     private static T? FindDescendant<T>(DependencyObject root) where T : DependencyObject

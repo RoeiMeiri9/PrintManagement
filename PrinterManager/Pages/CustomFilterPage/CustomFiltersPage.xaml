@@ -30,7 +30,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Padding="8">
+            <StackPanel Grid.Column="0" Padding="8,8,2,8">
                 <TreeView
                     x:Name="FiltersTree"
                     ItemsSource="{x:Bind FiltersList}"
@@ -48,23 +48,24 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
+                                        <!--  Note! FontFamily MUST stay with the old Binding and NOT be using the newer x:Bind  -->
                                         <FontIcon
                                             Grid.Column="0"
-                                            FontFamily="{Binding LeafIcon.Font, TargetNullValue={StaticResource SymbolThemeFontFamily}}"
+                                            FontFamily="{Binding LeafIcon.Font, Mode=OneWay, TargetNullValue={StaticResource SymbolThemeFontFamily}}"
                                             FontSize="16"
-                                            Glyph="{Binding LeafIcon.Glyph}" />
+                                            Glyph="{x:Bind LeafIcon.Glyph, Mode=OneWay}" />
                                         <TextBlock
                                             Grid.Column="1"
                                             VerticalAlignment="Center"
-                                            Text="{Binding DisplayName}"
+                                            Text="{x:Bind DisplayName, Mode=OneWay}"
                                             TextTrimming="CharacterEllipsis" />
                                     </Grid>
                                     <TextBlock
                                         Grid.Column="1"
                                         VerticalAlignment="Center"
                                         Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                        Text="{Binding TotalItems}"
-                                        Visibility="{Binding DisplayTotalItems}" />
+                                        Text="{x:Bind TotalItems, Mode=OneWay}"
+                                        Visibility="{x:Bind DisplayTotalItems, Mode=OneWay}" />
                                 </Grid>
                             </TreeViewItem>
                         </DataTemplate>
