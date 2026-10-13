@@ -1,0 +1,94 @@
+<Window
+    x:Class="PrintManagement.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:res="using:PrintManagement.Resources"
+    mc:Ignorable="d">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="Base" />
+    </Window.SystemBackdrop>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TitleBar
+            x:Name="titleBar"
+            Height="54"
+            IsBackButtonVisible="{x:Bind navFrame.CanGoBack, Mode=OneWay}"
+            IsPaneToggleButtonVisible="False"
+            PaneToggleRequested="TitleBar_PaneToggleRequested">
+            <TitleBar.Resources>
+                <HorizontalAlignment x:Key="TitleBarContentHorizontalAlignment">Stretch</HorizontalAlignment>
+            </TitleBar.Resources>
+            <TitleBar.IconSource>
+                <ImageIconSource ImageSource="/Assets/Icons/IconGroup51.ico" />
+            </TitleBar.IconSource>
+            <TitleBar.Content>
+                <Grid x:Name="TitleBarSearchBoxContainer" Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition x:Name="SearchColumn" Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        x:Name="CustomAppTitle"
+                        Grid.Column="0"
+                        Margin="4,0,16,0"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource BodyTextBlockStyle}"
+                        Text="{x:Bind AppTitle}" />
+                    <Button
+                        x:Name="SearchIconButton"
+                        Grid.Column="0"
+                        Click="SearchIconButton_Click"
+                        Style="{StaticResource SubtleButtonStyle}"
+                        Visibility="Collapsed">
+                        <FontIcon Glyph="{x:Bind res:Icons.Search.Glyph}" />
+                    </Button>
+                    <AutoSuggestBox
+                        x:Name="TitleBarSearchBox"
+                        Grid.Column="1"
+                        MaxWidth="600"
+                        VerticalAlignment="Center"
+                        LostFocus="TitleBarSearchBox_LostFocus"
+                        PlaceholderText="Search for printers, drivers, forms, etc..."
+                        QueryIcon="Find" />
+                </Grid>
+            </TitleBar.Content>
+        </TitleBar>
+
+        <NavigationView
+            x:Name="navView"
+            Grid.Row="1"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="True"
+            OpenPaneLength="220"
+            SelectedItem="{x:Bind CustomFilters}"
+            SelectionChanged="NavView_SelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    x:Name="CustomFilters"
+                    Content="Custom Filters"
+                    Icon="Filter"
+                    Tag="CustomFiltersPage" />
+                <NavigationViewItem
+                    x:Name="PrinterServers"
+                    Content="Printer Servers"
+                    Tag="PrinterServersPage">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="{x:Bind res:Icons.NetworkPrinter.Glyph}" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
+                    x:Name="DeployedPrinters"
+                    Content="Deployed Printers"
+                    Icon="Print"
+                    Tag="DeployedPrintersPage" />
+            </NavigationView.MenuItems>
+            <Frame x:Name="navFrame" Grid.Row="1" />
+        </NavigationView>
+    </Grid>
+</Window>

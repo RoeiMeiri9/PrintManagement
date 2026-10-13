@@ -1,0 +1,182 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>PrintManagement</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+    <UseWinUI>true</UseWinUI>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Controls\DataTable\**" />
+    <EmbeddedResource Remove="Controls\DataTable\**" />
+    <None Remove="Controls\DataTable\**" />
+    <Page Remove="Controls\DataTable\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Assets\Icons\BadgeLogo.scale-100.png" />
+    <Content Remove="Assets\Icons\BadgeLogo.scale-125.png" />
+    <Content Remove="Assets\Icons\BadgeLogo.scale-150.png" />
+    <Content Remove="Assets\Icons\BadgeLogo.scale-200.png" />
+    <Content Remove="Assets\Icons\BadgeLogo.scale-400.png" />
+    <Content Remove="Assets\Icons\Fonts\FluentSystemIcons-Regular.ttf" />
+    <Content Remove="Assets\Icons\IconGroup51.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-16.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-16_altform-lightunplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-16_altform-unplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-24.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-24_altform-lightunplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-256.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-256_altform-lightunplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-256_altform-unplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-32.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-32_altform-lightunplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-32_altform-unplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-48.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-48_altform-lightunplated.png" />
+    <None Remove="Assets\Icons\Square44x44Logo.targetsize-48_altform-unplated.png" />
+    <None Remove="Controls\DataTable.xaml" />
+    <None Remove="CustomFiltersPage.xaml" />
+    <None Remove="Pages\CommonPageWrapper\CommonPageWrapper.xaml" />
+    <None Remove="Pages\CustomFilterPage\SubPages\DriversFilter.xaml" />
+    <None Remove="Pages\CustomFilterPage\SubPages\PrintersFilter.xaml" />
+    <None Remove="Pages\CustomFiltersPage.xaml" />
+    <None Remove="Pages\SettingsPage\SettingsPage.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <!--
+    Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+    Tools extension to be activated for this project even if the Windows App SDK Nuget
+    package has not yet been restored.
+  -->
+  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.12" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-16.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-16_altform-lightunplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-16_altform-unplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-24.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-24_altform-lightunplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-256.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-256_altform-lightunplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-256_altform-unplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-32.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-32_altform-lightunplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-32_altform-unplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-48_altform-lightunplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Icons\Square44x44Logo.targetsize-48_altform-unplated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\Icons\Fonts\FluentSystemIcons-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Icons\IconGroup51.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Page Update="Pages\CommonPageWrapper\CommonPageWrapper.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\Settings\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\CustomFilterPage\SubPages\DriversFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\CustomFilterPage\SubPages\PrintersFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Resources\Fonts.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Resources\Themes.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\DataTable.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\CustomFiltersPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="CustomFiltersPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <!--
+    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
+    Explorer "Package and Publish" context menu entry to be enabled for this project even if
+    the Windows App SDK Nuget package has not yet been restored.
+  -->
+  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+  </PropertyGroup>
+
+  <!-- Publish Properties -->
+  <PropertyGroup>
+    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+  </PropertyGroup>
+  
+	<PropertyGroup>
+		<ApplicationIcon>Assets\Icons\IconGroup51.ico</ApplicationIcon>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+  
+	<ItemGroup>
+	  <PRIResource Remove="Controls\DataTable\**" />
+	</ItemGroup>
+</Project>

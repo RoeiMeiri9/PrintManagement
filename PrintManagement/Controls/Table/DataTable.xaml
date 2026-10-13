@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="PrintManagement.Controls.Table.DataTable"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:PrintManagement.Controls.Table"
+    xmlns:prim="using:Microsoft.UI.Xaml.Controls.Primitives">
+
+    <UserControl.Resources>
+        <Style x:Key="RoundedHeaderButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter
+                            x:Name="ContentPresenter"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--
+            ONE CELL. DataContext is a TableCell (column + row item).
+            The column decides the width, visibility and template; the content is the row item.
+            (Must be declared before it is referenced by the row template below.)
+        -->
+        <DataTemplate x:Key="CellTemplate" x:DataType="local:TableCell">
+            <ContentControl
+                Width="{x:Bind Column.DisplayWidth, Mode=OneWay}"
+                Padding="16,0"
+                HorizontalContentAlignment="Left"
+                VerticalContentAlignment="Center"
+                Content="{x:Bind Item}"
+                ContentTemplate="{x:Bind Column.EffectiveTemplate}"
+                Visibility="{x:Bind Column.CellVisibility, Mode=OneWay}" />
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  HEADER: built from Columns  -->
+            <ScrollViewer
+                x:Name="HeaderScroller"
+                Grid.Row="0"
+                HorizontalScrollBarVisibility="Hidden"
+                HorizontalScrollMode="Disabled"
+                IsTabStop="False"
+                Loaded="HeaderList_Loaded"
+                VerticalScrollBarVisibility="Disabled"
+                VerticalScrollMode="Disabled">
+
+                <ItemsControl Margin="16,8,24,8" ItemsSource="{x:Bind Columns}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="local:TableColumn">
+                            <Grid Width="{x:Bind DisplayWidth, Mode=OneWay}" Visibility="{x:Bind CellVisibility, Mode=OneWay}">
+                                <Button
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    Click="Header_Click"
+                                    IsEnabled="{x:Bind CanSort}"
+                                    Style="{StaticResource RoundedHeaderButtonStyle}">
+                                    <Grid ColumnSpacing="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="{x:Bind Header}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap" />
+
+                                        <FontIcon
+                                            Grid.Column="1"
+                                            FontSize="10"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Glyph="{x:Bind SortGlyph, Mode=OneWay}"
+                                            Visibility="{x:Bind SortIndicatorVisibility, Mode=OneWay}" />
+                                    </Grid>
+                                </Button>
+                                <Rectangle
+                                    Width="1"
+                                    Margin="0,6"
+                                    HorizontalAlignment="Right"
+                                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                    IsHitTestVisible="False" />
+                                <prim:Thumb
+                                    Width="8"
+                                    HorizontalAlignment="Right"
+                                    local:ThumbCursor.ResizeCursor="True"
+                                    Background="Transparent"
+                                    DoubleTapped="Thumb_DoubleTapped"
+                                    DragDelta="Thumb_DragDelta" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!--  ROWS: the (sorted) rows come from the Rows collection; the row itself is plain XAML  -->
+            <ListView
+                x:Name="RowsList"
+                Grid.Row="1"
+                Padding="12,0"
+                ItemsSource="{x:Bind Rows}"
+                Loaded="RowsList_Loaded"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                ScrollViewer.HorizontalScrollMode="Enabled"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                ScrollViewer.VerticalScrollMode="Enabled"
+                SelectionChanged="RowsList_SelectionChanged"
+                SelectionMode="Single">
+
+                <ListView.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="Padding" Value="0" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:TableRow">
+                        <ItemsControl
+                            Width="{x:Bind Table.TotalWidth, Mode=OneWay}"
+                            Padding="0,6"
+                            HorizontalAlignment="Left"
+                            IsTabStop="False"
+                            ItemTemplate="{StaticResource CellTemplate}"
+                            ItemsSource="{x:Bind Cells}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        <local:PanOverlay
+            x:Name="PanCursorOverlay"
+            Background="#55FF0000"
+            Visibility="Visible" />
+    </Grid>
+</UserControl>

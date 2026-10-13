@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PrintManagement.Resources">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <!--  Light Theme  -->
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="StatusGreenBrush" Color="#4420CE09" />
+            <SolidColorBrush x:Key="StatusOrangeBrush" Color="#44FF8200" />
+            <SolidColorBrush x:Key="StatusRedBrush" Color="#33FF0036" />
+            <SolidColorBrush x:Key="StatusDefaultBrush" Color="#338a8a8a" />
+        </ResourceDictionary>
+
+        <!--  Dark Theme  -->
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="StatusGreenBrush" Color="#443E9832" />
+            <SolidColorBrush x:Key="StatusOrangeBrush" Color="#3EF49F2C" />
+            <SolidColorBrush x:Key="StatusRedBrush" Color="#44CB2B40" />
+            <SolidColorBrush x:Key="StatusDefaultBrush" Color="#338a8a8a" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

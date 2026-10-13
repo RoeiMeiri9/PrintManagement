@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="PrintManagement.Pages.SettingsPage.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:res="using:PrintManagement.Resources"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <x:Double x:Key="SettingsCardSpacing">4</x:Double>
+        <Style
+            x:Key="SettingsSectionHeaderTextBlockStyle"
+            BasedOn="{StaticResource BodyStrongTextBlockStyle}"
+            TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="Margin" Value="1,30,0,6" />
+            </Style.Setters>
+        </Style>
+    </Page.Resources>
+    <ScrollViewer>
+        <Grid>
+            <StackPanel
+                MaxWidth="1000"
+                HorizontalAlignment="Stretch"
+                Spacing="{StaticResource SettingsCardSpacing}">
+                <win:StackPanel.ChildrenTransitions>
+                    <win:EntranceThemeTransition FromVerticalOffset="50" />
+                    <win:RepositionThemeTransition IsStaggeringEnabled="False" />
+                </win:StackPanel.ChildrenTransitions>
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="View" />
+                <controls:SettingsCard Description="Show a visual indicator on screen when scrolling with the middle mouse button." Header="Scroll direction indicator">
+                    <controls:SettingsCard.HeaderIcon>
+                        <FontIcon FontFamily="{x:Bind res:Icons.ArrowOut.Font}" Glyph="{x:Bind res:Icons.ArrowOut.Glyph}" />
+                    </controls:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="ScrollIndicatorToggle" Toggled="ScrollIndicatorToggle_Toggled" />
+                </controls:SettingsCard>
+
+                <!--  Example 'About' section  -->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
+
+                <controls:SettingsCard
+                    Description="© 2026. All rights reserved."
+                    Header="{x:Bind AppName}"
+                    HeaderIcon="{ui:BitmapIcon Source=ms-appx:///Assets/Icons/Square44x44Logo.targetsize-256.png}">
+                    <TextBlock
+                        win:IsTextSelectionEnabled="True"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{x:Bind appVersion}" />
+                </controls:SettingsCard>
+                <HyperlinkButton Margin="0,8,0,0" Content="Send feedback" />
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>
