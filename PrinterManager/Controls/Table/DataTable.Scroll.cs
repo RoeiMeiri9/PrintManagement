@@ -181,7 +181,8 @@ namespace PrinterManager.Controls.Table
             if (!_isPanning) return;
 
             _panCurrent = e.GetCurrentPoint(PanCursorOverlay).Position;
-            UpdatePanMarker(_panCurrent);
+            UpdatePanMarker(_panCurrent, _markerLine);
+            UpdatePanMarker(_panCurrent, _markerOuterLine);
             e.Handled = true;
         }
 
@@ -245,14 +246,25 @@ namespace PrinterManager.Controls.Table
         private const double MaxLineLength = 90.0;
 
         private Canvas? _markerCanvas;
+        private Ellipse? _markerRingWrapper;
         private Ellipse? _markerRing;
         private Ellipse? _markerDot;
         private Line? _markerLine;
+        private Line? _markerOuterLine;
 
         private void BuildPanMarker(Panel host)
         {
             var accent = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
-            double opacity = 0.8;
+            var outerLineBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(100, 0, 0, 0));
+            double opacity = 0.9;
+            _markerRingWrapper = new Ellipse
+            {
+                Width = MarkerRadius * 2 + 2,
+                Height = MarkerRadius * 2 + 2,
+                Stroke = outerLineBrush,
+                Opacity = opacity,
+                StrokeThickness = 4,
+            };
             _markerRing = new Ellipse
             {
                 Width = MarkerRadius * 2,
@@ -262,7 +274,15 @@ namespace PrinterManager.Controls.Table
                 StrokeThickness = 2,
                 Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(70, 128, 128, 128)),
             };
-            _markerDot = new Ellipse { Width = 6, Height = 6, Fill = accent, Opacity = opacity };
+            _markerDot = new Ellipse
+            {
+                Width = 6,
+                Height = 6,
+                Fill = accent,
+                Stroke = outerLineBrush,
+                StrokeThickness = 1,
+                Opacity = opacity
+            };
             _markerLine = new Line
             {
                 Stroke = accent,
@@ -272,10 +292,21 @@ namespace PrinterManager.Controls.Table
                 StrokeEndLineCap = PenLineCap.Triangle,
                 Visibility = Visibility.Collapsed,
             };
+            _markerOuterLine = new Line
+            {
+                Stroke = outerLineBrush,
+                StrokeThickness = 5,
+                Opacity = opacity,
+                StrokeStartLineCap = PenLineCap.Round,
+                StrokeEndLineCap = PenLineCap.Triangle,
+                Visibility = Visibility.Collapsed,
+            };
 
             _markerCanvas = new Canvas { IsHitTestVisible = false, Visibility = Visibility.Collapsed };
-            _markerCanvas.Children.Add(_markerRing);
+            _markerCanvas.Children.Add(_markerRingWrapper);
+            _markerCanvas.Children.Add(_markerOuterLine);
             _markerCanvas.Children.Add(_markerLine);
+            _markerCanvas.Children.Add(_markerRing);
             _markerCanvas.Children.Add(_markerDot);
 
             host.Children.Add(_markerCanvas);
@@ -285,18 +316,21 @@ namespace PrinterManager.Controls.Table
         {
             if (_markerCanvas == null || _markerRing == null || _markerDot == null) return;
 
+            Canvas.SetLeft(_markerRingWrapper, origin.X - MarkerRadius - 1);
+            Canvas.SetTop(_markerRingWrapper, origin.Y - MarkerRadius - 1);
             Canvas.SetLeft(_markerRing, origin.X - MarkerRadius);
             Canvas.SetTop(_markerRing, origin.Y - MarkerRadius);
             Canvas.SetLeft(_markerDot, origin.X - 3);
             Canvas.SetTop(_markerDot, origin.Y - 3);
 
-            UpdatePanMarker(origin);
+            UpdatePanMarker(origin, _markerLine);
+            UpdatePanMarker(origin, _markerOuterLine);
             _markerCanvas.Visibility = Visibility.Visible;
         }
 
-        private void UpdatePanMarker(Point current)
+        private void UpdatePanMarker(Point current, Line? markerLine)
         {
-            if (_markerLine == null) return;
+            if (markerLine == null) return;
 
             double dx = current.X - _panOrigin.X;
             double dy = current.Y - _panOrigin.Y;
@@ -305,7 +339,7 @@ namespace PrinterManager.Controls.Table
             // Only draw once the mouse is outside the ring (this also avoids a reversed line).
             if (distance <= MarkerRadius)
             {
-                _markerLine.Visibility = Visibility.Collapsed;
+                markerLine.Visibility = Visibility.Collapsed;
                 return;
             }
 
@@ -315,11 +349,11 @@ namespace PrinterManager.Controls.Table
             // Ends exactly at the mouse, capped at the ring's edge + MaxLineLength.
             double endDistance = Math.Min(distance, MarkerRadius + MaxLineLength);
 
-            _markerLine.X1 = _panOrigin.X + ux * MarkerRadius;
-            _markerLine.Y1 = _panOrigin.Y + uy * MarkerRadius;
-            _markerLine.X2 = _panOrigin.X + ux * endDistance;
-            _markerLine.Y2 = _panOrigin.Y + uy * endDistance;
-            _markerLine.Visibility = Visibility.Visible;
+            markerLine.X1 = _panOrigin.X + ux * MarkerRadius;
+            markerLine.Y1 = _panOrigin.Y + uy * MarkerRadius;
+            markerLine.X2 = _panOrigin.X + ux * endDistance;
+            markerLine.Y2 = _panOrigin.Y + uy * endDistance;
+            markerLine.Visibility = Visibility.Visible;
         }
 
         private void HidePanMarker()
