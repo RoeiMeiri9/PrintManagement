@@ -8,6 +8,7 @@
     xmlns:local="using:PrintManagement.Pages.CustomFilterPage.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:res="using:PrintManagement.Resources"
+    xmlns:sthelp="using:PrintManagement.Pages.CustomFilterPage.Helpers"
     xmlns:vm="using:PrintManagement.Pages.CustomFilterPage.Filters"
     d:DataContext="{d:DesignInstance Type=vm:PrinterFilterModel}"
     mc:Ignorable="d">
@@ -39,7 +40,7 @@
                             Grid.Column="1"
                             VerticalAlignment="Center"
                             FontWeight="SemiBold"
-                            Text="{x:Bind PrinterName, Mode=OneWay}"
+                            Text="{x:Bind Name, Mode=OneWay}"
                             TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </DataTemplate>
@@ -52,17 +53,28 @@
             SortPath="QueueStatus">
             <ctl:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
-                    <Border
-                        Margin="-4,0,0,0"
-                        Padding="8,3"
-                        HorizontalAlignment="Left"
-                        Background="{x:Bind QueueStatus, Mode=OneWay, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Background}"
-                        CornerRadius="12">
-                        <TextBlock
-                            FontSize="12"
-                            Foreground="{x:Bind QueueStatus, Mode=OneWay, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Foreground}"
-                            Text="{x:Bind QueueStatus, Mode=OneWay}" />
-                    </Border>
+                    <ItemsControl ItemsSource="{x:Bind QueueStatus, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="sthelp:PrinterStatusInfo">
+                                <Border
+                                    Margin="-4,0,0,0"
+                                    Padding="8,3"
+                                    HorizontalAlignment="Left"
+                                    Background="{x:Bind Flags, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Background}"
+                                    CornerRadius="12">
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{x:Bind Flags, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Foreground}"
+                                        Text="{x:Bind Status}" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </DataTemplate>
             </ctl:TableColumn.CellTemplate>
         </ctl:TableColumn>

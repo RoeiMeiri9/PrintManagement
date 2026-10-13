@@ -1,4 +1,4 @@
-﻿namespace PrintManagement.Pages.CustomFilterPage.SubPages
+﻿namespace PrintManagement.Pages.CustomFilterPage.Helpers
 {
     public enum FilterPages
     {

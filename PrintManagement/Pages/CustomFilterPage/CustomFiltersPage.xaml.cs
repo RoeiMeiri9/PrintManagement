@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Pages.CustomFilterPage.Components.TreeViewLeaf;
+using PrintManagement.Pages.CustomFilterPage.Helpers;
 using PrintManagement.Pages.CustomFilterPage.SubPages;
 using PrintManagement.Resources;
 using PrintManagement.Services;
@@ -20,6 +21,7 @@ namespace PrintManagement.Pages
         {
             InitializeComponent();
             LoadFilters();
+
         }
 
         private void LoadFilters()

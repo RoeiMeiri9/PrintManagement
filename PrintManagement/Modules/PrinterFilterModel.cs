@@ -1,11 +1,14 @@
-﻿namespace PrintManagement.Pages.CustomFilterPage.Filters
+﻿using PrintManagement.Pages.CustomFilterPage.Helpers;
+using System.Collections.Generic;
+
+namespace PrintManagement.Pages.CustomFilterPage.Filters
 {
     public partial class PrinterFilterModel : FilterModler
     {
 
-        private string _printerName = string.Empty;
-        private string _queueStatus = string.Empty;
-        private int _jobsInQueue = DEFAULT_VALUE;
+        private string _name = string.Empty;
+        private List<PrinterStatusInfo> _queueStatus = [];
+        private uint _jobsInQueue = DEFAULT_VALUE;
         private string _serverName = string.Empty;
         private string _driverName = string.Empty;
         private string _driverType = string.Empty;
@@ -16,20 +19,24 @@
         private string _location = string.Empty;
         private string _provider = string.Empty;
         private string _shareName = "<Not Shared>";
+        private string _portName = string.Empty;
+        private string _processor = string.Empty;
+        private string _dataType = string.Empty;
+        private uint _attributes = DEFAULT_VALUE;
 
-        public string PrinterName
+        public string Name
         {
-            get => _printerName;
-            set { _printerName = value; OnPropertyChanged(); }
+            get => _name;
+            set { _name = value; OnPropertyChanged(); }
         }
 
-        public string QueueStatus
+        public List<PrinterStatusInfo> QueueStatus
         {
             get => _queueStatus;
             set { _queueStatus = value; OnPropertyChanged(); }
         }
 
-        public int JobsInQueue
+        public uint JobsInQueue
         {
             get => _jobsInQueue;
             set { _jobsInQueue = value; OnPropertyChanged(); }
@@ -92,5 +99,26 @@
             get => _shareName;
             set { _shareName = value; OnPropertyChanged(); }
         }
+        public string PortName
+        {
+            get => _portName;
+            set { _portName = value; OnPropertyChanged(); }
+        }
+        public string PrintProcessor
+        {
+            get => _processor;
+            set { _processor = value; OnPropertyChanged(); }
+        }
+        public string DataType
+        {
+            get => _dataType;
+            set { _dataType = value; OnPropertyChanged(); }
+        }
+        public uint Attributes
+        {
+            get => _attributes;
+            set { _attributes = value; OnPropertyChanged(); }
+        }
+
     }
 }
