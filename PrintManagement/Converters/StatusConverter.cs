@@ -33,14 +33,13 @@ internal partial class StatusConverter : IValueConverter
                 Foreground = "SystemFillColorCautionBrush"
             },
             PrinterStatusFlags.Error or
-            PrinterStatusFlags.Offline or
             PrinterStatusFlags.PaperJam or
             PrinterStatusFlags.PaperOut => new StatusColorsNames
             {
                 Background = "StatusRedBrush",
                 Foreground = "SystemFillColorCriticalBrush"
             },
-            _ => new StatusColorsNames
+            _ => new StatusColorsNames // Offline status is grey!
             {
                 Background = "StatusDefaultBrush",
                 Foreground = "SystemFillColorSolidNeutralBrush"

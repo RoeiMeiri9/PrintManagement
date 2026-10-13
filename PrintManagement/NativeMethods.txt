@@ -4,3 +4,4 @@ PRINTER_INFO_2A
 DRIVER_INFO_6A
 OpenPrinter
 ClosePrinter
+GetPrinterDriver
