@@ -38,5 +38,10 @@ namespace PrinterManager.Resources
         // --- Table ---
         public static readonly Icons ChevronUp = new("\uE70D");
         public static readonly Icons ChevronDown = new("\uE70E");
+
+        // --- Settings ---
+        public static readonly Icons ArrowOut = new("\uE10D", Font: AppFonts.ExtendedFluentIconsFont);
+
+
     }
 }

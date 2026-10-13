@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using PrinterManager.Helpers.WindowHelpers;
 using PrinterManager.Pages;
+using PrinterManager.Pages.SettingsPage;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -61,40 +62,12 @@ namespace PrinterManager
             navFrame.Navigate(typeof(CustomFiltersPage));
         }
 
-        private void UpdateSelectedIcon(RadioMenuFlyoutItem item)
-        {
-            if (item == null) return;
-
-            if (item.Icon is FontIcon fontIcon)
-            {
-                SelectedIconPresenter.Content = new FontIcon
-                {
-                    Glyph = fontIcon.Glyph,
-                    FontFamily = fontIcon.FontFamily,
-                    FontSize = 20
-                };
-            }
-            else if (item.Icon is SymbolIcon symbolIcon)
-            {
-                SelectedIconPresenter.Content = new SymbolIcon
-                {
-                    Symbol = symbolIcon.Symbol
-                };
-            }
-        }
-
 
         // ---------------------------------------- //
         //              Event Handlers              //
         // ---------------------------------------- //
 
-        private void ViewMode_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is RadioMenuFlyoutItem item)
-            {
-                UpdateSelectedIcon(item);
-            }
-        }
+
         private void TitleBar_PaneToggleRequested(TitleBar sender, object args)
         {
             navView.IsPaneOpen = !navView.IsPaneOpen;
@@ -198,9 +171,25 @@ namespace PrinterManager
             source.SetRegionRects(NonClientRegionKind.Passthrough, rects.ToArray());
         }
 
-        private void ViewDropDownButton_Loaded(object sender, RoutedEventArgs e)
+        private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            UpdateSelectedIcon(DefaultDetailsViewItem);
+            if (args.IsSettingsSelected)
+            {
+                navFrame.Navigate(typeof(SettingsPage));
+            }
+            else
+            {
+                var selectedItem = args.SelectedItem as NavigationViewItem;
+                if (selectedItem != null)
+                {
+                    switch (selectedItem.Name.ToString())
+                    {
+                        case "CustomFilters":
+                            navFrame.Navigate(typeof(CustomFiltersPage));
+                            break;
+                    }
+                }
+            }
         }
     }
 }

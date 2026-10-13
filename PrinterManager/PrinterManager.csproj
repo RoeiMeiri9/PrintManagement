@@ -45,9 +45,11 @@
     <None Remove="Assets\Icons\Square44x44Logo.targetsize-48_altform-unplated.png" />
     <None Remove="Controls\DataTable.xaml" />
     <None Remove="CustomFiltersPage.xaml" />
+    <None Remove="Pages\CommonPageWrapper\CommonPageWrapper.xaml" />
     <None Remove="Pages\CustomFilterPage\SubPages\DriversFilter.xaml" />
     <None Remove="Pages\CustomFilterPage\SubPages\PrintersFilter.xaml" />
     <None Remove="Pages\CustomFiltersPage.xaml" />
+    <None Remove="Pages\SettingsPage\SettingsPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,6 +65,7 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
@@ -122,6 +125,12 @@
     <None Update="Assets\Icons\IconGroup51.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Page Update="Pages\CommonPageWrapper\CommonPageWrapper.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\Settings\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Pages\CustomFilterPage\SubPages\DriversFilter.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
