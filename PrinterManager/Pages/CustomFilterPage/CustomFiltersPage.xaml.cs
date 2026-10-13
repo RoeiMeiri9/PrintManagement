@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using PrinterManager.Pages.CustomFilterPage.Components.TreeViewLeaf;
 using PrinterManager.Pages.CustomFilterPage.SubPages;
 using PrinterManager.Resources;
+using PrinterManager.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,13 @@ namespace PrinterManager.Pages
 {
     public sealed partial class CustomFiltersPage : Page
     {
-
         public List<FilterLeaf> FiltersList = [];
+        public FilterLeaf? SelectedFilterLeaf;
 
         public CustomFiltersPage()
         {
             InitializeComponent();
             LoadFilters();
-            FilterSubPage.Navigate(typeof(DriversFilter));
         }
 
         private void LoadFilters()
@@ -89,28 +89,40 @@ namespace PrinterManager.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // 1. מחפשים את הפריט הרצוי מתוך הרשימה שלך (לפי שם או מפתח)
-            FilterLeaf? printersRoot = FiltersList.FirstOrDefault(f => f.Name == "Printers");
-            if (printersRoot != null)
+            string targetName = NavigationStateService.LastSelectedFilterName ?? "AllPrinters";
+
+            FilterLeaf? selectedLeaf = FindLeaf(FiltersList, targetName, FiltersTree);
+
+            if (selectedLeaf != null)
             {
-                var container = FiltersTree.ContainerFromItem(printersRoot) as TreeViewItem;
-                if (container != null)
+                FiltersTree.SelectedItem = selectedLeaf;
+            }
+        }
+        public static FilterLeaf? FindLeaf(IEnumerable<FilterLeaf> nodes, string targetName, TreeView FiltersTree)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.Name == targetName)
+                    return node;
+
+                var foundInDescendants = FindLeaf(node.Children, targetName, FiltersTree);
+                if (foundInDescendants != null)
                 {
-                    container.IsExpanded = true;
+                    var container = FiltersTree.ContainerFromItem(node) as TreeViewItem;
+                    if (container != null)
+                    {
+                        container.IsExpanded = true;
+                    }
+                    return foundInDescendants;
                 }
             }
-            FilterLeaf? defaultLeaf = printersRoot?.Children.FirstOrDefault(c => c.FilterPage == FilterPages.PrinterPage);
-            if (defaultLeaf != null)
-            {
-                FiltersTree.SelectedItem = defaultLeaf;
-            }
+            return null;
         }
 
         private void FiltersTree_SelectionChanged(TreeView sender, TreeViewSelectionChangedEventArgs e)
         {
             if (e.AddedItems.FirstOrDefault() is FilterLeaf leaf)
             {
-
                 Type? pageType = leaf.FilterPage switch
                 {
                     FilterPages.PrinterPage => typeof(PrintersFilter),
@@ -121,6 +133,7 @@ namespace PrinterManager.Pages
                 if (pageType != null)
                 {
                     FilterSubPage.Navigate(pageType, leaf);
+                    NavigationStateService.LastSelectedFilterName = leaf.Name;
                 }
             }
         }

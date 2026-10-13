@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using PrinterManager.Helpers.WindowHelpers;
-using PrinterManager.Pages;
+using PrinterManager.Pages.CommonPageWrapper;
 using PrinterManager.Pages.SettingsPage;
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,6 @@ namespace PrinterManager
         {
             InitializeComponent();
             InitializeWindow();
-            InitializeFrame();
         }
 
 
@@ -55,11 +54,6 @@ namespace PrinterManager
                 AppWindow.SetIcon(iconPath);
             else
                 System.Diagnostics.Debug.WriteLine($"Icon not found: {iconPath}");
-        }
-
-        private void InitializeFrame()
-        {
-            navFrame.Navigate(typeof(CustomFiltersPage));
         }
 
 
@@ -185,7 +179,7 @@ namespace PrinterManager
                     switch (selectedItem.Name.ToString())
                     {
                         case "CustomFilters":
-                            navFrame.Navigate(typeof(CustomFiltersPage));
+                            navFrame.Navigate(typeof(CommonPageWrapper));
                             break;
                     }
                 }
