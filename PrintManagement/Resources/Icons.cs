@@ -42,6 +42,12 @@ namespace PrintManagement.Resources
         // --- Settings ---
         public static readonly Icons ArrowOut = new("\uE10D", Font: AppFonts.ExtendedFluentIconsFont);
 
+        // --- BoolBadge ---
+        public static readonly Icons ErrorBadge12 = new("\uEDAE");
+        public static readonly Icons AcceptMedium = new("\uF78C");
+        public static readonly Icons Globe = new("\uE774");
+
+
 
     }
 }

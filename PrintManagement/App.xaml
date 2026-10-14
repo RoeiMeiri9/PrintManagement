@@ -13,6 +13,8 @@
                 <ResourceDictionary Source="/Resources/Fonts.xaml" />
                 <ResourceDictionary>
                     <conv:StatusConverter x:Key="StatusToBrushConverter" />
+                    <conv:DateConverter x:Key="DateConverter" />
+                    <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->

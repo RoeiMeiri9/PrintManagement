@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PrintManagement.Pages.CustomFilters.Filters;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -61,32 +62,6 @@ public enum DriverAttributes : uint
     CategoryCloud = 0x2000,
 }
 
-public sealed record DriverDetails(
-    string Name,
-    string Environment,
-    uint CVersion,
-    string Type,
-    string Version,
-    string Isolation,
-    string Provider,
-    string ServerName,
-    string PrintProcessor,
-    bool IsPackageAware,
-    DateTime? Date,
-    string InfPath,
-    bool IsXps,
-    string ConfigFile,
-    string DataFile,
-    string DefaultDatatype,
-    string DriverFile,
-    string HardwareId,
-    string HelpFile,
-    string LanguageMonitor,
-    string Manufacturer,
-    string OemUrl,
-    bool IsShareable,
-    DriverAttributes Attributes);
-
 // ───────────────────────── Drivers ─────────────────────────
 
 public static unsafe partial class SpoolerPrinterService
@@ -96,14 +71,14 @@ public static unsafe partial class SpoolerPrinterService
 
     // ───────────── Drivers page: all environments ─────────────
 
-    public static Task<IReadOnlyList<DriverDetails>> GetDriversAsync(string? serverName = null)
+    public static Task<IReadOnlyList<DriversFilterModel>> GetDriversAsync(string? serverName = null)
         => Task.Run(() => GetDrivers(serverName));
 
     /// <summary>Every driver on the server, across all supported architectures.</summary>
-    public static IReadOnlyList<DriverDetails> GetDrivers(string? serverName = null)
+    public static IReadOnlyList<DriversFilterModel> GetDrivers(string? serverName = null)
     {
         string displayServer = serverName ?? Environment.MachineName;
-        var all = new List<DriverDetails>();
+        var all = new List<DriversFilterModel>();
 
         foreach (string env in DriverEnvironments)
         {
@@ -112,7 +87,7 @@ public static unsafe partial class SpoolerPrinterService
                 all.AddRange(QueryBuffer(
                     (byte* buf, uint size, out uint needed, out uint count) =>
                         PInvoke.EnumPrinterDrivers(serverName, env, 8, buf, size, out needed, out count),
-                    (buf, count) => ParseDrivers(buf, count, displayServer),
+                    (buf, count) => ParseDrivers(buf, count, displayServer, IsLocalServer(serverName)),
                     []));
             }
             catch (Win32Exception ex) when (ex.NativeErrorCode == ERROR_INVALID_ENVIRONMENT)
@@ -128,7 +103,7 @@ public static unsafe partial class SpoolerPrinterService
     // ───────────── Printers page: native architecture only ─────────────
 
     /// <summary>Name → drivers map for the server's native architecture (used to resolve printers).</summary>
-    public static Dictionary<string, List<DriverDetails>> FetchDrivers(string? serverName)
+    public static Dictionary<string, List<DriversFilterModel>> FetchDrivers(string? serverName)
     {
         string displayServer = serverName ?? Environment.MachineName;
 
@@ -136,14 +111,14 @@ public static unsafe partial class SpoolerPrinterService
         var list = QueryBuffer(
             (byte* buf, uint size, out uint needed, out uint count) =>
                 PInvoke.EnumPrinterDrivers(serverName, null, 8, buf, size, out needed, out count),
-            (buf, count) => ParseDrivers(buf, count, displayServer),
+            (buf, count) => ParseDrivers(buf, count, displayServer, IsLocalServer(serverName)),
             []);
 
-        var map = new Dictionary<string, List<DriverDetails>>(StringComparer.OrdinalIgnoreCase);
+        var map = new Dictionary<string, List<DriversFilterModel>>(StringComparer.OrdinalIgnoreCase);
         foreach (var d in list)
         {
-            if (!map.TryGetValue(d.Name, out var bucket))
-                map[d.Name] = bucket = new List<DriverDetails>();
+            if (!map.TryGetValue(d.DriverName, out var bucket))
+                map[d.DriverName] = bucket = [];
             bucket.Add(d);
         }
         return map;
@@ -151,50 +126,52 @@ public static unsafe partial class SpoolerPrinterService
 
     // ───────────── Parsing ─────────────
 
-    private static List<DriverDetails> ParseDrivers(byte* buffer, uint count, string serverName)
+    private static List<DriversFilterModel> ParseDrivers(byte* buffer, uint count, string serverName, bool isLocal)
     {
-        var result = new List<DriverDetails>((int)count);
+        var result = new List<DriversFilterModel>((int)count);
         var items = (DRIVER_INFO_8*)buffer;
 
         for (uint i = 0; i < count; i++)
         {
-            var details = ToDetails(in items[i], serverName);
-            if (details.Name.Length > 0)
+            var details = ToDetails(in items[i], serverName, isLocal);
+            if (details.DriverName.Length > 0)
                 result.Add(details);
         }
         return result;
     }
 
-    private static DriverDetails ToDetails(in DRIVER_INFO_8 d, string serverName)
+    private static DriversFilterModel ToDetails(in DRIVER_INFO_8 d, string serverName, bool isLocal)
     {
         var attrs = (DriverAttributes)d.dwPrinterDriverAttributes;
         bool packageAware = attrs.HasFlag(DriverAttributes.PackageAware);
 
-        return new DriverDetails(
-            Name: Str(d.pName),
-            Environment: Str(d.pEnvironment),
-            CVersion: d.cVersion,
-            Type: FormatDriverType(d.cVersion, packageAware),
-            Version: FormatVersion(d.dwlDriverVersion),
-            Isolation: FormatIsolation(attrs),
-            Provider: Str(d.pszProvider),
-            ServerName: serverName,
-            PrintProcessor: Str(d.pszPrintProcessor),
-            IsPackageAware: packageAware,
-            Date: ToDate(d.ftDriverDate),
-            InfPath: Str(d.pszInfPath),
-            IsXps: attrs.HasFlag(DriverAttributes.Xps),
-            ConfigFile: Str(d.pConfigFile),
-            DataFile: Str(d.pDataFile),
-            DefaultDatatype: Str(d.pDefaultDataType),
-            DriverFile: Str(d.pDriverPath),
-            HardwareId: Str(d.pszHardwareID),
-            HelpFile: Str(d.pHelpFile),
-            LanguageMonitor: Str(d.pMonitorName),
-            Manufacturer: Str(d.pszMfgName),
-            OemUrl: Str(d.pszOEMUrl),
-            IsShareable: !attrs.HasFlag(DriverAttributes.NotShareable),
-            Attributes: attrs);
+        return new DriversFilterModel
+        {
+            DriverName = Str(d.pName),
+            Environment = Str(d.pEnvironment),
+            CVersion = d.cVersion,
+            Type = FormatDriverType(d.cVersion, packageAware),
+            DriverVersion = FormatVersion(d.dwlDriverVersion),
+            DriverIsolation = FormatIsolation(attrs),
+            Provider = Str(d.pszProvider),
+            ServerName = serverName,
+            IsLocal = isLocal,
+            PrintProcessor = Str(d.pszPrintProcessor),
+            Packaged = packageAware,
+            DriverDate = ToDate(d.ftDriverDate),
+            InfPath = Str(d.pszInfPath),
+            XPSDriver = attrs.HasFlag(DriverAttributes.Xps),
+            ConfigFilePath = Str(d.pConfigFile),
+            DataFilePath = Str(d.pDataFile),
+            DefaultDatatype = Str(d.pDefaultDataType),
+            DriverFilePath = Str(d.pDriverPath),
+            HardwareID = Str(d.pszHardwareID),
+            HelpFilePath = Str(d.pHelpFile),
+            LanguageMonitor = Str(d.pMonitorName),
+            Manufacturer = Str(d.pszMfgName),
+            OEMURL = Str(d.pszOEMUrl),
+            Shareable = !attrs.HasFlag(DriverAttributes.NotShareable)
+        };
     }
 
     // ───────────── Printer → driver resolution ─────────────
@@ -204,9 +181,9 @@ public static unsafe partial class SpoolerPrinterService
     /// Ambiguous (e.g. same name as both v3 and v4) → ask the spooler which
     /// driver this specific printer uses. Never guesses.
     /// </summary>
-    private static DriverDetails? ResolveDriver(
+    private static DriversFilterModel? ResolveDriver(
         string printerName, string driverName,
-        Dictionary<string, List<DriverDetails>> drivers)
+        Dictionary<string, List<DriversFilterModel>> drivers)
     {
         if (driverName.Length == 0 || !drivers.TryGetValue(driverName, out var candidates))
             return null;
@@ -217,7 +194,7 @@ public static unsafe partial class SpoolerPrinterService
         return GetExactDriver(printerName) ?? candidates.OrderByDescending(c => c.CVersion).First();
     }
 
-    private static DriverDetails? GetExactDriver(string printerName)
+    private static DriversFilterModel? GetExactDriver(string printerName)
     {
         if (!PInvoke.OpenPrinter(printerName, out var handle, null))
             return null;
@@ -234,7 +211,7 @@ public static unsafe partial class SpoolerPrinterService
                 if (!PInvoke.GetPrinterDriver(handle, null, 8, buffer, needed, out _))
                     return null;
 
-                return ToDetails(in *(DRIVER_INFO_8*)buffer, Environment.MachineName);
+                return ToDetails(in *(DRIVER_INFO_8*)buffer, Environment.MachineName, true);
             }
             finally
             {
@@ -279,4 +256,7 @@ public static unsafe partial class SpoolerPrinterService
         long ticks = ((long)(uint)ft.dwHighDateTime << 32) | (uint)ft.dwLowDateTime;
         return ticks == 0 ? null : DateTime.FromFileTimeUtc(ticks);
     }
+
+    private static bool IsLocalServer(string? serverName) =>
+        string.IsNullOrEmpty(serverName) || serverName == Environment.MachineName;
 }

@@ -19,6 +19,8 @@ namespace PrintManagement
         public App()
         {
             InitializeComponent();
+            UnhandledException += (_, e) => System.Diagnostics.Debug.WriteLine(e.Exception);
+
         }
 
         /// <summary>

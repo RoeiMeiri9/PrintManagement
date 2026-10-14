@@ -19,21 +19,24 @@ namespace PrintManagement.Pages.CustomFilters;
 public sealed partial class CustomFiltersPage : Page
 {
     public FilterLeaf? SelectedFilterLeaf;
-    private bool _isLoading;
+    private bool _isLoadingPrinters;
+    private bool _isLoadingDrivers;
     public ObservableCollection<FilterLeaf> FiltersList { get; } = [];
     public ObservableCollection<PrinterFilterModel> PrinterFiltersList { get; } = [];
+    public ObservableCollection<DriversFilterModel> DriverFiltersList { get; } = [];
 
     public CustomFiltersPage()
     {
         InitializeComponent();
         Loaded += async (_, _) => await LoadPrintersAsync();
+        Loaded += async (_, _) => await LoadDriversAsync();
     }
 
 
     private async Task LoadPrintersAsync()
     {
-        if (_isLoading) return;
-        _isLoading = true;
+        if (_isLoadingPrinters) return;
+        _isLoadingPrinters = true;
 
         try
         {
@@ -51,7 +54,32 @@ public sealed partial class CustomFiltersPage : Page
         }
         finally
         {
-            _isLoading = false;
+            _isLoadingPrinters = false;
+        }
+    }
+
+    private async Task LoadDriversAsync()
+    {
+        if (_isLoadingDrivers) return;
+        _isLoadingDrivers = true;
+
+        try
+        {
+            var drivers = await SpoolerPrinterService.GetDriversAsync();
+
+            DriverFiltersList.Clear();
+            foreach (var d in drivers)
+                DriverFiltersList.Add(d);
+
+            LoadFilters();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to load drivers: {ex}");
+        }
+        finally
+        {
+            _isLoadingDrivers = false;
         }
     }
 
@@ -114,7 +142,7 @@ public sealed partial class CustomFiltersPage : Page
             DisplayName = "All Drivers",
             LeafIcon = Icons.Filter,
             DisplayTotalItems = Visibility.Visible,
-            TotalItems = 7,
+            TotalItems = DriverFiltersList.Count,
             FilterPage = FilterPages.DriverPage
         });
 
@@ -147,7 +175,7 @@ public sealed partial class CustomFiltersPage : Page
             var foundInDescendants = FindLeaf(node.Children, targetName, FiltersTree);
             if (foundInDescendants != null)
             {
-                node.IsExpanded = true; // Expand the parent node
+                node.IsExpanded = true;
                 return foundInDescendants;
             }
         }
@@ -158,17 +186,14 @@ public sealed partial class CustomFiltersPage : Page
     {
         if (e.AddedItems.FirstOrDefault() is FilterLeaf leaf)
         {
-            Type? pageType = leaf.FilterPage switch
+            switch (leaf.FilterPage)
             {
-                FilterPages.PrinterPage => typeof(PrintersFilter),
-                FilterPages.DriverPage => typeof(DriversFilter),
-                _ => null
-            };
-
-            if (pageType != null)
-            {
-                FilterSubPage.Navigate(pageType, PrinterFiltersList);
-                NavigationStateService.LastSelectedFilterName = leaf.Name;
+                case FilterPages.PrinterPage:
+                    FilterSubPage.Navigate(typeof(PrintersFilter), PrinterFiltersList);
+                    break;
+                case FilterPages.DriverPage:
+                    FilterSubPage.Navigate(typeof(DriversFilter), DriverFiltersList);
+                    break;
             }
         }
     }

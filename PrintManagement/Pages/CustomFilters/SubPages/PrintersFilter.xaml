@@ -4,7 +4,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:comp="using:PrintManagement.Pages.CustomFilters.Comparers"
-    xmlns:ctl="using:PrintManagement.Controls.Table"
+    xmlns:ctl="using:PrintManagement.Controls"
+    xmlns:ctlTb="using:PrintManagement.Controls.Table"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hlps="using:PrintManagement.Pages.CustomFilters.Helpers"
     xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
@@ -18,16 +19,16 @@
         <comp:PrinterStatusListComparer x:Key="StatusComparer" />
     </Page.Resources>
 
-    <ctl:DataTable
+    <ctlTb:DataTable
         x:Name="PrintersTable"
         Grid.Column="2"
         ItemsSource="{x:Bind PrinterFiltersList, Mode=OneWay}">
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="237"
             Header="Printer Name"
             SortPath="Name">
-            <ctl:TableColumn.CellTemplate>
+            <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions>
@@ -48,15 +49,15 @@
                             TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </DataTemplate>
-            </ctl:TableColumn.CellTemplate>
-        </ctl:TableColumn>
+            </ctlTb:TableColumn.CellTemplate>
+        </ctlTb:TableColumn>
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="118"
             Comparer="{StaticResource StatusComparer}"
             Header="Queue Status"
             SortPath="QueueStatus">
-            <ctl:TableColumn.CellTemplate>
+            <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
                     <ItemsControl ItemsSource="{x:Bind QueueStatus, Mode=OneWay}">
                         <ItemsControl.ItemsPanel>
@@ -81,84 +82,125 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </DataTemplate>
-            </ctl:TableColumn.CellTemplate>
-        </ctl:TableColumn>
+            </ctlTb:TableColumn.CellTemplate>
+        </ctlTb:TableColumn>
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="124"
             Header="Jobs In Queue"
             Path="JobsInQueue" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="124"
             Header="Port Name"
             Path="PortName" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="221"
             Header="Server Name"
             Path="ServerName" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="227"
             Header="Driver Name"
             Path="DriverName" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="142"
             Header="Driver Version"
             Path="DriverVersion" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="173"
             Header="Driver Type"
             Path="DriverType" />
 
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="119"
             Header="Branch Office"
-            Path="BranchOffice" />
+            Path="BranchOffice">
+            <ctlTb:TableColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                    <ctl:BoolBadge
+                        FalseGlyph="{x:Bind res:Icons.Globe.Glyph}"
+                        FalseText="Server Routed"
+                        TrueText="Direct Print"
+                        Value="{x:Bind BranchOffice, Mode=OneWay}" />
+                </DataTemplate>
+            </ctlTb:TableColumn.CellTemplate>
+        </ctlTb:TableColumn>
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="112"
             Header="Comments"
             Path="Comments" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="112"
             Header="Is Shared"
-            Path="IsShared" />
+            Path="IsShared">
+            <ctlTb:TableColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                    <ctl:BoolBadge
+                        FalseText="Not Shared"
+                        TrueText="Shared"
+                        Value="{x:Bind IsShared, Mode=OneWay}" />
+                </DataTemplate>
+            </ctlTb:TableColumn.CellTemplate>
+        </ctlTb:TableColumn>
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="112"
             Header="Location"
             Path="Location" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="112"
             Header="Provider"
             Path="Provider" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="136"
             Header="Share Name"
-            Path="ShareName" />
+            Path="ShareName">
+            <ctlTb:TableColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                    <Grid
+                        Height="28"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontStyle="Italic"
+                            Foreground="{ThemeResource TemporaryTextFillColorDisabled}"
+                            Text="&lt; Not Shared &gt;"
+                            Visibility="{x:Bind IsShared, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind ShareName, Mode=OneWay}"
+                            TextTrimming="CharacterEllipsis"
+                            Visibility="{x:Bind IsShared, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=hideOnNull}" />
+                    </Grid>
+                </DataTemplate>
+            </ctlTb:TableColumn.CellTemplate>
+        </ctlTb:TableColumn>
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="136"
             Header="Print Processor"
             Path="PrintProcessor" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="136"
             Header="Data Type"
             Path="DataType" />
 
-        <ctl:TableColumn
+        <ctlTb:TableColumn
             Width="136"
             Header="Attributes"
             Path="Attributes" />
 
-    </ctl:DataTable>
+    </ctlTb:DataTable>
 </Page>

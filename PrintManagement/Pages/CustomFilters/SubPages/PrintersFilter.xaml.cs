@@ -19,12 +19,10 @@ namespace PrintManagement.Pages.CustomFilters.SubPages
         {
             base.OnNavigatedTo(e);
 
-            // בודקים שהתקבל פרמטר תקין וממירים אותו לטיפוס הרצוי שלך
             if (e.Parameter is ObservableCollection<PrinterFilterModel> receivedPrinterFiltersList)
             {
                 PrinterFiltersList = receivedPrinterFiltersList;
             }
         }
-
     }
 }

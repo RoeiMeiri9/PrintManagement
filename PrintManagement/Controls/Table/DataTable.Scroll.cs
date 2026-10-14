@@ -255,7 +255,7 @@ namespace PrintManagement.Controls.Table
         private void BuildPanMarker(Panel host)
         {
             var accent = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
-            var outerLineBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(100, 0, 0, 0));
+            var outerLineBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(60, 40, 40, 40));
             double opacity = 0.9;
             _markerRingWrapper = new Ellipse
             {

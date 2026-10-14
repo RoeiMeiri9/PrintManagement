@@ -59,7 +59,7 @@ public static unsafe partial class SpoolerPrinterService
         string? serverName = null, bool includeConnections = true)
     {
         // A driver lookup failure should not prevent listing printers.
-        Dictionary<string, List<DriverDetails>> drivers;
+        Dictionary<string, List<DriversFilterModel>> drivers;
         try
         {
             drivers = FetchDrivers(serverName);
@@ -88,7 +88,7 @@ public static unsafe partial class SpoolerPrinterService
 
     private static List<PrinterFilterModel> ParsePrinters(
         byte* buffer, uint count,
-        Dictionary<string, List<DriverDetails>> drivers,
+        Dictionary<string, List<DriversFilterModel>> drivers,
         RegistryKey? registryBase)
     {
         var result = new List<PrinterFilterModel>((int)count);
@@ -100,12 +100,13 @@ public static unsafe partial class SpoolerPrinterService
 
             string printerName = S(p.pPrinterName);
             string driverName = S(p.pDriverName);
-            DriverDetails? drv = ResolveDriver(printerName, driverName, drivers);
+            DriversFilterModel? drv = ResolveDriver(printerName, driverName, drivers);
 
             result.Add(new PrinterFilterModel
             {
                 Name = printerName,
                 ServerName = S(p.pServerName),
+                Provider = drv?.Provider ?? "Unknown",
                 ShareName = S(p.pShareName),
                 PortName = S(p.pPortName),
                 DriverName = driverName,
@@ -116,7 +117,7 @@ public static unsafe partial class SpoolerPrinterService
                 Attributes = p.Attributes,
                 QueueStatus = PrinterStatusHelper.FormatQueueStatus(p.Status),
                 JobsInQueue = p.cJobs,
-                DriverVersion = drv?.Version ?? "Unknown",
+                DriverVersion = drv?.DriverVersion ?? "Unknown",
                 DriverType = drv?.Type ?? "Unknown",
                 BranchOffice = IsBranchOffice(registryBase, printerName)
             });
