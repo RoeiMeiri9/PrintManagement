@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Page
-    x:Class="PrintManagement.Pages.CustomFilterPage.SubPages.PrintersFilter"
+    x:Class="PrintManagement.Pages.CustomFilters.SubPages.PrintersFilter"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:comp="using:PrintManagement.Pages.CustomFilterPage.Comparers"
+    xmlns:comp="using:PrintManagement.Pages.CustomFilters.Comparers"
     xmlns:ctl="using:PrintManagement.Controls.Table"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:hlps="using:PrintManagement.Pages.CustomFilterPage.Helpers"
-    xmlns:local="using:PrintManagement.Pages.CustomFilterPage.SubPages"
+    xmlns:hlps="using:PrintManagement.Pages.CustomFilters.Helpers"
+    xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:res="using:PrintManagement.Resources"
-    xmlns:vm="using:PrintManagement.Pages.CustomFilterPage.Filters"
+    xmlns:vm="using:PrintManagement.Pages.CustomFilters.Filters"
     d:DataContext="{d:DesignInstance Type=vm:PrinterFilterModel}"
     mc:Ignorable="d">
 
@@ -21,7 +21,7 @@
     <ctl:DataTable
         x:Name="PrintersTable"
         Grid.Column="2"
-        ItemsSource="{x:Bind PrinterFiltersList}">
+        ItemsSource="{x:Bind PrinterFiltersList, Mode=OneWay}">
 
         <ctl:TableColumn
             Width="237"

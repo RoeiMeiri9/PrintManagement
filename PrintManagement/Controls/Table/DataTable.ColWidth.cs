@@ -8,8 +8,25 @@ namespace PrintManagement.Controls.Table
 {
     public partial class DataTable
     {
-        // ---------- Dragging Thumb ----------
+        public static readonly DependencyProperty ThumbWithProperty =
+    DependencyProperty.Register(nameof(ThumbWith), typeof(double), typeof(DataTable),
+        new PropertyMetadata(8.0, OnThumbWidthChanged));
 
+        public double ThumbWith
+        {
+            get => (double)GetValue(ThumbWithProperty);
+            set => SetValue(ThumbWithProperty, value);
+        }
+
+        private static void OnThumbWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is DataTable table)
+            {
+                table.UpdateTotalWidth();
+            }
+        }
+
+        // ---------- Dragging Thumb ----------
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (sender is FrameworkElement { DataContext: TableColumn col })
@@ -28,7 +45,7 @@ namespace PrintManagement.Controls.Table
             private set => SetValue(TotalWidthProperty, value);
         }
 
-        private void UpdateTotalWidth() => TotalWidth = Columns.Sum(c => c.DisplayWidth);
+        private void UpdateTotalWidth() => TotalWidth = Columns.Sum(c => c.DisplayWidth) + ThumbWith;
 
         // ---------- Double Tapping Thumb ----------
         private void Thumb_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)

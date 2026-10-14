@@ -46,8 +46,8 @@
     <None Remove="Controls\DataTable.xaml" />
     <None Remove="CustomFiltersPage.xaml" />
     <None Remove="Pages\CommonPageWrapper\CommonPageWrapper.xaml" />
-    <None Remove="Pages\CustomFilterPage\SubPages\DriversFilter.xaml" />
-    <None Remove="Pages\CustomFilterPage\SubPages\PrintersFilter.xaml" />
+    <None Remove="Pages\CustomFilters\SubPages\DriversFilter.xaml" />
+    <None Remove="Pages\CustomFilters\SubPages\PrintersFilter.xaml" />
     <None Remove="Pages\CustomFiltersPage.xaml" />
     <None Remove="Pages\SettingsPage\SettingsPage.xaml" />
   </ItemGroup>
@@ -137,10 +137,10 @@
     <Page Update="Pages\Settings\SettingsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Pages\CustomFilterPage\SubPages\DriversFilter.xaml">
+    <Page Update="Pages\CustomFiltersPage\SubPages\DriversFilter.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Pages\CustomFilterPage\SubPages\PrintersFilter.xaml">
+    <Page Update="Pages\CustomFiltersPage\SubPages\PrintersFilter.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Resources\Fonts.xaml">

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Page
-    x:Class="PrintManagement.Pages.CustomFilterPage.SubPages.DriversFilter"
+    x:Class="PrintManagement.Pages.CustomFilters.SubPages.DriversFilter"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctl="using:PrintManagement.Controls.Table"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:PrintManagement.Pages.CustomFilterPage.SubPages"
+    xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:res="using:PrintManagement.Resources"
-    xmlns:vm="using:PrintManagement.Pages.CustomFilterPage.Filters"
+    xmlns:vm="using:PrintManagement.Pages.CustomFilters.Filters"
     d:DataContext="{d:DesignInstance Type=vm:PrinterFilterModel}"
     mc:Ignorable="d">
 

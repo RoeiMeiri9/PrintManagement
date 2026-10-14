@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PrintManagement.Pages.CustomFilterPage.Helpers;
+namespace PrintManagement.Pages.CustomFilters.Helpers;
 
 [Flags]
 public enum PrinterStatusFlags : uint

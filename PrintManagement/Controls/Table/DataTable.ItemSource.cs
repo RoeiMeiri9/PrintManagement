@@ -92,9 +92,21 @@ namespace PrintManagement.Controls.Table
         private void Columns_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
-                foreach (TableColumn c in e.OldItems) c.PropertyChanged -= Column_PropertyChanged;
+            {
+                foreach (TableColumn c in e.OldItems)
+                {
+                    c.PropertyChanged -= Column_PropertyChanged;
+                    c.Owner = null;
+                }
+            }
             if (e.NewItems != null)
-                foreach (TableColumn c in e.NewItems) c.PropertyChanged += Column_PropertyChanged;
+            {
+                foreach (TableColumn c in e.NewItems)
+                {
+                    c.PropertyChanged += Column_PropertyChanged;
+                    c.Owner = this;
+                }
+            }
 
             UpdateTotalWidth();
 

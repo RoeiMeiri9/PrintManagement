@@ -24,7 +24,7 @@ namespace PrintManagement.Controls.Table
         private bool _isVisible = true;
         private TableSortDirection _sortDirection = TableSortDirection.None;
         private DataTemplate? _generatedTemplate;
-
+        internal DataTable? Owner { get; set; }
         public event PropertyChangedEventHandler? PropertyChanged;
         private void Raise([CallerMemberName] string? n = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));

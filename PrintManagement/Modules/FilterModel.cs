@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace PrintManagement.Pages.CustomFilterPage.Filters
+namespace PrintManagement.Pages.CustomFilters.Filters
 {
 
     public partial class FilterModler : INotifyPropertyChanged

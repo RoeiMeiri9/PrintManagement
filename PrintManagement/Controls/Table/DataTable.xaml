@@ -5,7 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:PrintManagement.Controls.Table"
-    xmlns:prim="using:Microsoft.UI.Xaml.Controls.Primitives">
+    xmlns:prim="using:Microsoft.UI.Xaml.Controls.Primitives"
+    x:Name="RootDataTable">
 
     <UserControl.Resources>
         <Style x:Key="RoundedHeaderButtonStyle" TargetType="Button">
@@ -92,7 +93,7 @@
                 VerticalScrollBarVisibility="Disabled"
                 VerticalScrollMode="Disabled">
 
-                <ItemsControl Margin="16,8,24,8" ItemsSource="{x:Bind Columns}">
+                <ItemsControl Margin="16,10,16,8" ItemsSource="{x:Bind Columns}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" />
@@ -136,7 +137,7 @@
                                     Fill="{ThemeResource DividerStrokeColorDefaultBrush}"
                                     IsHitTestVisible="False" />
                                 <prim:Thumb
-                                    Width="8"
+                                    Width="{x:Bind Owner.ThumbWith, Mode=OneWay}"
                                     HorizontalAlignment="Right"
                                     local:ThumbCursor.ResizeCursor="True"
                                     Background="Transparent"

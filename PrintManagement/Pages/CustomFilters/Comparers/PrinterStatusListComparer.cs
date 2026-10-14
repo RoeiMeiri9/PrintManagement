@@ -1,8 +1,8 @@
-﻿using PrintManagement.Pages.CustomFilterPage.Helpers;
+﻿using PrintManagement.Pages.CustomFilters.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace PrintManagement.Pages.CustomFilterPage.Comparers;
+namespace PrintManagement.Pages.CustomFilters.Comparers;
 
 public class PrinterStatusListComparer : IComparer
 {

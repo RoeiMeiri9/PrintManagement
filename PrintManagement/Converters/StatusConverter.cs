@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
-using PrintManagement.Pages.CustomFilterPage.Helpers;
+using PrintManagement.Pages.CustomFilters.Helpers;
 using System;
 
 namespace PrintManagement.Converters;

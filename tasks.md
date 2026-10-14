@@ -2,7 +2,7 @@
 Usually (and you can see this in other project that I have in GitHub) I use issues as I should.
 This time though, this will have to do.
 
-1. Finnish the printers page
+1. [x] Finnish the printers page
 2. Dive deeper into the printer service
 3. Implement Drivers page
 4. Implement auto size for DataTable

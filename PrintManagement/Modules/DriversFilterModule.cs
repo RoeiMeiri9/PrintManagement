@@ -1,4 +1,4 @@
-﻿namespace PrintManagement.Pages.CustomFilterPage.Filters
+﻿namespace PrintManagement.Pages.CustomFilters.Filters
 {
     public partial class DriversFilterModel : FilterModler
     {
