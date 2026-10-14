@@ -5,3 +5,9 @@ DRIVER_INFO_6A
 OpenPrinter
 ClosePrinter
 GetPrinterDriver
+
+SetWindowLongPtr
+CallWindowProc
+MINMAXINFO
+WINDOW_LONG_PTR_INDEX
+WNDPROC

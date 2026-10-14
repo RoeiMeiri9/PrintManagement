@@ -45,7 +45,7 @@ namespace PrintManagement.Resources
         // --- BoolBadge ---
         public static readonly Icons ErrorBadge12 = new("\uEDAE");
         public static readonly Icons AcceptMedium = new("\uF78C");
-        public static readonly Icons Globe = new("\uE774");
+        public static readonly Icons RadioBullet = new("\uE915");
 
 
 

@@ -40,7 +40,7 @@ public sealed partial class CustomFiltersPage : Page
 
         try
         {
-            var printers = await SpoolerPrinterService.GetPrintersAsync(includeConnections: true);
+            var printers = await SpoolerService.GetPrintersAsync(includeConnections: true);
 
             PrinterFiltersList.Clear();
             foreach (var p in printers)
@@ -65,7 +65,7 @@ public sealed partial class CustomFiltersPage : Page
 
         try
         {
-            var drivers = await SpoolerPrinterService.GetDriversAsync();
+            var drivers = await SpoolerService.GetDriversAsync();
 
             DriverFiltersList.Clear();
             foreach (var d in drivers)

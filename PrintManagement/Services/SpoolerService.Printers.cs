@@ -38,7 +38,7 @@ internal struct PRINTER_INFO_2
     public uint AveragePPM;
 }
 
-public static unsafe partial class SpoolerPrinterService
+public static unsafe partial class SpoolerService
 {
     private const uint PRINTER_ENUM_LOCAL = 0x00000002;
     private const uint PRINTER_ENUM_NAME = 0x00000008;

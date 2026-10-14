@@ -15,7 +15,7 @@ public partial class PrinterFilterModel : FilterModler
     private string _driverType = string.Empty;
     private string _driverVersion = string.Empty;
     private bool _branchOffice = false;
-    private string _comment = string.Empty;
+    private string _comments = string.Empty;
     private bool _isShared = false;
     private string _location = string.Empty;
     private string _provider = string.Empty;
@@ -24,91 +24,148 @@ public partial class PrinterFilterModel : FilterModler
     private string _dataType = string.Empty;
     private uint _attributes = DEFAULT_VALUE;
 
+    /// <summary>
+    /// The name of the printer
+    /// </summary>
     public string Name
     {
         get => _name;
         set { _name = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// The status of the printer queue
+    /// </summary>
     public List<PrinterStatusInfo> QueueStatus
     {
         get => _queueStatus;
         set { _queueStatus = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// The number of jobs in the printer queue
+    /// </summary>
     public uint JobsInQueue
     {
         get => _jobsInQueue;
         set { _jobsInQueue = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// The name of the port to which the printer is connected
+    /// </summary>
     public string PortName
     {
         get => _portName;
         set { _portName = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// The name of the server hosting the printer
+    /// </summary>
     public string ServerName
     {
         get => _serverName;
         set { _serverName = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// The name of the printer driver
+    /// </summary>
     public string DriverName
     {
         get => _driverName;
         set { _driverName = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// The version of the printer driver
+    /// </summary>
     public string DriverVersion
     {
         get => _driverVersion;
         set { _driverVersion = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// The type of the printer driver
+    /// <list type="number">
+    /// <item><b>Type 3 - Kernel Mode</b> The old type, ran only on the Kernel</item>
+    /// <item><b>Type 4 - User Mode</b> Newer type, supported since Windows 8 / Windows Server 2012, running on User Mode</item>
+    /// </list>
+    /// </summary>
     public string DriverType
     {
         get => _driverType;
         set { _driverType = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// Indicates whether the printer is a branch office printer.
+    /// </summary>
     public bool BranchOffice
     {
         get => _branchOffice;
         set { _branchOffice = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// A brief description of the printer
+    /// </summary>
     public string Comments
     {
-        get => _comment;
-        set { _comment = value; OnPropertyChanged(); }
+        get => _comments;
+        set { _comments = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// Indicates whether the printer is shared on the network.
+    /// </summary>
     public bool IsShared
     {
         get => _isShared;
         set { _isShared = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// The physical location of the printer
+    /// </summary>
     public string Location
     {
         get => _location;
         set { _location = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// The name of the printer provider
+    /// </summary>
     public string Provider
     {
         get => _provider;
         set { _provider = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// The share name of the printer, if it is shared on the network.
+    /// </summary>
     public string ShareName
     {
         get => _shareName;
         set { _shareName = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// The name of the print processor used by the printer.
+    /// </summary>
     public string PrintProcessor
     {
         get => _processor;
         set { _processor = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// The type of data that the printer can process, such as RAW or EMF.
+    /// </summary>
     public string DataType
     {
         get => _dataType;

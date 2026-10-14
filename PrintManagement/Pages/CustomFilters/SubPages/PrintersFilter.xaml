@@ -125,9 +125,10 @@
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
                     <ctl:BoolBadge
-                        FalseGlyph="{x:Bind res:Icons.Globe.Glyph}"
-                        FalseText="Server Routed"
-                        TrueText="Direct Print"
+                        FalseGlyph="{x:Bind res:Icons.RadioBullet.Glyph}"
+                        FalseText="No"
+                        TrueGlyph="{x:Bind res:Icons.RadioBullet.Glyph}"
+                        TrueText="Yes"
                         Value="{x:Bind BranchOffice, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>

@@ -5,7 +5,7 @@ using Windows.Win32.Foundation;
 
 namespace PrintManagement.Services;
 
-public static unsafe partial class SpoolerPrinterService
+public static unsafe partial class SpoolerService
 {
     private const int ERROR_INSUFFICIENT_BUFFER = 122;
     private const int ERROR_INVALID_ENVIRONMENT = 1215;

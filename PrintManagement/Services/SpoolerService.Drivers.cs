@@ -64,7 +64,7 @@ public enum DriverAttributes : uint
 
 // ───────────────────────── Drivers ─────────────────────────
 
-public static unsafe partial class SpoolerPrinterService
+public static unsafe partial class SpoolerService
 {
     private static readonly string[] DriverEnvironments =
         { "Windows x64", "Windows NT x86", "Windows ARM64" };
