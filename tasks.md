@@ -3,10 +3,10 @@ Usually (and you can see this in other project that I have in GitHub) I use issu
 This time though, this will have to do.
 
 1. [x] Finnish the printers page
-2. Dive deeper into the printer service
+2. [x] Dive deeper into the printer service
 3. Implement Drivers page
 4. Implement auto size for DataTable
-5. Consider separating the Drivers Service from the Printer Service
+5. [x] Consider separating the Drivers Service from the Printer Service
 6. Fix button on title not calculated correctly when hiding the button
 7. Minimize tree view to nothing (takes too much space)
 8. Implement new views
