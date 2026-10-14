@@ -20,7 +20,7 @@
         ItemsSource="{x:Bind DriverFiltersList, Mode=OneWay}">
 
         <ctlTb:TableColumn
-            Width="468"
+            Width="Auto"
             Header="Driver Name"
             IsPrimary="True"
             Path="DriverName">
@@ -82,7 +82,7 @@
             Path="PrintProcessor" />
 
         <ctlTb:TableColumn
-            Width="112"
+            Width="Auto"
             Header="Packaged"
             Path="Packaged">
             <ctlTb:TableColumn.CellTemplate>
@@ -96,7 +96,7 @@
         </ctlTb:TableColumn>
 
         <ctlTb:TableColumn
-            Width="112"
+            Width="Auto"
             Header="Driver Date"
             Path="DriverDate">
             <ctlTb:TableColumn.CellTemplate>
@@ -107,12 +107,13 @@
         </ctlTb:TableColumn>
 
         <ctlTb:TableColumn
-            Width="795"
+            Width="Auto"
             Header="Inf Path"
+            MaxAutoWidth="800"
             Path="InfPath" />
 
         <ctlTb:TableColumn
-            Width="112"
+            Width="Auto"
             Header="XPS Driver"
             Path="XPSDriver">
             <ctlTb:TableColumn.CellTemplate>
@@ -126,12 +127,14 @@
         </ctlTb:TableColumn>
 
         <ctlTb:TableColumn
-            Width="861"
+            Width="Auto"
             Header="Config File Path"
+            MaxAutoWidth="870"
             Path="ConfigFilePath" />
 
         <ctlTb:TableColumn
-            Width="764"
+            MaxAutoWidth="800"
+            Width="Auto"
             Header="Data File Path"
             Path="DataFilePath" />
 
@@ -141,12 +144,14 @@
             Path="DefaultDatatype" />
 
         <ctlTb:TableColumn
-            Width="814"
+            Width="Auto"
+            MaxAutoWidth="870"
             Header="Driver File Path"
             Path="DriverFilePath" />
 
         <ctlTb:TableColumn
-            Width="331"
+            Width="Auto"
+            MaxAutoWidth="400"
             Header="Hardware I D"
             Path="HardwareID" />
 
@@ -171,7 +176,7 @@
             Path="OEMURL" />
 
         <ctlTb:TableColumn
-            Width="112"
+            Width="Auto"
             Header="Shareable"
             Path="Shareable">
             <ctlTb:TableColumn.CellTemplate>

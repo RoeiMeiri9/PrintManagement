@@ -22,6 +22,7 @@ public sealed partial class DataTable : UserControl
     public DataTable()
     {
         InitializeComponent();
+        Loaded += OnTableLoaded();
         Columns.CollectionChanged += Columns_CollectionChanged;
     }
 }

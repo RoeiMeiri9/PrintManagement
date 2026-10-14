@@ -26,6 +26,35 @@ namespace PrintManagement.Controls.Table
             }
         }
 
+        private RoutedEventHandler OnTableLoaded()
+        {
+            return (sender, e) =>
+            {
+                foreach (var column in Columns)
+                {
+                    if (string.Equals(column.Width, "Auto", StringComparison.OrdinalIgnoreCase))
+                    {
+                        double calculatedWidth = GetMaxWidth(column);
+
+                        if (column.MaxAutoWidth.HasValue && calculatedWidth > column.MaxAutoWidth.Value)
+                        {
+                            calculatedWidth = column.MaxAutoWidth.Value;
+                        }
+
+                        column.ActualWidth = calculatedWidth;
+                    }
+                    else if (double.TryParse(column.Width, out double parsedWidth))
+                    {
+                        column.ActualWidth = parsedWidth;
+                    }
+                    else
+                    {
+                        column.ActualWidth = MinWidth;
+                    }
+                }
+            };
+        }
+
         // ---------- Dragging Thumb ----------
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
@@ -52,7 +81,7 @@ namespace PrintManagement.Controls.Table
         {
             if (sender is FrameworkElement { DataContext: TableColumn col })
             {
-                col.Width = GetMaxWidth(col);
+                col.ActualWidth = GetMaxWidth(col);
             }
         }
 

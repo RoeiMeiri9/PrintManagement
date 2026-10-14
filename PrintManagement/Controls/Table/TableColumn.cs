@@ -19,8 +19,9 @@ namespace PrintManagement.Controls.Table
 
     public partial class TableColumn : INotifyPropertyChanged
     {
-
+        private string _importedWidth = "Auto";
         private double _width = 150;
+        private double? _maxAutoWidth;
         private bool _isVisible = true;
         private TableSortDirection _sortDirection = TableSortDirection.None;
         private DataTemplate? _generatedTemplate;
@@ -43,10 +44,38 @@ namespace PrintManagement.Controls.Table
         /// <summary>Optional custom cell. Its DataContext is the whole row item.</summary>
         public DataTemplate? CellTemplate { get; set; }
 
-        public double Width
+        public String Width
+        {
+            get => _importedWidth;
+            set
+            {
+                if (!string.Equals(value, "Auto", StringComparison.OrdinalIgnoreCase) &&
+            !double.TryParse(value, out _))
+                {
+                    throw new ArgumentException($"Invalid column width value: '{value}'. Must be 'Auto' or a valid number.");
+                }
+                _importedWidth = value; Raise(); Raise(nameof(DisplayWidth));
+            }
+        }
+
+        /// The actual width of the column, which may be different from Width if Width is "Auto"
+        public double ActualWidth
         {
             get => _width;
-            set { _width = value; Raise(); Raise(nameof(DisplayWidth)); }
+            set
+            {
+                if (value < MinWidth) value = MinWidth;
+                if (_width == value) return;
+                _width = value;
+                Raise();
+                Raise(nameof(DisplayWidth));
+            }
+        }
+
+        public double? MaxAutoWidth
+        {
+            get => _maxAutoWidth;
+            set { _maxAutoWidth = value; Raise(); }
         }
 
         public bool IsVisible
@@ -59,7 +88,7 @@ namespace PrintManagement.Controls.Table
         public double DisplayWidth => _isVisible ? _width : 0;
         public Visibility CellVisibility => _isVisible ? Visibility.Visible : Visibility.Collapsed;
 
-        internal void Resize(double delta) => Width = Math.Max(MinWidth, _width + delta);
+        internal void Resize(double delta) => ActualWidth = Math.Max(MinWidth, _width + delta);
 
         // ---------- cell template ----------
 

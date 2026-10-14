@@ -25,7 +25,7 @@
         ItemsSource="{x:Bind PrinterFiltersList, Mode=OneWay}">
 
         <ctlTb:TableColumn
-            Width="237"
+            Width="Auto"
             Header="Printer Name"
             SortPath="Name">
             <ctlTb:TableColumn.CellTemplate>
@@ -53,7 +53,7 @@
         </ctlTb:TableColumn>
 
         <ctlTb:TableColumn
-            Width="118"
+            Width="Auto"
             Comparer="{StaticResource StatusComparer}"
             Header="Queue Status"
             SortPath="QueueStatus">
@@ -91,8 +91,9 @@
             Path="JobsInQueue" />
 
         <ctlTb:TableColumn
-            Width="124"
+            Width="Auto"
             Header="Port Name"
+            MaxAutoWidth="450"
             Path="PortName" />
 
         <ctlTb:TableColumn
@@ -101,8 +102,9 @@
             Path="ServerName" />
 
         <ctlTb:TableColumn
-            Width="227"
+            Width="Auto"
             Header="Driver Name"
+            MaxAutoWidth="450"
             Path="DriverName" />
 
         <ctlTb:TableColumn
@@ -117,7 +119,7 @@
 
 
         <ctlTb:TableColumn
-            Width="119"
+            Width="Auto"
             Header="Branch Office"
             Path="BranchOffice">
             <ctlTb:TableColumn.CellTemplate>
@@ -137,7 +139,7 @@
             Path="Comments" />
 
         <ctlTb:TableColumn
-            Width="112"
+            Width="Auto"
             Header="Is Shared"
             Path="IsShared">
             <ctlTb:TableColumn.CellTemplate>
@@ -151,8 +153,9 @@
         </ctlTb:TableColumn>
 
         <ctlTb:TableColumn
-            Width="112"
+            Width="Auto"
             Header="Location"
+            MaxAutoWidth="450"
             Path="Location" />
 
         <ctlTb:TableColumn
@@ -161,7 +164,7 @@
             Path="Provider" />
 
         <ctlTb:TableColumn
-            Width="136"
+            Width="Auto"
             Header="Share Name"
             Path="ShareName">
             <ctlTb:TableColumn.CellTemplate>
