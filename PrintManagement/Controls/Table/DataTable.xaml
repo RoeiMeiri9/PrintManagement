@@ -9,7 +9,7 @@
     x:Name="RootDataTable">
 
     <UserControl.Resources>
-        <Style x:Key="RoundedHeaderButtonStyle" TargetType="Button">
+        <Style x:Key="HeaderCellStyle" TargetType="ContentControl">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
@@ -21,7 +21,7 @@
 
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
+                    <ControlTemplate TargetType="ContentControl">
                         <ContentPresenter
                             x:Name="ContentPresenter"
                             Padding="{TemplateBinding Padding}"
@@ -86,6 +86,8 @@
             <ScrollViewer
                 x:Name="HeaderScroller"
                 Grid.Row="0"
+                AllowDrop="True"
+                DragOver="HeaderScroller_DragOver"
                 HorizontalScrollBarVisibility="Hidden"
                 HorizontalScrollMode="Disabled"
                 IsTabStop="False"
@@ -102,13 +104,32 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="local:TableColumn">
-                            <Grid Width="{x:Bind DisplayWidth, Mode=OneWay}" Visibility="{x:Bind CellVisibility, Mode=OneWay}">
-                                <Button
+                            <Grid
+                                Width="{x:Bind DisplayWidth, Mode=OneWay}"
+                                AllowDrop="True"
+                                DragLeave="Header_DragLeave"
+                                DragOver="Header_DragOver"
+                                Drop="Header_Drop"
+                                Opacity="{x:Bind HeaderOpacity, Mode=OneWay}"
+                                Visibility="{x:Bind CellVisibility, Mode=OneWay}">
+                                <!--
+                                    Not a Button: a Button handles the press and captures the pointer,
+                                    so the framework never starts a drag from it.
+                                -->
+                                <ContentControl
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
-                                    Click="Header_Click"
-                                    IsEnabled="{x:Bind CanSort}"
-                                    Style="{StaticResource RoundedHeaderButtonStyle}">
+                                    CanDrag="{x:Bind CanReorder}"
+                                    DragStarting="Header_DragStarting"
+                                    DropCompleted="Header_DropCompleted"
+                                    PointerCanceled="HeaderCell_PointerExited"
+                                    PointerCaptureLost="HeaderCell_PointerExited"
+                                    PointerEntered="HeaderCell_PointerEntered"
+                                    PointerExited="HeaderCell_PointerExited"
+                                    PointerPressed="HeaderCell_PointerPressed"
+                                    PointerReleased="HeaderCell_PointerReleased"
+                                    Style="{StaticResource HeaderCellStyle}"
+                                    Tapped="Header_Click">
                                     <Grid ColumnSpacing="6">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
@@ -129,7 +150,7 @@
                                             Glyph="{x:Bind SortGlyph, Mode=OneWay}"
                                             Visibility="{x:Bind SortIndicatorVisibility, Mode=OneWay}" />
                                     </Grid>
-                                </Button>
+                                </ContentControl>
                                 <Rectangle
                                     Width="1"
                                     Margin="0,6"
@@ -139,10 +160,23 @@
                                 <prim:Thumb
                                     Width="{x:Bind Owner.ThumbWith, Mode=OneWay}"
                                     HorizontalAlignment="Right"
-                                    local:ThumbCursor.ResizeCursor="True"
                                     Background="Transparent"
                                     DoubleTapped="Thumb_DoubleTapped"
                                     DragDelta="Thumb_DragDelta" />
+
+                                <!--  Drop indicators, shown while another column is dragged over this one  -->
+                                <Rectangle
+                                    Width="2"
+                                    HorizontalAlignment="Left"
+                                    Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                                    IsHitTestVisible="False"
+                                    Visibility="{x:Bind DropBeforeVisibility, Mode=OneWay}" />
+                                <Rectangle
+                                    Width="2"
+                                    HorizontalAlignment="Right"
+                                    Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                                    IsHitTestVisible="False"
+                                    Visibility="{x:Bind DropAfterVisibility, Mode=OneWay}" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

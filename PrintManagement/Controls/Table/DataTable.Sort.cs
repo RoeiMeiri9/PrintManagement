@@ -14,7 +14,7 @@ namespace PrintManagement.Controls.Table
 
         private void Header_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not FrameworkElement { DataContext: TableColumn col }) return;
+            if (sender is not FrameworkElement { DataContext: TableColumn col } || !col.CanSort) return;
 
             col.SortDirection = col.SortDirection switch
             {

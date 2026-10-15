@@ -91,6 +91,14 @@ namespace PrintManagement.Controls.Table
         // ---------- Columns ----------
         private void Columns_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            // a reorder: same columns, new order. Just move each row's cell; no rebuild, same total width.
+            if (e.Action == NotifyCollectionChangedAction.Move)
+            {
+                foreach (var row in _all)
+                    row.MoveCell(e.OldStartingIndex, e.NewStartingIndex);
+                return;
+            }
+
             if (e.OldItems != null)
             {
                 foreach (TableColumn c in e.OldItems)

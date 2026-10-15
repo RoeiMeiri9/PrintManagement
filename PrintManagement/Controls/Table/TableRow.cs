@@ -11,16 +11,21 @@ namespace PrintManagement.Controls.Table;
 /// <summary>One row of the table: the original item plus one cell per column.</summary>
 public sealed class TableRow
 {
+    // observable at runtime, so the row's ItemsControl follows a column being moved
+    private readonly ObservableCollection<TableCell> _cells;
+
     internal TableRow(DataTable table, object item)
     {
         Table = table;
         Item = item;
-        Cells = [.. table.Columns.Select(c => new TableCell(c, item))];
+        _cells = [.. table.Columns.Select(c => new TableCell(c, item))];
     }
 
     public DataTable Table { get; }
     public object Item { get; }
-    public IReadOnlyList<TableCell> Cells { get; }
+    public IReadOnlyList<TableCell> Cells => _cells;
+
+    internal void MoveCell(int oldIndex, int newIndex) => _cells.Move(oldIndex, newIndex);
 }
 
 /// <summary>Pairs a column with the row item, so a cell template can see both.</summary>
