@@ -25,8 +25,13 @@ public static unsafe partial class SpoolerService
             return empty;
 
         int err = Marshal.GetLastWin32Error();
+
+        if (err == 0 && needed > 0)
+            err = ERROR_INSUFFICIENT_BUFFER;
+
         if (err != ERROR_INSUFFICIENT_BUFFER)
             throw new Win32Exception(err);
+
 
         for (int attempt = 0; attempt < 5; attempt++)
         {

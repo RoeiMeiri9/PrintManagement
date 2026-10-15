@@ -88,7 +88,13 @@
         <ctlTb:TableColumn
             Width="124"
             Header="Jobs In Queue"
-            Path="JobsInQueue" />
+            Path="JobsInQueue">
+            <ctlTb:TableColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                    <TextBlock Foreground="{x:Bind JobsInQueue, Converter={StaticResource JobsCounterConverter}}" Text="{x:Bind JobsInQueue, Mode=OneWay}" />
+                </DataTemplate>
+            </ctlTb:TableColumn.CellTemplate>
+        </ctlTb:TableColumn>
 
         <ctlTb:TableColumn
             Width="Auto"
@@ -100,6 +106,11 @@
             Width="221"
             Header="Server Name"
             Path="ServerName" />
+
+        <ctlTb:TableColumn
+            Width="Auto"
+            Header="Connection Summary"
+            Path="ConnectionSummary" />
 
         <ctlTb:TableColumn
             Width="Auto"
@@ -125,9 +136,7 @@
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
                     <ctl:BoolBadge
-                        FalseGlyph="{x:Bind res:Icons.RadioBullet.Glyph}"
                         FalseText="No"
-                        TrueGlyph="{x:Bind res:Icons.RadioBullet.Glyph}"
                         TrueText="Yes"
                         Value="{x:Bind BranchOffice, Mode=OneWay}" />
                 </DataTemplate>
@@ -200,11 +209,6 @@
             Width="136"
             Header="Data Type"
             Path="DataType" />
-
-        <ctlTb:TableColumn
-            Width="136"
-            Header="Attributes"
-            Path="Attributes" />
 
     </ctlTb:DataTable>
 </Page>

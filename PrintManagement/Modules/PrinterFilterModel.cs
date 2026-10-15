@@ -1,11 +1,11 @@
 ﻿using PrintManagement.Pages.CustomFilters.Helpers;
+using PrintManagement.Services;
 using System.Collections.Generic;
 
 namespace PrintManagement.Pages.CustomFilters.Filters;
 
 public partial class PrinterFilterModel : FilterModler
 {
-
     private string _name = string.Empty;
     private List<PrinterStatusInfo> _queueStatus = [];
     private uint _jobsInQueue = DEFAULT_VALUE;
@@ -23,6 +23,8 @@ public partial class PrinterFilterModel : FilterModler
     private string _processor = string.Empty;
     private string _dataType = string.Empty;
     private uint _attributes = DEFAULT_VALUE;
+    private string _connectionSummary = string.Empty;
+    private string _connectionKind = string.Empty;
 
     /// <summary>
     /// The name of the printer
@@ -171,10 +173,35 @@ public partial class PrinterFilterModel : FilterModler
         get => _dataType;
         set { _dataType = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// A smart summary of the printer connection type (e.g. Local USB, Direct IP, Branch-Office, Server Shared, or Virtual/Fax).
+    /// </summary>
+    public string ConnectionSummary
+    {
+        get => _connectionSummary;
+        set { _connectionSummary = value; OnPropertyChanged(); }
+    }
+
+    #region internal-only properties
+    /// <summary>
+    /// The kind of connection the printer uses (e.g. Local, Network, USB, Virtual, etc.).<br />
+    /// This is a more technical classification than ConnectionSummary, used internaly and not shown.
+    /// </summary>
+    public string ConnectionKind
+    {
+        get => _connectionKind;
+        set { _connectionKind = value; OnPropertyChanged(); }
+    }
+
+    /// <summary>
+    /// The attributes of the printer, represented as a bitmask of flags.<br />
+    /// Used internally for filtering and not shown to the user. See <see cref="PrinterAttributesMask"/> for the possible flags.
+    /// </summary>
     public uint Attributes
     {
         get => _attributes;
         set { _attributes = value; OnPropertyChanged(); }
     }
-
+    #endregion
 }

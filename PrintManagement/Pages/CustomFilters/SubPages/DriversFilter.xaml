@@ -119,8 +119,8 @@
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:DriversFilterModel">
                     <ctl:BoolBadge
-                        FalseText="Not Supports"
-                        TrueText="Supports"
+                        FalseText="Not Supported"
+                        TrueText="Supported"
                         Value="{x:Bind XPSDriver, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
@@ -133,9 +133,9 @@
             Path="ConfigFilePath" />
 
         <ctlTb:TableColumn
-            MaxAutoWidth="800"
             Width="Auto"
             Header="Data File Path"
+            MaxAutoWidth="800"
             Path="DataFilePath" />
 
         <ctlTb:TableColumn
@@ -145,14 +145,14 @@
 
         <ctlTb:TableColumn
             Width="Auto"
-            MaxAutoWidth="870"
             Header="Driver File Path"
+            MaxAutoWidth="870"
             Path="DriverFilePath" />
 
         <ctlTb:TableColumn
             Width="Auto"
-            MaxAutoWidth="400"
             Header="Hardware I D"
+            MaxAutoWidth="400"
             Path="HardwareID" />
 
         <ctlTb:TableColumn

@@ -5,6 +5,7 @@ DRIVER_INFO_6A
 OpenPrinter
 ClosePrinter
 GetPrinterDriver
+EnumPorts
 
 SetWindowLongPtr
 CallWindowProc

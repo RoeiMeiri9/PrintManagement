@@ -31,9 +31,10 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Padding="8,8,2,8">
+            <StackPanel Grid.Column="0" >
                 <TreeView
                     x:Name="FiltersTree"
+                    Margin="4,7,-3,8"
                     ItemsSource="{x:Bind FiltersList, Mode=OneWay}"
                     SelectionChanged="FiltersTree_SelectionChanged">
                     <TreeView.ItemTemplate>
