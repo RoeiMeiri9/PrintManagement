@@ -18,20 +18,25 @@
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
             TargetType="TextBlock">
             <Style.Setters>
-                <Setter Property="Margin" Value="1,30,0,6" />
+                <Setter Property="Margin" Value="1,20,0,6" />
             </Style.Setters>
         </Style>
     </Page.Resources>
-    <ScrollViewer>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
             <StackPanel
                 MaxWidth="1000"
+                Padding="26,20,26,0"
                 HorizontalAlignment="Stretch"
                 Spacing="{StaticResource SettingsCardSpacing}">
                 <win:StackPanel.ChildrenTransitions>
                     <win:EntranceThemeTransition FromVerticalOffset="50" />
                     <win:RepositionThemeTransition IsStaggeringEnabled="False" />
                 </win:StackPanel.ChildrenTransitions>
+                <TextBlock
+                    Margin="0,0,0,2"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="Settings" />
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="View" />
                 <controls:SettingsCard Description="Show a visual indicator on screen when scrolling with the middle mouse button." Header="Scroll direction indicator">
                     <controls:SettingsCard.HeaderIcon>

@@ -7,10 +7,7 @@
     xmlns:res="using:PrintManagement.Resources"
     mc:Ignorable="d">
 
-    <Window.SystemBackdrop>
-        <MicaBackdrop Kind="Base" />
-    </Window.SystemBackdrop>
-    <Grid>
+    <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -88,7 +85,9 @@
                     Icon="Print"
                     Tag="DeployedPrintersPage" />
             </NavigationView.MenuItems>
-            <Frame x:Name="navFrame" Grid.Row="1" />
+            <Grid x:Name="ContentGrid">
+                <Frame x:Name="navFrame" Grid.Row="1" />
+            </Grid>
         </NavigationView>
     </Grid>
 </Window>
