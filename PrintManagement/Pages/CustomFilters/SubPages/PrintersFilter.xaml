@@ -22,6 +22,7 @@
     <ctlTb:DataTable
         x:Name="PrintersTable"
         Grid.Column="2"
+        CompactView="{x:Bind IsCompact, Mode=OneWay}"
         ItemsSource="{x:Bind PrinterFiltersList, Mode=OneWay}">
 
         <ctlTb:TableColumn
@@ -179,10 +180,7 @@
             Path="ShareName">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
-                    <Grid
-                        Height="28"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch">
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                         <TextBlock
                             VerticalAlignment="Center"
                             FontStyle="Italic"

@@ -26,7 +26,7 @@ namespace PrintManagement.Controls.Table
             }
         }
 
-        private RoutedEventHandler OnTableLoaded()
+        private RoutedEventHandler OnTableLoaded_SetAutoWidth()
         {
             return (sender, e) =>
             {

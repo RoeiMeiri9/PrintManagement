@@ -57,7 +57,7 @@ namespace PrintManagement
             else
             {
                 SystemBackdrop = new DesktopAcrylicBackdrop();
-                MainGrid.Background = new SolidColorBrush(Color.FromArgb(60, 100, 100, 100)); // Dark gray background for acrylic
+                MainGrid.Background = new SolidColorBrush(Color.FromArgb(60, 56, 56, 56)); // Dark gray background for acrylic
                 ContentGrid.Background = new SolidColorBrush(Color.FromArgb(10, 250, 250, 250)); // Dark gray background for acrylic
             }
         }

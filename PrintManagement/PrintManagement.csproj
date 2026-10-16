@@ -25,6 +25,8 @@
     <Content Remove="Assets\Icons\BadgeLogo.scale-150.png" />
     <Content Remove="Assets\Icons\BadgeLogo.scale-200.png" />
     <Content Remove="Assets\Icons\BadgeLogo.scale-400.png" />
+    <Content Remove="Assets\Icons\CustomIconSet\CompactView.svg" />
+    <Content Remove="Assets\Icons\CustomIconSet\CompactViewOpt2.svg" />
     <Content Remove="Assets\Icons\Fonts\FluentSystemIcons-Regular.ttf" />
     <Content Remove="Assets\Icons\IconGroup51.ico" />
   </ItemGroup>
@@ -125,6 +127,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Assets\Icons\CustomIconSet\CompactView.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Icons\CustomIconSet\CompactViewOpt2.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Icons\Fonts\FluentSystemIcons-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

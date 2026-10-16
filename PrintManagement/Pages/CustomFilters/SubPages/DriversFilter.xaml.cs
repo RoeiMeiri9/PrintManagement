@@ -1,26 +1,38 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using PrintManagement.Pages.CustomFilters.Filters;
+using PrintManagement.Services;
 using System.Collections.ObjectModel;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using System.ComponentModel;
 
 namespace PrintManagement.Pages.CustomFilters.SubPages;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
-public sealed partial class DriversFilter : Page
+public sealed partial class DriversFilter : Page, INotifyPropertyChanged
 {
     public ObservableCollection<DriversFilterModel> DriverFiltersList { get; set; } = [];
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public bool _isCompact = false;
+    public bool IsCompact
+    {
+        get => _isCompact;
+        set
+        {
+            if (_isCompact != value)
+            {
+                _isCompact = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCompact)));
+            }
+        }
+    }
 
     public DriversFilter()
     {
         InitializeComponent();
+        Loaded += DriversFilter_Loaded;
+        Unloaded += DriversFilter_Unloaded;
     }
-
-
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -30,5 +42,21 @@ public sealed partial class DriversFilter : Page
         {
             DriverFiltersList = receivedDriverFiltersList;
         }
+    }
+
+    private void DriversFilter_Loaded(object sender, RoutedEventArgs e)
+    {
+        ViewDDSettingsService.CompactViewChanged += OnViewModeChanged;
+        IsCompact = ViewDDSettingsService.IsCompactView;
+    }
+
+    private void DriversFilter_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewDDSettingsService.CompactViewChanged -= OnViewModeChanged;
+    }
+
+    private void OnViewModeChanged(object? sender, bool isCompactView)
+    {
+        IsCompact = isCompactView;
     }
 }

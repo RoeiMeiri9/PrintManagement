@@ -200,7 +200,9 @@
                 <ListView.ItemContainerStyle>
                     <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Left" />
-                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="Padding" Value="5" />
+                        <Setter Property="MinHeight" Value="10" />
                     </Style>
                 </ListView.ItemContainerStyle>
 
@@ -208,6 +210,7 @@
                     <DataTemplate x:DataType="local:TableRow">
                         <ItemsControl
                             Width="{x:Bind Table.TotalWidth, Mode=OneWay}"
+                            Margin="0,0"
                             Padding="0,6"
                             HorizontalAlignment="Left"
                             IsTabStop="False"

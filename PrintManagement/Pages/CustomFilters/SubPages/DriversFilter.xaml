@@ -17,6 +17,7 @@
     <ctlTb:DataTable
         x:Name="PrintersTable"
         Grid.Column="2"
+        CompactView="{x:Bind IsCompact, Mode=OneWay}"
         ItemsSource="{x:Bind DriverFiltersList, Mode=OneWay}">
 
         <ctlTb:TableColumn

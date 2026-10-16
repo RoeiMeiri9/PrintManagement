@@ -22,7 +22,8 @@ public sealed partial class DataTable : UserControl
     public DataTable()
     {
         InitializeComponent();
-        Loaded += OnTableLoaded();
+        Loaded += OnTableLoaded_SetAutoWidth();
+        Loaded += OnTableLoaded_ApplyCompactViewStyle();
         Columns.CollectionChanged += Columns_CollectionChanged;
     }
 }

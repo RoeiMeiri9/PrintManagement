@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Pages.CustomFilters;
+using PrintManagement.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,6 +27,7 @@ public sealed partial class CommonPageWrapper : Page
     private void ViewDropDownButton_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateSelectedIcon(DefaultDetailsViewItem);
+        CompactViewToggleItem.IsChecked = ViewDDSettingsService.IsCompactView;
     }
 
     private void UpdateSelectedIcon(RadioMenuFlyoutItem item)
@@ -47,6 +49,14 @@ public sealed partial class CommonPageWrapper : Page
             {
                 Symbol = symbolIcon.Symbol
             };
+        }
+    }
+
+    private void ToggleMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is ToggleMenuFlyoutItem toggleItem)
+        {
+            ViewDDSettingsService.IsCompactView = toggleItem.IsChecked;
         }
     }
 }
