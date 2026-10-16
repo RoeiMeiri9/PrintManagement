@@ -84,7 +84,6 @@
                             <MenuFlyoutSeparator />
 
                             <MenuFlyoutSubItem Text="Customize...">
-                                <MenuFlyoutItem Icon="AllApps" Text="Add/Remove Columns..." />
                                 <ToggleMenuFlyoutItem
                                     x:Name="CompactViewToggleItem"
                                     Click="ToggleMenuFlyoutItem_Click"
