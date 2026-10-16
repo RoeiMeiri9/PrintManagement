@@ -125,7 +125,9 @@ public sealed partial class BoolBadge : Control
         {
             DisplayText = string.IsNullOrEmpty(TrueText) ? "True" : TrueText;
             Glyph = string.IsNullOrEmpty(TrueGlyph) ? (Icons.AcceptMedium.Glyph ?? string.Empty) : TrueGlyph;
-            GlyphFontFamily = Icons.AcceptMedium.Font ?? new FontFamily("Segoe Fluent Icons"); Application.Current.Resources.TryGetValue("StatusGreenBrush", out var backgroundBrush);
+            GlyphFontFamily = Icons.AcceptMedium.Font;
+
+            Application.Current.Resources.TryGetValue("StatusGreenBrush", out var backgroundBrush);
             BackgroundBrush = backgroundBrush as Brush ?? new SolidColorBrush(Microsoft.UI.Colors.LightGreen);
 
             Application.Current.Resources.TryGetValue("SystemFillColorSuccessBrush", out var foregroundBrush);
@@ -135,7 +137,9 @@ public sealed partial class BoolBadge : Control
         {
             DisplayText = string.IsNullOrEmpty(FalseText) ? "False" : FalseText;
             Glyph = string.IsNullOrEmpty(FalseGlyph) ? (Icons.ErrorBadge12.Glyph ?? string.Empty) : FalseGlyph;
-            GlyphFontFamily = Icons.ErrorBadge12.Font ?? new FontFamily("Segoe Fluent Icons"); Application.Current.Resources.TryGetValue("StatusDefaultBrush", out var backgroundBrush);
+            GlyphFontFamily = Icons.ErrorBadge12.Font;
+
+            Application.Current.Resources.TryGetValue("StatusDefaultBrush", out var backgroundBrush);
             BackgroundBrush = backgroundBrush as Brush ?? new SolidColorBrush(Microsoft.UI.Colors.MistyRose);
 
             Application.Current.Resources.TryGetValue("SystemFillColorSolidNeutralBrush", out var foregroundBrush);

@@ -45,7 +45,11 @@
 
                     <DropDownButton.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Icon="Add" Text="Add/Remove Columns..." />
+                            <MenuFlyoutItem Text="Add/Remove Columns...">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="{x:Bind res:Icons.Add.Font}" Glyph="{x:Bind res:Icons.Add.Glyph}" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
 
                             <MenuFlyoutSeparator />
 
@@ -61,14 +65,20 @@
                             <RadioMenuFlyoutItem
                                 Click="ViewMode_Click"
                                 GroupName="ViewMode"
-                                Icon="ViewAll"
-                                Text="Small Icons" />
+                                Text="Small Icons">
+                                <RadioMenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="{x:Bind res:Icons.ViewAll.Font}" Glyph="{x:Bind res:Icons.ViewAll.Glyph}" />
+                                </RadioMenuFlyoutItem.Icon>
+                            </RadioMenuFlyoutItem>
 
                             <RadioMenuFlyoutItem
                                 Click="ViewMode_Click"
                                 GroupName="ViewMode"
-                                Icon="AllApps"
-                                Text="List" />
+                                Text="List">
+                                <RadioMenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="{x:Bind res:Icons.AllApps.Font}" Glyph="{x:Bind res:Icons.AllApps.Glyph}" />
+                                </RadioMenuFlyoutItem.Icon>
+                            </RadioMenuFlyoutItem>
 
                             <RadioMenuFlyoutItem
                                 x:Name="DefaultDetailsViewItem"
@@ -102,7 +112,7 @@
                     BorderBrush="Transparent"
                     BorderThickness="0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="{x:Bind res:Icons.Clear.Glyph}" />
+                        <FontIcon FontFamily="{x:Bind res:Icons.Clear.Font}" Glyph="{x:Bind res:Icons.Clear.Glyph}" />
                         <TextBlock
                             Margin="0,-1,8,1"
                             VerticalAlignment="Center"
@@ -115,7 +125,7 @@
                     BorderBrush="Transparent"
                     BorderThickness="0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="{x:Bind res:Icons.Export.Glyph}" />
+                        <FontIcon FontFamily="{x:Bind res:Icons.Export.Font}" Glyph="{x:Bind res:Icons.Export.Glyph}" />
                         <TextBlock
                             Margin="0,-1,8,1"
                             VerticalAlignment="Center"
@@ -133,28 +143,40 @@
                     Background="Transparent"
                     BorderBrush="Transparent"
                     BorderThickness="0">
-                    <FontIcon FontSize="14" Glyph="{x:Bind res:Icons.Refresh.Glyph}" />
+                    <FontIcon
+                        FontFamily="{x:Bind res:Icons.Refresh.Font}"
+                        FontSize="14"
+                        Glyph="{x:Bind res:Icons.Refresh.Glyph}" />
                 </Button>
                 <Button
                     Height="36"
                     Background="Transparent"
                     BorderBrush="Transparent"
                     BorderThickness="0">
-                    <FontIcon FontSize="14" Glyph="{x:Bind res:Icons.Up.Glyph}" />
+                    <FontIcon
+                        FontFamily="{x:Bind res:Icons.Up.Font}"
+                        FontSize="14"
+                        Glyph="{x:Bind res:Icons.Up.Glyph}" />
                 </Button>
                 <Button
                     Height="36"
                     Background="Transparent"
                     BorderBrush="Transparent"
                     BorderThickness="0">
-                    <FontIcon FontSize="14" Glyph="{x:Bind res:Icons.Back.Glyph}" />
+                    <FontIcon
+                        FontFamily="{x:Bind res:Icons.Back.Font}"
+                        FontSize="14"
+                        Glyph="{x:Bind res:Icons.Back.Glyph}" />
                 </Button>
                 <Button
                     Height="36"
                     Background="Transparent"
                     BorderBrush="Transparent"
                     BorderThickness="0">
-                    <FontIcon FontSize="14" Glyph="{x:Bind res:Icons.Forward.Glyph}" />
+                    <FontIcon
+                        FontFamily="{x:Bind res:Icons.Forward.Font}"
+                        FontSize="14"
+                        Glyph="{x:Bind res:Icons.Forward.Glyph}" />
                 </Button>
             </StackPanel>
         </Grid>

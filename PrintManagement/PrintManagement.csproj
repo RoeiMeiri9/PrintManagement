@@ -31,6 +31,7 @@
     <Content Remove="Assets\Icons\IconGroup51.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\Fonts\Segoe Fluent Icons.ttf" />
     <None Remove="Assets\Icons\Square44x44Logo.targetsize-16.png" />
     <None Remove="Assets\Icons\Square44x44Logo.targetsize-16_altform-lightunplated.png" />
     <None Remove="Assets\Icons\Square44x44Logo.targetsize-16_altform-unplated.png" />
@@ -80,6 +81,9 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Assets\Fonts\FluentSystemIcons-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\Icons\Square44x44Logo.targetsize-16.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -127,6 +131,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Assets\Fonts\Segoe Fluent Icons.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Update="Assets\Icons\CustomIconSet\CompactView.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -149,9 +156,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Pages\CustomFiltersPage\SubPages\PrintersFilter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Resources\Fonts.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Resources\Themes.xaml">
@@ -192,7 +196,7 @@
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 		<PackageCertificateThumbprint>FB49A78C49890379B215CA235E42686456882ADF</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
 		<GenerateTestArtifacts>False</GenerateTestArtifacts>
 		<AppxBundle>Never</AppxBundle>
 		<HoursBetweenUpdateChecks>24</HoursBetweenUpdateChecks>

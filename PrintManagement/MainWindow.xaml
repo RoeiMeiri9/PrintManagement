@@ -43,7 +43,7 @@
                         Click="SearchIconButton_Click"
                         Style="{StaticResource SubtleButtonStyle}"
                         Visibility="Collapsed">
-                        <FontIcon Glyph="{x:Bind res:Icons.Search.Glyph}" />
+                        <FontIcon FontFamily="{x:Bind res:Icons.Search.Font}" Glyph="{x:Bind res:Icons.Search.Glyph}" />
                     </Button>
                     <AutoSuggestBox
                         x:Name="TitleBarSearchBox"
@@ -51,8 +51,14 @@
                         MaxWidth="600"
                         VerticalAlignment="Center"
                         LostFocus="TitleBarSearchBox_LostFocus"
-                        PlaceholderText="Search for printers, drivers, forms, etc..."
-                        QueryIcon="Find" />
+                        PlaceholderText="Search for printers, drivers, forms, etc...">
+                        <AutoSuggestBox.QueryIcon>
+                            <FontIcon
+                                FontFamily="{x:Bind res:Icons.Search.Font}"
+                                FontSize="12"
+                                Glyph="{x:Bind res:Icons.Search.Glyph}" />
+                        </AutoSuggestBox.QueryIcon>
+                    </AutoSuggestBox>
                 </Grid>
             </TitleBar.Content>
         </TitleBar>
@@ -69,23 +75,29 @@
                 <NavigationViewItem
                     x:Name="CustomFilters"
                     Content="Custom Filters"
-                    Icon="Filter"
-                    Tag="CustomFiltersPage" />
+                    Tag="CustomFiltersPage">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{x:Bind res:Icons.Filter.Font}" Glyph="{x:Bind res:Icons.Filter.Glyph}" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem
                     x:Name="PrinterServers"
                     Content="Printer Servers"
                     Tag="PrinterServersPage">
                     <NavigationViewItem.Icon>
-                        <FontIcon Glyph="{x:Bind res:Icons.NetworkPrinter.Glyph}" />
+                        <FontIcon FontFamily="{x:Bind res:Icons.NetworkPrinter.Font}" Glyph="{x:Bind res:Icons.NetworkPrinter.Glyph}" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem
                     x:Name="DeployedPrinters"
                     Content="Deployed Printers"
-                    Icon="Print"
-                    Tag="DeployedPrintersPage" />
+                    Tag="DeployedPrintersPage">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{x:Bind res:Icons.Printer.Font}" Glyph="{x:Bind res:Icons.Printer.Glyph}" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
-            <Grid x:Name="ContentGrid">
+            <Grid x:Name="ContentGrid" CornerRadius="7,0,0,0">
                 <Frame x:Name="navFrame" Grid.Row="1" />
             </Grid>
         </NavigationView>

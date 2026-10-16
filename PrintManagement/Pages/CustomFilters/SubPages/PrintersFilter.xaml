@@ -39,6 +39,7 @@
 
                         <FontIcon
                             Grid.Column="0"
+                            FontFamily="{x:Bind res:Icons.Printer.Font}"
                             FontSize="16"
                             Glyph="{x:Bind res:Icons.Printer.Glyph}" />
 

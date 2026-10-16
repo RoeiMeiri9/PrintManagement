@@ -11,7 +11,7 @@
   <Identity
     Name="09a1f3a2-14d7-42c3-9e3b-b03f98e87b3b"
     Publisher="CN=roeim"
-    Version="1.0.0.0" />
+    Version="1.0.5.0" />
 
   <mp:PhoneIdentity PhoneProductId="09a1f3a2-14d7-42c3-9e3b-b03f98e87b3b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

@@ -31,7 +31,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" >
+            <StackPanel Grid.Column="0">
                 <TreeView
                     x:Name="FiltersTree"
                     Margin="4,7,-3,8"
@@ -53,7 +53,7 @@
                                         <!--  Note! FontFamily MUST stay with the old Binding and NOT be using the newer x:Bind  -->
                                         <FontIcon
                                             Grid.Column="0"
-                                            FontFamily="{Binding LeafIcon.Font, Mode=OneWay, TargetNullValue={StaticResource SymbolThemeFontFamily}}"
+                                            FontFamily="{Binding LeafIcon.Font, Mode=OneWay}"
                                             FontSize="16"
                                             Glyph="{x:Bind LeafIcon.Glyph, Mode=OneWay}" />
                                         <TextBlock

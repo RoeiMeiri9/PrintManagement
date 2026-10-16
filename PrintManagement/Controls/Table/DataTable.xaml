@@ -145,6 +145,7 @@
 
                                         <FontIcon
                                             Grid.Column="1"
+                                            FontFamily="{StaticResource SegoeFluentFont}"
                                             FontSize="10"
                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                             Glyph="{x:Bind SortGlyph, Mode=OneWay}"

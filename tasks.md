@@ -7,9 +7,11 @@ This time though, this will have to do.
 3.  [x] Implement Drivers page
 4.  [x] Implement auto size for DataTable
 5.  [x] Consider separating the Drivers Service from the Printer Service
-6.  [ ] Format all columns in printers page
-7.  [ ] Clean up naming conventions
-8.  [ ] Fix button on title not calculated correctly when hiding the button
-9.  [ ] Minimize tree view to nothing (takes too much space)
-10. [ ] Implement new views
-11. [ ] Add rest of the tasks... if you have some more time left to finnish this product :/s
+6.  [x] Format all columns in printers page
+7.  [x] Implement Compact View
+8.  [x] Support Windows 10 - Acrylic done, icons done.
+9.  [ ] Clean up naming conventions
+10. [ ] Fix button on title not calculated correctly when hiding the button
+11. [ ] Minimize tree view to nothing (takes too much space)
+12. [ ] Implement new views
+13. [ ] Add rest of the tasks... if you have some more time left to finnish this product :/s
