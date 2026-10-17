@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 
@@ -69,41 +69,54 @@ public static unsafe partial class SpoolerService
     private const uint PRINTER_ENUM_NAME = 0x00000008;
     private const uint PRINTER_ENUM_CONNECTIONS = 0x00000004;
     private const string PrintersRegistryPath = @"SYSTEM\CurrentControlSet\Control\Print\Printers";
-    private const string BranchOfficeValueName = "BranchOfficeEnabled";
+    private const string BranchOfficeValueName = "EnableBranchOfficePrinting";
 
     // ───────────── Printers: public API ─────────────
-
-    public static Task<IReadOnlyList<PrinterFilterModel>> GetPrintersAsync(
-        string? serverName = null, bool includeConnections = true)
-        => Task.Run(() => GetPrinters(serverName, includeConnections));
 
     /// <param name="serverName">null = local machine, otherwise e.g. "\\\\PRINTSRV".</param>
     public static IReadOnlyList<PrinterFilterModel> GetPrinters(
         string? serverName = null, bool includeConnections = true)
     {
+
         Dictionary<string, List<DriversFilterModel>> drivers;
         try
         {
             drivers = FetchDrivers(serverName);
+            Logger.Log($"drivers fetched: {drivers.Count}");
         }
         catch (Win32Exception ex)
         {
-            Debug.WriteLine($"Driver enumeration failed: {ex.Message}");
+            Logger.Log($"Driver enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
             drivers = new(StringComparer.OrdinalIgnoreCase);
         }
 
         uint flags = serverName is null
             ? PRINTER_ENUM_LOCAL | (includeConnections ? PRINTER_ENUM_CONNECTIONS : 0)
             : PRINTER_ENUM_NAME;
+        Logger.Log($"GetPrinters server='{serverName ?? "<null>"}' flags=0x{flags:X}");
 
-        using var registryBase = serverName is null ? OpenPrintersRegistryKey() : null;
+
+        using var registryBase = OpenPrintersRegistryKey(serverName);
+        if (registryBase is null)
+            Logger.Log($"Printers registry key unavailable for '{serverName ?? "<local>"}'; Branch Office will show false.");
         var ports = FetchPorts(serverName);
 
-        return QueryBuffer<IReadOnlyList<PrinterFilterModel>>(
+        try
+        {
+            var result = QueryBuffer<IReadOnlyList<PrinterFilterModel>>(
             (byte* buf, uint size, out uint needed, out uint count) =>
                 PInvoke.EnumPrinters(flags, serverName, 2, buf, size, out needed, out count),
-            (buf, count) => ParsePrinters(buf, count, drivers, ports, registryBase),
+            (buf, count) => ParsePrinters(buf, count, drivers, ports, registryBase, remote: serverName is not null),
             []);
+            Logger.Log($"printers returned: {result.Count}");
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"EXCEPTION {ex.GetType().Name}: {ex.Message}" +
+                (ex is Win32Exception w ? $" (Win32 {w.NativeErrorCode})" : ""));
+            throw;
+        }
     }
 
     // ───────────── Printers: parsing ─────────────
@@ -112,7 +125,7 @@ public static unsafe partial class SpoolerService
      byte* buffer, uint count,
      Dictionary<string, List<DriversFilterModel>> drivers,
      Dictionary<string, PortDetails> ports,
-     RegistryKey? registryBase)
+     RegistryKey? registryBase, bool remote)
     {
 
         var result = new List<PrinterFilterModel>((int)count);
@@ -121,22 +134,35 @@ public static unsafe partial class SpoolerService
         for (uint i = 0; i < count; i++)
         {
             ref readonly PRINTER_INFO_2 p = ref items[i];
+            string rawName = S(p.pPrinterName);
+            string serverRawName = S(p.pServerName);
+            bool isNetworkConnection = (p.Attributes & PRINTER_ATTRIBUTE_NETWORK) != 0;
 
-            string printerName = S(p.pPrinterName);
+            // Enumerating a remote server returns "\\SRV\Printer"; show it as the MMC does.
+            string printerName =
+                remote && serverRawName.Length > 0 &&
+                rawName.StartsWith(serverRawName + "\\", StringComparison.OrdinalIgnoreCase)
+                ? rawName[(serverRawName.Length + 1)..]
+                : rawName;
+
             string driverName = S(p.pDriverName);
-            string serverName = S(p.pServerName);
+            string serverDisplayName = FormatServerName(serverRawName);
             string portName = S(p.pPortName);
-            DriversFilterModel? drv = ResolveDriver(printerName, driverName, drivers);
+            DriversFilterModel? drv = ResolveDriver(rawName, serverRawName, driverName, drivers);  // raw name: it needs the qualified form
             bool isBranchOffice = IsBranchOffice(registryBase, printerName);
 
-            var (kind, summary) = DetermineConnection(p.Attributes, printerName, serverName, portName, driverName, isBranchOffice, ports);
+            var (kind, summary) = DetermineConnection(p.Attributes, printerName, serverRawName, portName, driverName, isBranchOffice, ports, remote);
+
+            Logger.Log($"printerName: {printerName}, serverName: {serverRawName}, formattedServerName: {serverDisplayName}, attributes: {p.Attributes}");
+
 
             result.Add(new PrinterFilterModel
             {
                 Name = printerName,
-                ServerName = serverName,
+                ServerName = serverDisplayName,
                 Provider = drv?.Provider ?? "Unknown",
                 ShareName = S(p.pShareName),
+                IsShared = (p.Attributes & (uint)PrinterAttributesMask.Shared) != 0,
                 PortName = portName,
                 DriverName = driverName,
                 Comments = S(p.pComment),
@@ -215,7 +241,7 @@ public static unsafe partial class SpoolerService
         }
         catch (Win32Exception ex)
         {
-            Debug.WriteLine($"Port enumeration failed: {ex.Message}");
+            Logger.Log($"Port enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
         }
         return map;
     }
@@ -224,7 +250,7 @@ public static unsafe partial class SpoolerService
 
     private static (ConnectionKind Kind, string Summary) DetermineConnection(
         uint attributes, string printerName, string serverName, string portName, string driverName,
-        bool branchOffice, Dictionary<string, PortDetails> ports)
+        bool branchOffice, Dictionary<string, PortDetails> ports, bool remoteServer)
     {
         // 1. Unambiguous attribute flags
         if ((attributes & PRINTER_ATTRIBUTE_FAX) != 0) return (ConnectionKind.Fax, "Fax");
@@ -232,8 +258,9 @@ public static unsafe partial class SpoolerService
         if ((attributes & PRINTER_ATTRIBUTE_TS) != 0) return (ConnectionKind.RemoteDesktop, "Remote Desktop (redirected)");
 
         // 2. Connection to a print server (\\server\printer)
-        bool isConnection = printerName.StartsWith(@"\\", StringComparison.Ordinal)
-                            || ((attributes & PRINTER_ATTRIBUTE_NETWORK) != 0 && serverName.Length > 0);
+        bool isConnection = !remoteServer &&
+    (printerName.StartsWith(@"\\", StringComparison.Ordinal)
+     || ((attributes & PRINTER_ATTRIBUTE_NETWORK) != 0 && serverName.Length > 0));
         if (isConnection)
         {
             return branchOffice
@@ -288,16 +315,20 @@ public static unsafe partial class SpoolerService
 
     // ───────────── Branch office ─────────────
 
-    private static RegistryKey? OpenPrintersRegistryKey()
+    private static RegistryKey? OpenPrintersRegistryKey(string? serverName)
     {
         try
         {
-            using var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            using var hklm = string.IsNullOrWhiteSpace(serverName)
+                ? RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                : RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine,
+                      serverName.TrimStart('\\'), RegistryView.Registry64);
             return hklm.OpenSubKey(PrintersRegistryPath);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
+                                       or System.Security.SecurityException)
         {
-            Debug.WriteLine($"Cannot open printers registry key: {ex.Message}");
+            Logger.Log($"Cannot open printers registry key on '{serverName ?? "<local>"}': {ex.GetType().Name}: {ex.Message}");
             return null;
         }
     }
@@ -309,7 +340,7 @@ public static unsafe partial class SpoolerService
 
         try
         {
-            using var key = printersKey.OpenSubKey(printerName);
+            using var key = printersKey.OpenSubKey($@"{printerName}\PrinterDriverData");
             return key?.GetValue(BranchOfficeValueName) is int v && v == 1;
         }
         catch (Exception ex)

@@ -10,7 +10,6 @@ namespace PrintManagement.Pages.CustomFilters.Filters
         private string _driverIsolation = string.Empty;
         private string _provider = string.Empty;
         private string _serverName = string.Empty;
-        private bool _isLocal = false;
         private string _printProcessor = string.Empty;
         private bool _packaged = false;
         private DateTime? _driverDate = null;
@@ -85,15 +84,6 @@ namespace PrintManagement.Pages.CustomFilters.Filters
         {
             get => _serverName;
             set { _serverName = value; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Indicates whether the printer driver is installed on the local computer. <br />
-        /// </summary>
-        public bool IsLocal
-        {
-            get => _isLocal;
-            set { _isLocal = value; OnPropertyChanged(); }
         }
 
         /// <summary>

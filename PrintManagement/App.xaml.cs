@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using PrintManagement.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -20,7 +21,7 @@ namespace PrintManagement
         {
             InitializeComponent();
             UnhandledException += (_, e) => System.Diagnostics.Debug.WriteLine(e.Exception);
-
+            SpoolerService.Credentials = ("printtest", "WIN-HO9KT6LB37V", "Aa123456@#$fg");
         }
 
         /// <summary>

@@ -40,7 +40,7 @@ public sealed partial class CustomFiltersPage : Page
 
         try
         {
-            var printers = await SpoolerService.GetPrintersAsync(includeConnections: true);
+            var printers = await SpoolerService.GetPrintersAsync(serverName: @"\\WIN-HO9KT6LB37V", includeConnections: true);
 
             PrinterFiltersList.Clear();
             foreach (var p in printers)
@@ -51,6 +51,7 @@ public sealed partial class CustomFiltersPage : Page
         catch (Exception ex)
         {
             Debug.WriteLine($"Failed to load printers: {ex}");
+            Logger.Log($"Failed to load printers: {ex}");
         }
         finally
         {
@@ -65,7 +66,7 @@ public sealed partial class CustomFiltersPage : Page
 
         try
         {
-            var drivers = await SpoolerService.GetDriversAsync();
+            var drivers = await SpoolerService.GetDriversAsync(serverName: @"\\WIN-HO9KT6LB37V");
 
             DriverFiltersList.Clear();
             foreach (var d in drivers)

@@ -1,11 +1,11 @@
-﻿using PrintManagement.Pages.CustomFilters.Filters;
+﻿using Microsoft.Win32;
+using PrintManagement.Pages.CustomFilters.Filters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Windows.Win32;
 
 namespace PrintManagement.Services;
@@ -56,10 +56,7 @@ public enum DriverAttributes : uint
     CategoryFile = 0x0080,
     CategoryVirtual = 0x0100,
     CategoryService = 0x0200,
-    SoftResetRequired = 0x0400,
-    SandboxDisabled = 0x0800,
-    Category3D = 0x1000,
-    CategoryCloud = 0x2000,
+    SoftResetRequired = 0x0400
 }
 
 // ───────────────────────── Drivers ─────────────────────────
@@ -71,29 +68,26 @@ public static unsafe partial class SpoolerService
 
     // ───────────── Drivers page: all environments ─────────────
 
-    public static Task<IReadOnlyList<DriversFilterModel>> GetDriversAsync(string? serverName = null)
-        => Task.Run(() => GetDrivers(serverName));
-
     /// <summary>Every driver on the server, across all supported architectures.</summary>
     public static IReadOnlyList<DriversFilterModel> GetDrivers(string? serverName = null)
     {
-        string displayServer = serverName ?? Environment.MachineName;
         var all = new List<DriversFilterModel>();
-
+        IsolationConfig? cfg = ReadIsolationConfig(serverName);
         foreach (string env in DriverEnvironments)
         {
             try
             {
+                // If serverName (injectd into the pName variable) is NULL, the function enumerates the local printer drivers.
                 all.AddRange(QueryBuffer(
                     (byte* buf, uint size, out uint needed, out uint count) =>
                         PInvoke.EnumPrinterDrivers(serverName, env, 8, buf, size, out needed, out count),
-                    (buf, count) => ParseDrivers(buf, count, displayServer, IsLocalServer(serverName)),
+                    (buf, count) => ParseDrivers(buf, count, serverName, cfg),
                     []));
             }
             catch (Win32Exception ex) when (ex.NativeErrorCode == ERROR_INVALID_ENVIRONMENT)
             {
                 // This server doesn't support that architecture; skip it.
-                Debug.WriteLine($"Environment '{env}' not supported on '{displayServer}'.");
+                Logger.Log($"Environment '{env}' not supported on '{serverName ?? "<local>"}'.");
             }
         }
 
@@ -105,13 +99,13 @@ public static unsafe partial class SpoolerService
     /// <summary>Name → drivers map for the server's native architecture (used to resolve printers).</summary>
     public static Dictionary<string, List<DriversFilterModel>> FetchDrivers(string? serverName)
     {
-        string displayServer = serverName ?? Environment.MachineName;
+        IsolationConfig? cfg = ReadIsolationConfig(serverName);
 
-        // environment = null → the server's native architecture only.
+        // If serverName (injectd into the pName variable) is NULL, the function enumerates the local printer drivers.
         var list = QueryBuffer(
             (byte* buf, uint size, out uint needed, out uint count) =>
                 PInvoke.EnumPrinterDrivers(serverName, null, 8, buf, size, out needed, out count),
-            (buf, count) => ParseDrivers(buf, count, displayServer, IsLocalServer(serverName)),
+            (buf, count) => ParseDrivers(buf, count, serverName, cfg),
             []);
 
         var map = new Dictionary<string, List<DriversFilterModel>>(StringComparer.OrdinalIgnoreCase);
@@ -126,36 +120,36 @@ public static unsafe partial class SpoolerService
 
     // ───────────── Parsing ─────────────
 
-    private static List<DriversFilterModel> ParseDrivers(byte* buffer, uint count, string serverName, bool isLocal)
+    private static List<DriversFilterModel> ParseDrivers(byte* buffer, uint count, string? serverName, IsolationConfig? cfg)
     {
         var result = new List<DriversFilterModel>((int)count);
         var items = (DRIVER_INFO_8*)buffer;
 
         for (uint i = 0; i < count; i++)
         {
-            var details = ToDetails(in items[i], serverName, isLocal);
+            var details = ToDetails(in items[i], serverName, cfg);
             if (details.DriverName.Length > 0)
                 result.Add(details);
         }
         return result;
     }
 
-    private static DriversFilterModel ToDetails(in DRIVER_INFO_8 d, string serverName, bool isLocal)
+    private static DriversFilterModel ToDetails(in DRIVER_INFO_8 d, string? serverName, IsolationConfig? cfg)
     {
         var attrs = (DriverAttributes)d.dwPrinterDriverAttributes;
+        string driverName = Str(d.pName);
         bool packageAware = attrs.HasFlag(DriverAttributes.PackageAware);
 
         return new DriversFilterModel
         {
-            DriverName = Str(d.pName),
+            DriverName = driverName,
             Environment = Str(d.pEnvironment),
             CVersion = d.cVersion,
             Type = FormatDriverType(d.cVersion, packageAware),
             DriverVersion = FormatVersion(d.dwlDriverVersion),
-            DriverIsolation = FormatIsolation(attrs),
+            DriverIsolation = FormatIsolation(driverName, attrs, cfg),
             Provider = Str(d.pszProvider),
-            ServerName = serverName,
-            IsLocal = isLocal,
+            ServerName = FormatServerName(serverName),
             PrintProcessor = Str(d.pszPrintProcessor),
             Packaged = packageAware,
             DriverDate = ToDate(d.ftDriverDate),
@@ -182,23 +176,27 @@ public static unsafe partial class SpoolerService
     /// driver this specific printer uses. Never guesses.
     /// </summary>
     private static DriversFilterModel? ResolveDriver(
-        string printerName, string driverName,
-        Dictionary<string, List<DriversFilterModel>> drivers)
+    string printerName, string rawServer, string driverName,
+    Dictionary<string, List<DriversFilterModel>> drivers)
     {
         if (driverName.Length == 0 || !drivers.TryGetValue(driverName, out var candidates))
             return null;
-
         if (candidates.Count == 1)
             return candidates[0];
 
-        return GetExactDriver(printerName) ?? candidates.OrderByDescending(c => c.CVersion).First();
+        return GetExactDriver(printerName, rawServer, candidates)
+               ?? candidates.OrderByDescending(c => c.CVersion).First();
     }
 
-    private static DriversFilterModel? GetExactDriver(string printerName)
+    private static DriversFilterModel? GetExactDriver(
+        string printerName, string rawServer, List<DriversFilterModel> candidates)
     {
-        if (!PInvoke.OpenPrinter(printerName, out var handle, null))
-            return null;
+        // Qualify the name so a remote printer isn't opened on the local spooler.
+        string target = rawServer.Length > 0 && !printerName.StartsWith(@"\\")
+            ? $@"{rawServer}\{printerName}" : printerName;
 
+        if (!PInvoke.OpenPrinter(target, out var handle, null))
+            return null;
         try
         {
             PInvoke.GetPrinterDriver(handle, null, 8, null, 0, out uint needed);
@@ -211,17 +209,15 @@ public static unsafe partial class SpoolerService
                 if (!PInvoke.GetPrinterDriver(handle, null, 8, buffer, needed, out _))
                     return null;
 
-                return ToDetails(in *(DRIVER_INFO_8*)buffer, Environment.MachineName, true);
+                ref readonly DRIVER_INFO_8 d = ref *(DRIVER_INFO_8*)buffer;
+                string env = Str(d.pEnvironment);
+                uint ver = d.cVersion;
+                return candidates.FirstOrDefault(c => c.CVersion == ver &&
+                    string.Equals(c.Environment, env, StringComparison.OrdinalIgnoreCase));
             }
-            finally
-            {
-                NativeMemory.Free(buffer);
-            }
+            finally { NativeMemory.Free(buffer); }
         }
-        finally
-        {
-            handle.Dispose();
-        }
+        finally { handle.Dispose(); }
     }
 
     // ───────────── Formatting rules (one place each) ─────────────
@@ -236,17 +232,66 @@ public static unsafe partial class SpoolerService
         return $"Type {cVersion} - {(userMode ? "User Mode" : "Kernel Mode")}";
     }
 
-    /// <summary>
-    /// UNVERIFIED proxy. Print Management shows None / Shared / Isolated. I derive it from
-    /// the SANDBOX_ENABLED / SANDBOX_DISABLED attribute bits; compare against the MMC
-    /// on your Server 2025 VM and adjust here if they differ.
-    /// </summary>
-    private static string FormatIsolation(DriverAttributes attrs)
+    private const string PrintKey = @"SYSTEM\CurrentControlSet\Control\Print";
+    private const string GroupsValue = "PrintDriverIsolationGroups";
+    private const string PolicyKey = @"SOFTWARE\Policies\Microsoft\Windows NT\Printers";
+    private const string PolicyExec = "PrintDriverIsolationExecutionPolicy";      // TODO: VERIFY
+    private const string PolicyOverride = "PrintDriverIsolationOverrideCompat";   // TODO: VERIFY
+
+    internal sealed record IsolationConfig(
+        List<HashSet<string>> Groups, bool IsolationEnabled, bool OverrideCompat);
+
+    private static IsolationConfig? ReadIsolationConfig(string? serverName)
     {
-        if (attrs.HasFlag(DriverAttributes.SandboxDisabled)) return "None";
-        if (attrs.HasFlag(DriverAttributes.SandboxEnabled)) return "Isolated";
-        return "Shared";
+        try
+        {
+            using var hklm = string.IsNullOrWhiteSpace(serverName)
+                ? RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                : RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine,
+                      serverName.TrimStart('\\'), RegistryView.Registry64);
+
+            var groups = new List<HashSet<string>>();
+            using (var key = hklm.OpenSubKey(PrintKey))
+            {
+                if (key?.GetValue(GroupsValue) is string raw && raw.Length > 0)
+                    foreach (string g in raw.Split(@"\\"))
+                        groups.Add(new HashSet<string>(
+                            g.Split('\\', StringSplitOptions.RemoveEmptyEntries),
+                            StringComparer.OrdinalIgnoreCase));
+            }
+
+            bool enabled = true, overrideCompat = false;
+            using (var pol = hklm.OpenSubKey(PolicyKey))
+            {
+                if (pol?.GetValue(PolicyExec) is int e) enabled = e != 0;
+                if (pol?.GetValue(PolicyOverride) is int o) overrideCompat = o != 0;
+            }
+            Logger.Log($"isolation config '{serverName ?? "<local>"}': groups={groups.Count}, enabled={enabled}, overrideCompat={overrideCompat}");
+            return new IsolationConfig(groups, enabled, overrideCompat);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
+                                       or System.Security.SecurityException)
+        {
+            Logger.Log($"Isolation config unavailable for '{serverName}': {ex.GetType().Name}: {ex.Message}");
+            return null;
+        }
     }
+
+    private static string FormatIsolation(string driverName, DriverAttributes attrs, IsolationConfig? cfg)
+    {
+        if (cfg is null) return "Unknown";
+        if (!cfg.IsolationEnabled) return "None";                    // GP: machine disabled
+
+        for (int i = 0; i < cfg.Groups.Count; i++)                   // per-driver mode set
+            if (cfg.Groups[i].Contains(driverName))
+                return i == 0 ? "None" : i == 1 ? "Shared" : "Isolated";
+
+        // Not set: INF compat (0x4 as proxy) → Shared; else the override policy decides.
+        // NOTE: the 0x4 = "INF DriverIsolation=2" mapping is untested. No driver with this flag was
+        // available on the test servers (all isolatable drivers there were v3 without 0x4).
+        return attrs.HasFlag(DriverAttributes.SandboxEnabled) || cfg.OverrideCompat ? "Shared" : "None";
+    }
+
 
     private static string FormatVersion(ulong v) =>
         $"{(v >> 48) & 0xFFFF}.{(v >> 32) & 0xFFFF}.{(v >> 16) & 0xFFFF}.{v & 0xFFFF}";
@@ -256,7 +301,4 @@ public static unsafe partial class SpoolerService
         long ticks = ((long)(uint)ft.dwHighDateTime << 32) | (uint)ft.dwLowDateTime;
         return ticks == 0 ? null : DateTime.FromFileTimeUtc(ticks);
     }
-
-    private static bool IsLocalServer(string? serverName) =>
-        string.IsNullOrEmpty(serverName) || serverName == Environment.MachineName;
 }
