@@ -9,7 +9,7 @@ namespace PrintManagement.Pages.SettingsPage;
 public sealed partial class SettingsPage : Page
 {
     public string AppName => Package.Current.DisplayName;
-    private PackageVersion AppVersion => Package.Current.Id.Version;
+    private static PackageVersion AppVersion => Package.Current.Id.Version;
     public string appVersion;
 
     public SettingsPage()
@@ -20,12 +20,29 @@ public sealed partial class SettingsPage : Page
     }
     private void LoadSettings()
     {
-        bool isEnabled = SettingsService.ReadSetting(Settings.ScrollIndicatorSetting.Value, false);
-        ScrollIndicatorToggle.IsOn = isEnabled;
+        ScrollIndicatorToggle.IsOn = SettingsService.ReadSetting(Settings.ScrollIndicatorSetting.Value, Settings.ScrollIndicatorSetting.defaultValue);
+        UseISODateFormatToggle.IsOn = SettingsService.ReadSetting(Settings.UseISODateFormatSetting.Value, Settings.UseISODateFormatSetting.defaultValue);
+        WriteTrueFalseLowercaseToggle.IsOn = SettingsService.ReadSetting(Settings.WriteTrueFalseLowercaseSetting.Value, Settings.WriteTrueFalseLowercaseSetting.defaultValue);
+        ShowNotSharedToggle.IsOn = SettingsService.ReadSetting(Settings.ShowNotSharedSetting.Value, Settings.ShowNotSharedSetting.defaultValue);
     }
 
     private void ScrollIndicatorToggle_Toggled(object sender, RoutedEventArgs e)
     {
         SettingsService.SaveSetting(Settings.ScrollIndicatorSetting.Value, ScrollIndicatorToggle.IsOn);
+    }
+
+    private void UseISODateFormatToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        SettingsService.SaveSetting(Settings.UseISODateFormatSetting.Value, UseISODateFormatToggle.IsOn);
+    }
+
+    private void WriteTrueFalseLowercaseToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        SettingsService.SaveSetting(Settings.WriteTrueFalseLowercaseSetting.Value, WriteTrueFalseLowercaseToggle.IsOn);
+    }
+
+    private void ShowNotSharedToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        SettingsService.SaveSetting(Settings.ShowNotSharedSetting.Value, ShowNotSharedToggle.IsOn);
     }
 }

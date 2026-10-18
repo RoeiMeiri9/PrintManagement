@@ -49,6 +49,9 @@ public class Icons(string glyph, FontFamily? font = null)
 
     // --- Settings ---
     public static readonly Icons ArrowOut = new("\uE10D", font: ExtendedSegoeFluentFont);
+    public static readonly Icons Calendar = new("\uE787");
+    public static readonly Icons TextChangeCaseRegular = new("\uF7B3", font: ExtendedSegoeFluentFont);
+    public static readonly Icons CodeRegular = new("\uF2F0", font: ExtendedSegoeFluentFont);
 
     // --- BoolBadge ---
     public static readonly Icons ErrorBadge12 = new("\uEDAE");

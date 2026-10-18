@@ -158,7 +158,7 @@ namespace PrintManagement.Controls.Table
                 return;
             }
 
-            ShowMarker = SettingsService.ReadSetting(Settings.ScrollIndicatorSetting.Value, false);
+            ShowMarker = SettingsService.ReadSetting(Settings.ScrollIndicatorSetting.Value, Settings.ScrollIndicatorSetting.defaultValue);
 
             _isPanning = true;
             _panOrigin = _panCurrent = point.Position;

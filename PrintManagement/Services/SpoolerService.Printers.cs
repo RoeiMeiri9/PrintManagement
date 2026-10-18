@@ -75,19 +75,27 @@ public static unsafe partial class SpoolerService
 
     /// <param name="serverName">null = local machine, otherwise e.g. "\\\\PRINTSRV".</param>
     public static IReadOnlyList<PrinterFilterModel> GetPrinters(
-        string? serverName = null, bool includeConnections = true)
+        string? serverName = null, bool includeConnections = true,
+        IReadOnlyList<DriversFilterModel>? knownDrivers = null)
     {
-
         Dictionary<string, List<DriversFilterModel>> drivers;
-        try
+        if (knownDrivers is not null)
         {
-            drivers = FetchDrivers(serverName);
-            Logger.Log($"drivers fetched: {drivers.Count}");
+            drivers = ToDriverMap(knownDrivers);
+            Logger.Log($"drivers reused: {drivers.Count}");
         }
-        catch (Win32Exception ex)
+        else
         {
-            Logger.Warning($"Driver enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
-            drivers = new(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                drivers = FetchDrivers(serverName);
+                Logger.Log($"drivers fetched: {drivers.Count}");
+            }
+            catch (Win32Exception ex)
+            {
+                Logger.Log($"Driver enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
+                drivers = new(StringComparer.OrdinalIgnoreCase);
+            }
         }
 
         uint flags = serverName is null

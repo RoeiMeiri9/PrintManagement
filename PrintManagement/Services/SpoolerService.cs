@@ -99,8 +99,9 @@ public static unsafe partial class SpoolerService
             : action();
 
     public static Task<IReadOnlyList<PrinterFilterModel>> GetPrintersAsync(
-        string? serverName = null, bool includeConnections = true)
-        => Task.Run(() => WithCreds(serverName, () => GetPrinters(serverName, includeConnections)));
+        string? serverName = null, bool includeConnections = true,
+        IReadOnlyList<DriversFilterModel>? knownDrivers = null)
+        => Task.Run(() => WithCreds(serverName, () => GetPrinters(serverName, includeConnections, knownDrivers)));
 
     public static Task<IReadOnlyList<DriversFilterModel>> GetDriversAsync(string? serverName = null)
         => Task.Run(() => WithCreds(serverName, () => GetDrivers(serverName)));

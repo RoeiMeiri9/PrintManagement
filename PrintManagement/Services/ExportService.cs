@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using PrintManagement.Resources;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,13 +21,27 @@ public interface IExportService
         Func<TColumn, string> headerSelector,
         Func<TRow, TColumn, object?> valueSelector,
         Func<TColumn, bool> isVisibleSelector,
+        Func<TColumn, string?> columnPathSelector,
         string pageName);
 }
 
 public class ExportService : IExportService
 {
+    /// <summary>
+    /// What a value selector returns for the Share Name of an unshared printer.
+    /// The export blanks it out when the "show &lt;Not Shared&gt;" option is off.
+    /// </summary>
+    public const string NotSharedPlaceholder = "<Not Shared>";
+
     /// <summary>The data every format needs, already converted to strings.</summary>
     private readonly record struct Table(string[] Headers, List<string[]> Rows);
+
+    /// <summary>The export settings, read once per export.</summary>
+    private readonly record struct CellOptions(bool IsoDates, bool LowercaseBools, bool ShowNotShared);
+
+    // CSV gets a BOM so Excel detects UTF-8; text and Markdown don't.
+    private static readonly UTF8Encoding Utf8WithBom = new(encoderShouldEmitUTF8Identifier: true);
+    private static readonly UTF8Encoding Utf8NoBom = new(encoderShouldEmitUTF8Identifier: false);
 
     public async Task ExportAsync<TColumn, TRow>(
         IEnumerable<TColumn> columns,
@@ -34,6 +49,7 @@ public class ExportService : IExportService
         Func<TColumn, string> headerSelector,
         Func<TRow, TColumn, object?> valueSelector,
         Func<TColumn, bool> isVisibleSelector,
+        Func<TColumn, string?> columnPathSelector,
         string pageName)
     {
         var filePath = await PickSaveFilePathAsync(pageName);
@@ -53,12 +69,21 @@ public class ExportService : IExportService
             var ext => throw Unsupported(ext)
         };
 
+        // Read the settings once, not once per cell.
+        var options = new CellOptions(
+            IsoDates: SettingsService.ReadSetting(Settings.UseISODateFormatSetting.Value, Settings.UseISODateFormatSetting.defaultValue),
+            LowercaseBools: SettingsService.ReadSetting(Settings.WriteTrueFalseLowercaseSetting.Value, Settings.WriteTrueFalseLowercaseSetting.defaultValue),
+            ShowNotShared: SettingsService.ReadSetting(Settings.ShowNotSharedSetting.Value, Settings.ShowNotSharedSetting.defaultValue));
+
+        // TODO: Remove this log once the export is working well. It's just for debugging.
+        Logger.Log($"export options: iso={options.IsoDates}, lowercase={options.LowercaseBools}, showNotShared={options.ShowNotShared}");
+
         await Task.Run(() =>
         {
             // The only place that touches the selectors: one pass, one formatting rule.
             var table = new Table(
-                visibleColumns.Select(c => headerSelector(c) ?? string.Empty).ToArray(),
-                rowsList.Select(r => visibleColumns.Select(c => ToCell(valueSelector(r, c))).ToArray()).ToList());
+                [.. visibleColumns.Select(c => headerSelector(c) ?? string.Empty)],
+                [.. rowsList.Select(r => visibleColumns.Select(c => ToCell(valueSelector(r, c), columnPathSelector(c), options)).ToArray())]);
 
             write(table, filePath);
         });
@@ -66,8 +91,26 @@ public class ExportService : IExportService
 
     // ───────────── Shared helpers ─────────────
 
-    private static string ToCell(object? value) =>
-        Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+    private static string ToCell(object? value, object? path, CellOptions options) => value switch
+    {
+        null => string.Empty,
+        DateTime dt => FormatDate(dt, options.IsoDates),
+        bool b => options.LowercaseBools ? (b ? "true" : "false") : (b ? "True" : "False"),
+        string when path != null && path.ToString() == "ShareName" && string.IsNullOrEmpty(value.ToString()) => options.ShowNotShared ? NotSharedPlaceholder : string.Empty,
+        _ => Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty
+    };
+
+    /// <summary>
+    /// ISO: 2006-06-21 (the same on every computer). Otherwise the date as Windows shows it
+    /// for the current regional settings, such as 21/06/2006. The time is added only when it isn't midnight.
+    /// </summary>
+    private static string FormatDate(DateTime dt, bool iso)
+    {
+        bool dateOnly = dt.TimeOfDay == TimeSpan.Zero;
+        return iso
+            ? dt.ToString(dateOnly ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
+            : dt.ToString(dateOnly ? "d" : "G", CultureInfo.CurrentCulture);
+    }
 
     /// <summary>Keeps one record on one line for the line-based formats (md, txt).</summary>
     private static string Flatten(string s) =>
@@ -81,6 +124,7 @@ public class ExportService : IExportService
     }
 
     // ───────────── Writers: one per format, strings only ─────────────
+
     /// <summary>
     /// Writes the table as CSV with a header row. Quoting is handled by CsvHelper.
     /// </summary>
@@ -88,7 +132,7 @@ public class ExportService : IExportService
     /// <param name="filePath">The file to create. An existing file is overwritten.</param>
     private static void WriteCsv(Table table, string filePath)
     {
-        using var writer = new StreamWriter(filePath, false, Encoding.UTF8);
+        using var writer = new StreamWriter(filePath, false, Utf8WithBom);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
         foreach (var header in table.Headers)
@@ -116,7 +160,7 @@ public class ExportService : IExportService
         foreach (var row in table.Rows)
             sb.AppendLine(string.Join("\t", row.Select(Flatten)));
 
-        File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+        File.WriteAllText(filePath, sb.ToString(), Utf8NoBom);
     }
 
     /// <summary>
@@ -126,8 +170,8 @@ public class ExportService : IExportService
     /// <param name="filePath">The file to create. An existing file is overwritten.</param>
     private static void WriteMarkdown(Table table, string filePath)
     {
-        // A pipe inside a cell would split it into two columns.
-        static string Escape(string s) => Flatten(s).Replace("|", "\\|");
+        // A pipe would split a cell in two; a "<" would be read as an HTML tag and hidden.
+        static string Escape(string s) => Flatten(s).Replace("|", "\\|").Replace("<", "\\<");
 
         var headers = table.Headers.Select(Escape).ToArray();
         var rows = table.Rows.Select(r => r.Select(Escape).ToArray()).ToList();
@@ -144,7 +188,7 @@ public class ExportService : IExportService
         foreach (var row in rows)
             sb.AppendLine(Line(row));
 
-        File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+        File.WriteAllText(filePath, sb.ToString(), Utf8NoBom);
     }
 
     // ───────────── File picker ─────────────

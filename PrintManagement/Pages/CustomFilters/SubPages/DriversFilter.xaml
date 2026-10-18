@@ -152,7 +152,7 @@
 
         <ctlTb:TableColumn
             Width="Auto"
-            Header="Hardware I D"
+            Header="Hardware ID"
             MaxAutoWidth="400"
             Path="HardwareID" />
 
@@ -173,7 +173,7 @@
 
         <ctlTb:TableColumn
             Width="112"
-            Header="OEMURL"
+            Header="OEM URL"
             Path="OEMURL" />
 
         <ctlTb:TableColumn

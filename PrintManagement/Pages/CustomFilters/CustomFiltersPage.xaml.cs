@@ -42,8 +42,20 @@ public sealed partial class CustomFiltersPage : Page
     public CustomFiltersPage()
     {
         InitializeComponent();
-        Loaded += async (_, _) => await LoadPrintersAsync();
-        Loaded += async (_, _) => await LoadDriversAsync();
+        Loaded += async (_, _) => await LoadAllAsync();
+    }
+
+    /// <summary>
+    /// Drivers first, because the printers load reuses that list instead of asking the server again.
+    /// The filter tree is built once, at the end, so it never shows a half-loaded count.
+    /// </summary>
+    private async Task LoadAllAsync()
+    {
+        var sw = Stopwatch.StartNew();
+        await LoadDriversAsync();
+        await LoadPrintersAsync();
+        LoadFilters();
+        Logger.Log($"initial load: {sw.ElapsedMilliseconds} ms");
     }
 
 
@@ -54,13 +66,17 @@ public sealed partial class CustomFiltersPage : Page
 
         try
         {
-            var printers = await SpoolerService.GetPrintersAsync(serverName: @"\\WIN-HO9KT6LB37V", includeConnections: true);
+            // Reuse the drivers page's list so the server isn't asked for the same drivers twice.
+            // If that load failed (empty list), pass null and let the service fetch them itself.
+            IReadOnlyList<DriversFilterModel>? knownDrivers =
+                DriverFiltersList.Count > 0 ? DriverFiltersList.ToList() : null;
+
+            var printers = await SpoolerService.GetPrintersAsync(
+                serverName: @"\\WIN-HO9KT6LB37V", includeConnections: true, knownDrivers: knownDrivers);
 
             PrinterFiltersList.Clear();
             foreach (var p in printers)
                 PrinterFiltersList.Add(p);
-
-            LoadFilters();
         }
         catch (Exception ex)
         {
@@ -85,8 +101,6 @@ public sealed partial class CustomFiltersPage : Page
             DriverFiltersList.Clear();
             foreach (var d in drivers)
                 DriverFiltersList.Add(d);
-
-            LoadFilters();
         }
         catch (Exception ex)
         {

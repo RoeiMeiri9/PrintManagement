@@ -41,6 +41,9 @@ public partial class TableColumn : INotifyPropertyChanged
     /// <summary>Bold, primary-colored text (like the printer name).</summary>
     public bool IsPrimary { get; set; }
 
+    /// <summary>Optional: what to write for this column when exporting, instead of reading the property.</summary>
+    public Func<object, object?>? ExportValue { get; set; }
+
     /// <summary>Optional custom cell. Its DataContext is the whole row item.</summary>
     public DataTemplate? CellTemplate { get; set; }
 

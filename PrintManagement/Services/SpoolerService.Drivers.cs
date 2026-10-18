@@ -108,6 +108,11 @@ public static unsafe partial class SpoolerService
             (buf, count) => ParseDrivers(buf, count, serverName, cfg),
             []);
 
+        return ToDriverMap(list);
+    }
+
+    private static Dictionary<string, List<DriversFilterModel>> ToDriverMap(IEnumerable<DriversFilterModel> list)
+    {
         var map = new Dictionary<string, List<DriversFilterModel>>(StringComparer.OrdinalIgnoreCase);
         foreach (var d in list)
         {

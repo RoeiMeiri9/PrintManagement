@@ -22,12 +22,16 @@ public partial class DataTable
             col => col.Header,
             (row, col) => GetCellValue(row.Item, col),
             col => col.IsVisible,
+            col => col.Path,
             pageName
         );
     }
 
     private static object? GetCellValue(object item, TableColumn col)
     {
+        if (col.ExportValue is { } export)
+            return export(item);
+
         var propertyPath = !string.IsNullOrWhiteSpace(col.Path) ? col.Path : col.SortPath;
 
         if (string.IsNullOrWhiteSpace(propertyPath))
