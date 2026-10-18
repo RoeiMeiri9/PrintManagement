@@ -112,7 +112,7 @@
                     BorderBrush="Transparent"
                     BorderThickness="0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontFamily="{x:Bind res:Icons.Clear.Font}" Glyph="{x:Bind res:Icons.Clear.Glyph}" />
+                        <FontIcon FontFamily="{x:Bind res:Icons.Delete.Font}" Glyph="{x:Bind res:Icons.Delete.Glyph}" />
                         <TextBlock
                             Margin="0,-1,8,1"
                             VerticalAlignment="Center"
@@ -126,7 +126,7 @@
                     BorderThickness="0"
                     Click="ExportButton_Click">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontFamily="{x:Bind res:Icons.Export.Font}" Glyph="{x:Bind res:Icons.Export.Glyph}" />
+                        <FontIcon FontFamily="{x:Bind res:Icons.Share.Font}" Glyph="{x:Bind res:Icons.Share.Glyph}" />
                         <TextBlock
                             Margin="0,-1,8,1"
                             VerticalAlignment="Center"

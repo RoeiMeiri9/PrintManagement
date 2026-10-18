@@ -38,12 +38,12 @@ namespace PrintManagement.Controls.Table
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add when e.NewItems != null && e.NewStartingIndex >= 0:
-                    var index = e.NewStartingIndex;
+                    var c1index = e.NewStartingIndex;
                     foreach (var item in e.NewItems)
                     {
                         if (item == null) continue;
                         var row = new TableRow(this, item);
-                        _all.Insert(Math.Min(index++, _all.Count), row);
+                        _all.Insert(Math.Min(c1index++, _all.Count), row);
                         InsertIntoView(row);
                     }
                     break;
@@ -55,6 +55,18 @@ namespace PrintManagement.Controls.Table
                         _all.Remove(row);
                         Rows.Remove(row);
                     }
+                    break;
+
+                case NotifyCollectionChangedAction.Add when e.NewItems != null && e.NewStartingIndex >= 0:
+                    var c3index = e.NewStartingIndex;
+                    foreach (var item in e.NewItems)
+                    {
+                        if (item == null) continue;
+                        var row = new TableRow(this, item);
+                        _all.Insert(Math.Min(c3index++, _all.Count), row);
+                        InsertIntoView(row);
+                    }
+                    RecalculateAutoWidths();
                     break;
 
                 default: // replace / move / reset
@@ -169,6 +181,10 @@ namespace PrintManagement.Controls.Table
             }
 
             ApplySort(selected);
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                RecalculateAutoWidths();
+            });
         }
     }
 }

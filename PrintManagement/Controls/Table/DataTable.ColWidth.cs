@@ -28,31 +28,35 @@ namespace PrintManagement.Controls.Table
 
         private RoutedEventHandler OnTableLoaded_SetAutoWidth()
         {
-            return (sender, e) =>
+            return (sender, e) => RecalculateAutoWidths();
+        }
+
+        public void RecalculateAutoWidths()
+        {
+            foreach (var column in Columns)
             {
-                foreach (var column in Columns)
+                if (string.Equals(column.Width, "Auto", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (string.Equals(column.Width, "Auto", StringComparison.OrdinalIgnoreCase))
-                    {
-                        double calculatedWidth = GetMaxWidth(column);
+                    double calculatedWidth = GetMaxWidth(column);
 
-                        if (column.MaxAutoWidth.HasValue && calculatedWidth > column.MaxAutoWidth.Value)
-                        {
-                            calculatedWidth = column.MaxAutoWidth.Value;
-                        }
+                    if (column.MaxAutoWidth.HasValue && calculatedWidth > column.MaxAutoWidth.Value)
+                    {
+                        calculatedWidth = column.MaxAutoWidth.Value;
+                    }
 
-                        column.ActualWidth = calculatedWidth;
-                    }
-                    else if (double.TryParse(column.Width, out double parsedWidth))
-                    {
-                        column.ActualWidth = parsedWidth;
-                    }
-                    else
-                    {
-                        column.ActualWidth = MinWidth;
-                    }
+                    column.ActualWidth = calculatedWidth;
                 }
-            };
+                else if (double.TryParse(column.Width, out double parsedWidth))
+                {
+                    column.ActualWidth = parsedWidth;
+                }
+                else
+                {
+                    column.ActualWidth = MinWidth;
+                }
+            }
+
+            UpdateTotalWidth();
         }
 
         // ---------- Dragging Thumb ----------

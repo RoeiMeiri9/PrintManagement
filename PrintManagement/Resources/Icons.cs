@@ -32,8 +32,8 @@ public class Icons(string glyph, FontFamily? font = null)
     public static readonly Icons ListDetail = new("\uE065", font: ExtendedSegoeFluentFont);
 
     // - controls row -
-    public static readonly Icons Export = new("\uEDE1");
-    public static readonly Icons Clear = new("\uE894");
+    public static readonly Icons Share = new("\uE72D");
+    public static readonly Icons Delete = new("\uE74D");
     public static readonly Icons Refresh = new("\uE72C");
     public static readonly Icons Up = new("\uE74A");
     public static readonly Icons Back = new("\uE72B");

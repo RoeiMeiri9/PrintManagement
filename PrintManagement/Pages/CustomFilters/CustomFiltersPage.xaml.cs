@@ -42,6 +42,7 @@ public sealed partial class CustomFiltersPage : Page
     public CustomFiltersPage()
     {
         InitializeComponent();
+        Loaded += LoadFilters;
         Loaded += async (_, _) => await LoadAllAsync();
     }
 
@@ -54,7 +55,6 @@ public sealed partial class CustomFiltersPage : Page
         var sw = Stopwatch.StartNew();
         await LoadDriversAsync();
         await LoadPrintersAsync();
-        LoadFilters();
         Logger.Log($"initial load: {sw.ElapsedMilliseconds} ms");
     }
 
@@ -113,7 +113,7 @@ public sealed partial class CustomFiltersPage : Page
         }
     }
 
-    private void LoadFilters()
+    private void LoadFilters(object sender, RoutedEventArgs e)
     {
         // --- Printers Root Leaf ---
         FiltersList.Clear();
@@ -127,7 +127,7 @@ public sealed partial class CustomFiltersPage : Page
 
         // Adding sub leafs
 
-        printersRoot.Children.Add(new FilterLeaf
+        var allPrintersLeaf = new FilterLeaf
         {
             Name = "AllPrinters",
             DisplayName = "All Printers",
@@ -135,7 +135,15 @@ public sealed partial class CustomFiltersPage : Page
             DisplayTotalItems = Visibility.Visible,
             TotalItems = PrinterFiltersList.Count,
             FilterPage = FilterPages.PrinterPage
-        });
+        };
+
+        PrinterFiltersList.CollectionChanged += (s, args) =>
+        {
+            allPrintersLeaf.TotalItems = PrinterFiltersList.Count;
+        };
+
+        printersRoot.Children.Add(allPrintersLeaf);
+
         printersRoot.Children.Add(new FilterLeaf
         {
             Name = "PrintersNorReady",
@@ -166,7 +174,7 @@ public sealed partial class CustomFiltersPage : Page
 
         // Adding sub leafs
 
-        driversRoot.Children.Add(new FilterLeaf
+        var allDriversLeaf = new FilterLeaf
         {
             Name = "AllDrivers",
             DisplayName = "All Drivers",
@@ -174,7 +182,14 @@ public sealed partial class CustomFiltersPage : Page
             DisplayTotalItems = Visibility.Visible,
             TotalItems = DriverFiltersList.Count,
             FilterPage = FilterPages.DriverPage
-        });
+        };
+
+        DriverFiltersList.CollectionChanged += (s, args) =>
+        {
+            allDriversLeaf.TotalItems = DriverFiltersList.Count;
+        };
+
+        driversRoot.Children.Add(allDriversLeaf);
 
         FiltersList.Add(driversRoot);
 
@@ -225,6 +240,7 @@ public sealed partial class CustomFiltersPage : Page
                     FilterSubPage.Navigate(typeof(DriversFilter), DriverFiltersList);
                     break;
             }
+            NavigationStateService.LastSelectedFilterName = leaf.Name;
         }
     }
 }
