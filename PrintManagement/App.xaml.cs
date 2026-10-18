@@ -1,5 +1,7 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
 using PrintManagement.Services;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -12,6 +14,9 @@ namespace PrintManagement
     public partial class App : Application
     {
         private Window? _window;
+        public static IServiceProvider Services { get; private set; } = null!;
+
+        public static Window? MainWindow => (Current as App)?._window;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -22,6 +27,7 @@ namespace PrintManagement
             InitializeComponent();
             UnhandledException += (_, e) => System.Diagnostics.Debug.WriteLine(e.Exception);
             SpoolerService.Credentials = ("printtest", "WIN-HO9KT6LB37V", "Aa123456@#$fg");
+            Services = ConfigureServices;
         }
 
         /// <summary>
@@ -32,6 +38,28 @@ namespace PrintManagement
         {
             _window = new MainWindow();
             _window.Activate();
+        }
+
+        private static IServiceProvider ConfigureServices
+        {
+            get
+            {
+                var services = new ServiceCollection();
+
+                // רישום השירותים באפליקציה (Singleton או Transient)
+                services.AddSingleton<IExportService, ExportService>();
+
+                // אם יש ViewModels שרוצים להזריק:
+                // services.AddTransient<MainViewModel>();
+
+                return services.BuildServiceProvider();
+            }
+        }
+
+        public static T GetService<T>() where T : class
+        {
+            var service = Services.GetService(typeof(T)) as T;
+            return service ?? throw new ArgumentException($"{typeof(T)} is not registered in Dependency Injection.");
         }
     }
 }

@@ -25,6 +25,20 @@ public sealed partial class CustomFiltersPage : Page
     public ObservableCollection<PrinterFilterModel> PrinterFiltersList { get; } = [];
     public ObservableCollection<DriversFilterModel> DriverFiltersList { get; } = [];
 
+    public string SelectedFilterName
+    {
+        get
+        {
+            if (FiltersTree.SelectedItem is FilterLeaf selectedLeaf)
+            {
+                return selectedLeaf.Name;
+            }
+            return "UnknownFilter";
+        }
+    }
+
+    public string ActiveSubPageName => FilterSubPage.Content?.GetType().Name ?? string.Empty;
+
     public CustomFiltersPage()
     {
         InitializeComponent();
@@ -51,7 +65,7 @@ public sealed partial class CustomFiltersPage : Page
         catch (Exception ex)
         {
             Debug.WriteLine($"Failed to load printers: {ex}");
-            Logger.Log($"Failed to load printers: {ex}");
+            Logger.Warning($"Failed to load printers: {ex}");
         }
         finally
         {
@@ -77,6 +91,7 @@ public sealed partial class CustomFiltersPage : Page
         catch (Exception ex)
         {
             Debug.WriteLine($"Failed to load drivers: {ex}");
+            Logger.Warning($"Failed to load drivers: {ex}");
         }
         finally
         {

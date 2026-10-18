@@ -1,13 +1,15 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
+using PrintManagement.Services;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace PrintManagement.Controls.Table;
 
 [ContentProperty(Name = nameof(Columns))]
-public sealed partial class DataTable : UserControl
+public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequestMessage>
 {
     public TableColumnCollection Columns { get; } = [];
 
@@ -19,12 +21,20 @@ public sealed partial class DataTable : UserControl
 
     private INotifyCollectionChanged? _observedSource;
 
-    public DataTable()
+    public DataTable() : this(App.GetService<IExportService>())
+    {
+    }
+
+    public DataTable(IExportService exportService)
     {
         InitializeComponent();
         Loaded += OnTableLoaded_SetAutoWidth();
         Loaded += OnTableLoaded_ApplyCompactViewStyle();
         Columns.CollectionChanged += Columns_CollectionChanged;
+        _exportService = exportService;
+
+        Loaded += (s, e) => WeakReferenceMessenger.Default.Register<ExportCsvRequestMessage>(this);
+        Unloaded += (s, e) => WeakReferenceMessenger.Default.Unregister<ExportCsvRequestMessage>(this);
     }
 }
 

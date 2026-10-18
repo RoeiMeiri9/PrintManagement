@@ -28,6 +28,7 @@
         <ctlTb:TableColumn
             Width="Auto"
             Header="Printer Name"
+            Path="Name"
             SortPath="Name">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
@@ -58,6 +59,7 @@
             Width="Auto"
             Comparer="{StaticResource StatusComparer}"
             Header="Queue Status"
+            Path="QueueStatus"
             SortPath="QueueStatus">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">

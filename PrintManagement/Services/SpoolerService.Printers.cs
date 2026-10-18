@@ -86,7 +86,7 @@ public static unsafe partial class SpoolerService
         }
         catch (Win32Exception ex)
         {
-            Logger.Log($"Driver enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
+            Logger.Warning($"Driver enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
             drivers = new(StringComparer.OrdinalIgnoreCase);
         }
 
@@ -98,7 +98,7 @@ public static unsafe partial class SpoolerService
 
         using var registryBase = OpenPrintersRegistryKey(serverName);
         if (registryBase is null)
-            Logger.Log($"Printers registry key unavailable for '{serverName ?? "<local>"}'; Branch Office will show false.");
+            Logger.Warning($"Printers registry key unavailable for '{serverName ?? "<local>"}'; Branch Office will show false.");
         var ports = FetchPorts(serverName);
 
         try
@@ -241,7 +241,7 @@ public static unsafe partial class SpoolerService
         }
         catch (Win32Exception ex)
         {
-            Logger.Log($"Port enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
+            Logger.Warning($"Port enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
         }
         return map;
     }
@@ -328,7 +328,7 @@ public static unsafe partial class SpoolerService
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
                                        or System.Security.SecurityException)
         {
-            Logger.Log($"Cannot open printers registry key on '{serverName ?? "<local>"}': {ex.GetType().Name}: {ex.Message}");
+            Logger.Warning($"Cannot open printers registry key on '{serverName ?? "<local>"}': {ex.GetType().Name}: {ex.Message}");
             return null;
         }
     }

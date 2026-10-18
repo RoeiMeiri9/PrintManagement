@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Pages.CustomFilters;
@@ -58,5 +59,22 @@ public sealed partial class CommonPageWrapper : Page
         {
             ViewDDSettingsService.IsCompactView = toggleItem.IsChecked;
         }
+    }
+
+
+    private void ExportButton_Click(object sender, RoutedEventArgs e)
+    {
+        string pageName = string.Empty;
+
+        // נגשים ל-Content של navFrame (שהוא CustomFiltersPage) ושואלים אותו ישירות
+        if (navFrame.Content is CustomFiltersPage customFiltersPage)
+        {
+            pageName = customFiltersPage.SelectedFilterName;
+        }
+
+        WeakReferenceMessenger.Default.Send(new ExportCsvRequestMessage
+        {
+            PageName = pageName
+        });
     }
 }
