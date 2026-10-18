@@ -16,27 +16,25 @@ public partial class DataTable
 
     public async Task ExportCsvAsync(string pageName)
     {
-        await _exportService.ExportToCsvAsync(
+        await _exportService.ExportAsync(
             Columns,
             Rows,
             col => col.Header,
             (row, col) => GetCellValue(row.Item, col),
+            col => col.IsVisible,
             pageName
         );
     }
 
     private static object? GetCellValue(object item, TableColumn col)
     {
-        // 1. קביעת ה-Property Path (מעדיפים Path, ואם ריק משתמשים ב-SortPath)
         var propertyPath = !string.IsNullOrWhiteSpace(col.Path) ? col.Path : col.SortPath;
 
         if (string.IsNullOrWhiteSpace(propertyPath))
             return null;
 
-        // 2. קריאת הערך האמיתי מהמודל באמצעות ה-ValueReader
         var value = ValueReader.Read(item, propertyPath);
 
-        // 3. טיפול מיוחד באוספים/רשימות (כמו QueueStatus) כדי שלא ירנדרו כ-System.Collections.Generic...
         if (value is IEnumerable list && value is not string)
         {
             var items = new List<string>();
