@@ -88,24 +88,7 @@
                 Background="Transparent"
                 BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                 BorderThickness="0,0,1,0"
-                PointerCaptureLost="TreeSplitter_PointerCaptureLost"
-                PointerEntered="TreeSplitter_PointerEntered"
-                PointerExited="TreeSplitter_PointerExited"
-                PointerMoved="TreeSplitter_PointerMoved"
-                PointerPressed="TreeSplitter_PointerPressed"
-                PointerReleased="TreeSplitter_PointerReleased">
-                <Border
-                    x:Name="SplitterHighlight"
-                    HorizontalAlignment="Stretch"
-                    Background="{ThemeResource ControlStrongFillColorDefaultBrush}"
-                    CornerRadius="1"
-                    IsHitTestVisible="False"
-                    Opacity="0">
-                    <Border.OpacityTransition>
-                        <ScalarTransition Duration="0:0:0.15" />
-                    </Border.OpacityTransition>
-                </Border>
-            </ctrlSSC:SnapSplitter>
+                TargetColumn="{x:Bind TreeColumn, Mode=OneWay}" />
 
             <Frame
                 x:Name="FilterSubPage"
