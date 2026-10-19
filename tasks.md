@@ -10,8 +10,8 @@ This time though, this will have to do.
 6.  [x] Format all columns in printers page
 7.  [x] Implement Compact View
 8.  [x] Support Windows 10 - Acrylic done, icons done.
-9.  [ ] Clean up naming conventions
+9.  [x] Clean up naming conventions
 10. [ ] Fix button on title not calculated correctly when hiding the button
-11. [ ] Minimize tree view to nothing (takes too much space)
+11. [x] Minimize tree view to nothing (takes too much space)
 12. [ ] Implement new views
 13. [ ] Add rest of the tasks... if you have some more time left to finnish this product :/s

@@ -35,6 +35,10 @@ public sealed partial class SnapSplitter : Grid
     private Stopwatch? _snapStopwatch;
     private const double SnapDurationMs = 180.0;
 
+    private double _lastMouseX;
+
+    private double _mouseOffset;
+
     private readonly Border _highlightBorder;
 
     private double CurrentTreeWidth =>
@@ -65,6 +69,8 @@ public sealed partial class SnapSplitter : Grid
         PointerMoved += SnapSplitter_PointerMoved;
         PointerReleased += SnapSplitter_PointerReleased;
         PointerCaptureLost += SnapSplitter_PointerCaptureLost;
+
+        DoubleTapped += SnapSplitter_DoubleTapped;
     }
 
     private void SnapSplitter_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -90,7 +96,9 @@ public sealed partial class SnapSplitter : Grid
         var rootGrid = FindParent<Grid>(this);
         if (rootGrid != null)
         {
-            _grabOffset = e.GetCurrentPoint(rootGrid).Position.X - CurrentTreeWidth;
+            var currentPoint = e.GetCurrentPoint(rootGrid).Position;
+            _grabOffset = currentPoint.X - CurrentTreeWidth;
+            _lastMouseX = currentPoint.X;
         }
 
         e.Handled = true;
@@ -103,29 +111,49 @@ public sealed partial class SnapSplitter : Grid
         var rootGrid = FindParent<Grid>(this);
         if (rootGrid == null) return;
 
-        double desired = e.GetCurrentPoint(rootGrid).Position.X - _grabOffset;
-        bool wantCollapsed = desired < MinTreeWidth;
-        double target = wantCollapsed ? 0 : Math.Min(desired, TargetColumn.MaxWidth);
+        var currentPoint = e.GetCurrentPoint(rootGrid).Position;
+        double currentMouseX = currentPoint.X;
 
-        if (wantCollapsed != _isTreeCollapsed)
+        double deltaX = currentMouseX - _lastMouseX;
+        _lastMouseX = currentMouseX;
+
+        double desired = currentMouseX - _grabOffset;
+
+        if (_isTreeCollapsed)
         {
-            _isTreeCollapsed = wantCollapsed;
-            StartOrUpdateSnapAnimation(target);
+            if (deltaX > 0)
+            {
+                _isTreeCollapsed = false;
+                StartOrUpdateSnapAnimation(Math.Max(desired, MinTreeWidth));
+                _mouseOffset = MinTreeWidth - desired;
+            }
+            e.Handled = true;
+            return;
+        }
+
+        bool wantCollapsed = desired < MinTreeWidth && deltaX < 0;
+
+        if (wantCollapsed)
+        {
+            _isTreeCollapsed = true;
+            StartOrUpdateSnapAnimation(0);
         }
         else if (_isAnimatingSnap)
         {
-            _snapTargetWidth = target;
+            _snapTargetWidth = Math.Max(desired + _mouseOffset, MinTreeWidth);
         }
         else
         {
-            ApplyWidth(target);
+            ApplyWidth(Math.Max(desired + _mouseOffset, MinTreeWidth));
         }
+
         e.Handled = true;
     }
 
     private void SnapSplitter_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
         _isDraggingSplitter = false;
+        _mouseOffset = 0;
         StopSnapAnimation();
         ReleasePointerCapture(e.Pointer);
         UpdateHighlight();
@@ -175,7 +203,7 @@ public sealed partial class SnapSplitter : Grid
 
     private void OnSnapStep(object? sender, object e)
     {
-        if (!_isDraggingSplitter || _snapStopwatch == null)
+        if (!_isAnimatingSnap || _snapStopwatch == null)
         {
             StopSnapAnimation();
             return;
@@ -203,5 +231,48 @@ public sealed partial class SnapSplitter : Grid
         if (parentObject == null) return null;
         if (parentObject is T parent) return parent;
         return FindParent<T>(parentObject);
+    }
+
+
+    // --- Double Tap for auto width ---
+    private void SnapSplitter_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (TargetColumn == null) return;
+
+        StopSnapAnimation();
+        _isAnimatingSnap = false;
+        _snapStopwatch = null;
+        _isDraggingSplitter = false;
+        _mouseOffset = 0;
+
+        var rootGrid = FindParent<Grid>(this);
+        if (rootGrid == null) return;
+
+        double targetAutoWidth = 250;
+
+        int targetColumnIndex = rootGrid.ColumnDefinitions.IndexOf(TargetColumn);
+        if (targetColumnIndex >= 0)
+        {
+            foreach (UIElement child in rootGrid.Children)
+            {
+                if (child is FrameworkElement fe && Grid.GetColumn(fe) == targetColumnIndex)
+                {
+                    fe.Measure(new Windows.Foundation.Size(fe.MaxWidth, rootGrid.ActualHeight));
+
+                    double desiredContentWidth = fe.DesiredSize.Width + 24;
+
+                    targetAutoWidth = Math.Clamp(desiredContentWidth, MinTreeWidth, TargetColumn.MaxWidth);
+                    break;
+                }
+            }
+        }
+
+        if (_isTreeCollapsed || CurrentTreeWidth < MinTreeWidth)
+        {
+            _isTreeCollapsed = false;
+        }
+
+        ApplyWidth(targetAutoWidth);
+        e.Handled = true;
     }
 }
