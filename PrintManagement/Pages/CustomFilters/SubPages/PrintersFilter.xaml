@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:comp="using:PrintManagement.Pages.CustomFilters.Comparers"
-    xmlns:ctl="using:PrintManagement.Controls"
+    xmlns:ctlBdg="using:PrintManagement.Controls.BadgeControl"
     xmlns:ctlTb="using:PrintManagement.Controls.Table"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hlps="using:PrintManagement.Pages.CustomFilters.Helpers"
@@ -17,6 +17,84 @@
 
     <Page.Resources>
         <comp:PrinterStatusListComparer x:Key="StatusComparer" />
+
+        <ctlBdg:BadgeRuleCollection x:Key="SharedBadgeRules">
+            <ctlBdg:BadgeRule
+                Key="True"
+                BackgroundResourceKey="StatusGreenBrush"
+                DisplayText="Shared"
+                ForegroundResourceKey="SystemFillColorSuccessBrush"
+                Glyph="{x:Bind res:Icons.AcceptMedium.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.AcceptMedium.Font}" />
+
+            <ctlBdg:BadgeRule
+                Key="False"
+                BackgroundResourceKey="StatusDefaultBrush"
+                DisplayText="Not Shared"
+                ForegroundResourceKey="SystemFillColorSolidNeutralBrush"
+                Glyph="{x:Bind res:Icons.ErrorBadge12.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.ErrorBadge12.Font}" />
+        </ctlBdg:BadgeRuleCollection>
+
+        <ctlBdg:BadgeRuleCollection x:Key="BranchOfficeRules">
+            <ctlBdg:BadgeRule
+                Key="True"
+                BackgroundResourceKey="StatusGreenBrush"
+                DisplayText="Yes"
+                ForegroundResourceKey="SystemFillColorSuccessBrush"
+                Glyph="{x:Bind res:Icons.AcceptMedium.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.AcceptMedium.Font}" />
+
+            <ctlBdg:BadgeRule
+                Key="False"
+                BackgroundResourceKey="StatusDefaultBrush"
+                DisplayText="No"
+                ForegroundResourceKey="SystemFillColorSolidNeutralBrush"
+                Glyph="{x:Bind res:Icons.ErrorBadge12.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.ErrorBadge12.Font}" />
+        </ctlBdg:BadgeRuleCollection>
+
+        <ctlBdg:BadgeRuleCollection x:Key="PrinterStatusBadgeRules">
+            <!--  Ready  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.Ready}"
+                BackgroundResourceKey="StatusGreenBrush"
+                ForegroundResourceKey="SystemFillColorSuccessBrush" />
+
+            <!--  Printing / Busy / Processing  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.Printing}"
+                BackgroundResourceKey="StatusOrangeBrush"
+                ForegroundResourceKey="SystemFillColorCautionBrush" />
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.Busy}"
+                BackgroundResourceKey="StatusOrangeBrush"
+                ForegroundResourceKey="SystemFillColorCautionBrush" />
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.Processing}"
+                BackgroundResourceKey="StatusOrangeBrush"
+                ForegroundResourceKey="SystemFillColorCautionBrush" />
+
+            <!--  Errors / Paper Jam / Paper Out  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.Error}"
+                BackgroundResourceKey="StatusRedBrush"
+                ForegroundResourceKey="SystemFillColorCriticalBrush" />
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.PaperJam}"
+                BackgroundResourceKey="StatusRedBrush"
+                ForegroundResourceKey="SystemFillColorCriticalBrush" />
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.PaperOut}"
+                BackgroundResourceKey="StatusRedBrush"
+                ForegroundResourceKey="SystemFillColorCriticalBrush" />
+
+            <!--  Offline / Default  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:PrinterStatusFlags.Offline}"
+                BackgroundResourceKey="StatusDefaultBrush"
+                ForegroundResourceKey="SystemFillColorSolidNeutralBrush" />
+        </ctlBdg:BadgeRuleCollection>
     </Page.Resources>
 
     <ctlTb:DataTable
@@ -71,17 +149,10 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="hlps:PrinterStatusInfo">
-                                <Border
-                                    Margin="-4,0,0,0"
-                                    Padding="8,3"
-                                    HorizontalAlignment="Left"
-                                    Background="{x:Bind Flags, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Background}"
-                                    CornerRadius="12">
-                                    <TextBlock
-                                        FontSize="12"
-                                        Foreground="{x:Bind Flags, Converter={StaticResource StatusToBrushConverter}, ConverterParameter=Foreground}"
-                                        Text="{x:Bind Status}" />
-                                </Border>
+                                <ctlBdg:Badge
+                                    DisplayText="{x:Bind Status, Mode=OneWay}"
+                                    Rules="{StaticResource PrinterStatusBadgeRules}"
+                                    Value="{x:Bind Flags, Mode=OneWay}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -139,10 +210,7 @@
             Path="BranchOffice">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
-                    <ctl:BoolBadge
-                        FalseText="No"
-                        TrueText="Yes"
-                        Value="{x:Bind BranchOffice, Mode=OneWay}" />
+                    <ctlBdg:Badge Rules="{StaticResource BranchOfficeRules}" Value="{x:Bind BranchOffice, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
         </ctlTb:TableColumn>
@@ -158,10 +226,7 @@
             Path="IsShared">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:PrinterFilterModel">
-                    <ctl:BoolBadge
-                        FalseText="Not Shared"
-                        TrueText="Shared"
-                        Value="{x:Bind IsShared, Mode=OneWay}" />
+                    <ctlBdg:Badge Rules="{StaticResource SharedBadgeRules}" Value="{x:Bind IsShared, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
         </ctlTb:TableColumn>

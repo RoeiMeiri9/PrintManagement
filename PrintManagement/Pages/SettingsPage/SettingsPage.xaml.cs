@@ -21,6 +21,7 @@ public sealed partial class SettingsPage : Page
     private void LoadSettings()
     {
         ScrollIndicatorToggle.IsOn = SettingsService.ReadSetting(Settings.ScrollIndicatorSetting.Value, Settings.ScrollIndicatorSetting.defaultValue);
+        StatusBadgeAppearanceToggle.IsOn = SettingsService.ReadSetting(Settings.StatusBadgeAppearanceSetting.Value, Settings.StatusBadgeAppearanceSetting.defaultValue);
         UseISODateFormatToggle.IsOn = SettingsService.ReadSetting(Settings.UseISODateFormatSetting.Value, Settings.UseISODateFormatSetting.defaultValue);
         WriteTrueFalseLowercaseToggle.IsOn = SettingsService.ReadSetting(Settings.WriteTrueFalseLowercaseSetting.Value, Settings.WriteTrueFalseLowercaseSetting.defaultValue);
         ShowNotSharedToggle.IsOn = SettingsService.ReadSetting(Settings.ShowNotSharedSetting.Value, Settings.ShowNotSharedSetting.defaultValue);
@@ -29,6 +30,11 @@ public sealed partial class SettingsPage : Page
     private void ScrollIndicatorToggle_Toggled(object sender, RoutedEventArgs e)
     {
         SettingsService.SaveSetting(Settings.ScrollIndicatorSetting.Value, ScrollIndicatorToggle.IsOn);
+    }
+
+    private void StatusBadgeAppearanceToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        ViewDDSettingsService.IsColorfulBadgeView = StatusBadgeAppearanceToggle.IsOn;
     }
 
     private void UseISODateFormatToggle_Toggled(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PrintManagement.Pages.CustomFilters.Helpers;
+using System;
 
 namespace PrintManagement.Pages.CustomFilters.Filters
 {
@@ -7,7 +8,7 @@ namespace PrintManagement.Pages.CustomFilters.Filters
         private string _driverName = string.Empty;
         private string _environment = string.Empty;
         private string _driverVersion = string.Empty;
-        private string _driverIsolation = string.Empty;
+        private IsolationFlag _driverIsolation = IsolationFlag.Unknown;
         private string _provider = string.Empty;
         private string _serverName = string.Empty;
         private string _printProcessor = string.Empty;
@@ -61,7 +62,7 @@ namespace PrintManagement.Pages.CustomFilters.Filters
         /// the SANDBOX_ENABLED / SANDBOX_DISABLED attribute bits; compare against the MMC
         /// on your Server 2025 VM and adjust here if they differ.
         /// </summary>
-        public string DriverIsolation
+        public IsolationFlag DriverIsolation
         {
             get => _driverIsolation;
             set { _driverIsolation = value; OnPropertyChanged(); }

@@ -33,17 +33,30 @@
                     <win:EntranceThemeTransition FromVerticalOffset="50" />
                     <win:RepositionThemeTransition IsStaggeringEnabled="False" />
                 </win:StackPanel.ChildrenTransitions>
+                <!--  Main Title  -->
                 <TextBlock
                     Margin="0,0,0,2"
                     Style="{StaticResource SubtitleTextBlockStyle}"
                     Text="Settings" />
+
+                <!--  View Section  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="View" />
+
                 <controls:SettingsCard Description="Show a visual indicator on screen when scrolling with the middle mouse button." Header="Scroll direction indicator">
                     <controls:SettingsCard.HeaderIcon>
                         <FontIcon FontFamily="{x:Bind res:Icons.ArrowOut.Font}" Glyph="{x:Bind res:Icons.ArrowOut.Glyph}" />
                     </controls:SettingsCard.HeaderIcon>
                     <ToggleSwitch x:Name="ScrollIndicatorToggle" Toggled="ScrollIndicatorToggle_Toggled" />
                 </controls:SettingsCard>
+
+                <controls:SettingsCard Description="Show statuses as colored badges with icons. When off, they appear as plain text." Header="Colorful status badges">
+                    <controls:SettingsCard.HeaderIcon>
+                        <FontIcon FontFamily="{x:Bind res:Icons.Color.Font}" Glyph="{x:Bind res:Icons.Color.Glyph}" />
+                    </controls:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="StatusBadgeAppearanceToggle" Toggled="StatusBadgeAppearanceToggle_Toggled" />
+                </controls:SettingsCard>
+
+                <!--  Export Section  -->
 
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Export" />
 
@@ -71,7 +84,8 @@
                     <ToggleSwitch x:Name="ShowNotSharedToggle" Toggled="ShowNotSharedToggle_Toggled" />
                 </controls:SettingsCard>
 
-                <!--  Example 'About' section  -->
+                <!--  About Section  -->
+
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
 
                 <controls:SettingsCard

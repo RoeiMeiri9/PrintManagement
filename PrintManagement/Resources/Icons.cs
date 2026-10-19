@@ -49,12 +49,15 @@ public class Icons(string glyph, FontFamily? font = null)
 
     // --- Settings ---
     public static readonly Icons ArrowOut = new("\uE10D", font: ExtendedSegoeFluentFont);
+    public static readonly Icons Color = new("\uE790");
     public static readonly Icons Calendar = new("\uE787");
     public static readonly Icons TextChangeCaseRegular = new("\uF7B3", font: ExtendedSegoeFluentFont);
     public static readonly Icons CodeRegular = new("\uF2F0", font: ExtendedSegoeFluentFont);
 
-    // --- BoolBadge ---
+    // --- Badge ---
     public static readonly Icons ErrorBadge12 = new("\uEDAE");
     public static readonly Icons AcceptMedium = new("\uF78C");
-    public static readonly Icons RadioBullet = new("\uE915");
+    public static readonly Icons Help = new("\uE897");
+    public static readonly Icons InternetSharing = new("\uE704");
+    public static readonly Icons Lock = new("\uE72E");
 }

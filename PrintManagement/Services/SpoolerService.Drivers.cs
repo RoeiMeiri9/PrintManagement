@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using PrintManagement.Pages.CustomFilters.Filters;
+using PrintManagement.Pages.CustomFilters.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -282,19 +283,19 @@ public static unsafe partial class SpoolerService
         }
     }
 
-    private static string FormatIsolation(string driverName, DriverAttributes attrs, IsolationConfig? cfg)
+    private static IsolationFlag FormatIsolation(string driverName, DriverAttributes attrs, IsolationConfig? cfg)
     {
-        if (cfg is null) return "Unknown";
-        if (!cfg.IsolationEnabled) return "None";                    // GP: machine disabled
+        if (cfg is null) return IsolationFlag.Unknown;
+        if (!cfg.IsolationEnabled) return IsolationFlag.None;                    // GP: machine disabled
 
         for (int i = 0; i < cfg.Groups.Count; i++)                   // per-driver mode set
             if (cfg.Groups[i].Contains(driverName))
-                return i == 0 ? "None" : i == 1 ? "Shared" : "Isolated";
+                return i == 0 ? IsolationFlag.None : i == 1 ? IsolationFlag.Shared : IsolationFlag.Isolation;
 
         // Not set: INF compat (0x4 as proxy) → Shared; else the override policy decides.
         // NOTE: the 0x4 = "INF DriverIsolation=2" mapping is untested. No driver with this flag was
         // available on the test servers (all isolatable drivers there were v3 without 0x4).
-        return attrs.HasFlag(DriverAttributes.SandboxEnabled) || cfg.OverrideCompat ? "Shared" : "None";
+        return attrs.HasFlag(DriverAttributes.SandboxEnabled) || cfg.OverrideCompat ? IsolationFlag.Shared : IsolationFlag.None;
     }
 
 

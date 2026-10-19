@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PrintManagement.Resources;
+using System;
 
 namespace PrintManagement.Services;
 
@@ -8,8 +9,9 @@ namespace PrintManagement.Services;
 /// </summary>
 internal class ViewDDSettingsService
 {
-    private const string CompactViewKey = "IsCompactView";
-    private static bool _isCompactView = SettingsService.ReadSetting<bool>(CompactViewKey);
+    // --- Compact View ---
+    private static bool _isCompactView = SettingsService.ReadSetting(
+        Settings.CompactViewSetting.Value, Settings.CompactViewSetting.defaultValue);
 
     public static bool IsCompactView
     {
@@ -19,11 +21,30 @@ internal class ViewDDSettingsService
             if (_isCompactView != value)
             {
                 _isCompactView = value;
-                SettingsService.SaveSetting(CompactViewKey, _isCompactView);
+                SettingsService.SaveSetting(Settings.CompactViewSetting.Value, _isCompactView);
                 CompactViewChanged?.Invoke(null, _isCompactView);
             }
         }
     }
 
     public static event EventHandler<bool>? CompactViewChanged;
+
+    // --- Minimal Badge View ---
+    private static bool _isColorfulBadgeView = SettingsService.ReadSetting(
+        Settings.StatusBadgeAppearanceSetting.Value, Settings.StatusBadgeAppearanceSetting.defaultValue);
+    public static bool IsColorfulBadgeView
+    {
+        get => _isColorfulBadgeView;
+        set
+        {
+            if (_isColorfulBadgeView != value)
+            {
+                _isColorfulBadgeView = value;
+                SettingsService.SaveSetting(Settings.StatusBadgeAppearanceSetting.Value, _isColorfulBadgeView);
+                BadgeStyleChanged?.Invoke(null, _isColorfulBadgeView);
+            }
+        }
+    }
+
+    public static event EventHandler<bool>? BadgeStyleChanged;
 }

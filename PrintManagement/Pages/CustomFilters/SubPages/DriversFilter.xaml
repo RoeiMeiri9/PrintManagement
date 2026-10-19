@@ -4,15 +4,110 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:comp="using:PrintManagement.Pages.CustomFilters.Comparers"
-    xmlns:ctl="using:PrintManagement.Controls"
+    xmlns:ctlBdg="using:PrintManagement.Controls.BadgeControl"
     xmlns:ctlTb="using:PrintManagement.Controls.Table"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hlps="using:PrintManagement.Pages.CustomFilters.Helpers"
     xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:res="using:PrintManagement.Resources"
     xmlns:vm="using:PrintManagement.Pages.CustomFilters.Filters"
     d:DataContext="{d:DesignInstance Type=vm:PrinterFilterModel}"
     mc:Ignorable="d">
+
+    <Page.Resources>
+        <ctlBdg:BadgeRuleCollection x:Key="PackagedBadgeRules">
+            <ctlBdg:BadgeRule
+                Key="True"
+                BackgroundResourceKey="StatusGreenBrush"
+                DisplayText="Packaged"
+                ForegroundResourceKey="SystemFillColorSuccessBrush"
+                Glyph="{x:Bind res:Icons.AcceptMedium.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.AcceptMedium.Font}" />
+
+            <ctlBdg:BadgeRule
+                Key="False"
+                BackgroundResourceKey="StatusDefaultBrush"
+                DisplayText="Not Packaged"
+                ForegroundResourceKey="SystemFillColorSolidNeutralBrush"
+                Glyph="{x:Bind res:Icons.ErrorBadge12.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.ErrorBadge12.Font}" />
+        </ctlBdg:BadgeRuleCollection>
+
+        <ctlBdg:BadgeRuleCollection x:Key="XPSDriverBadgeRules">
+            <ctlBdg:BadgeRule
+                Key="True"
+                BackgroundResourceKey="StatusGreenBrush"
+                DisplayText="Supported"
+                ForegroundResourceKey="SystemFillColorSuccessBrush"
+                Glyph="{x:Bind res:Icons.AcceptMedium.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.AcceptMedium.Font}" />
+
+            <ctlBdg:BadgeRule
+                Key="False"
+                BackgroundResourceKey="StatusDefaultBrush"
+                DisplayText="Not Supported"
+                ForegroundResourceKey="SystemFillColorSolidNeutralBrush"
+                Glyph="{x:Bind res:Icons.ErrorBadge12.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.ErrorBadge12.Font}" />
+        </ctlBdg:BadgeRuleCollection>
+
+        <ctlBdg:BadgeRuleCollection x:Key="ShareableBadgeRules">
+            <ctlBdg:BadgeRule
+                Key="True"
+                BackgroundResourceKey="StatusGreenBrush"
+                DisplayText="Shared"
+                ForegroundResourceKey="SystemFillColorSuccessBrush"
+                Glyph="{x:Bind res:Icons.AcceptMedium.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.AcceptMedium.Font}" />
+
+            <ctlBdg:BadgeRule
+                Key="False"
+                BackgroundResourceKey="StatusDefaultBrush"
+                DisplayText="Not Shared"
+                ForegroundResourceKey="SystemFillColorSolidNeutralBrush"
+                Glyph="{x:Bind res:Icons.ErrorBadge12.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.ErrorBadge12.Font}" />
+        </ctlBdg:BadgeRuleCollection>
+
+        <ctlBdg:BadgeRuleCollection x:Key="DriverIsolationBadgeRules">
+            <!--  Green  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:IsolationFlag.Shared}"
+                BackgroundResourceKey="StatusGreenBrush"
+                DisplayText="Shared"
+                ForegroundResourceKey="SystemFillColorSuccessBrush"
+                Glyph="{x:Bind res:Icons.InternetSharing.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.InternetSharing.Font}" />
+
+            <!--  Orange  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:IsolationFlag.Isolation}"
+                BackgroundResourceKey="StatusOrangeBrush"
+                DisplayText="Isolated"
+                ForegroundResourceKey="SystemFillColorCautionBrush"
+                Glyph="{x:Bind res:Icons.Lock.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.Lock.Font}" />
+
+            <!--  Red  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:IsolationFlag.Unknown}"
+                BackgroundResourceKey="StatusRedBrush"
+                DisplayText="Unknown"
+                ForegroundResourceKey="SystemFillColorCriticalBrush"
+                Glyph="{x:Bind res:Icons.Help.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.Help.Font}" />
+
+            <!--  Grey  -->
+            <ctlBdg:BadgeRule
+                Key="{x:Bind hlps:IsolationFlag.None}"
+                BackgroundResourceKey="StatusDefaultBrush"
+                DisplayText="None"
+                ForegroundResourceKey="SystemFillColorSolidNeutralBrush"
+                Glyph="{x:Bind res:Icons.ErrorBadge12.Glyph}"
+                GlyphFontFamily="{x:Bind res:Icons.ErrorBadge12.Font}" />
+        </ctlBdg:BadgeRuleCollection>
+    </Page.Resources>
 
     <ctlTb:DataTable
         x:Name="PrintersTable"
@@ -65,7 +160,13 @@
         <ctlTb:TableColumn
             Width="130"
             Header="Driver Isolation"
-            Path="DriverIsolation" />
+            Path="DriverIsolation">
+            <ctlTb:TableColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:DriversFilterModel">
+                    <ctlBdg:Badge Rules="{StaticResource DriverIsolationBadgeRules}" Value="{x:Bind DriverIsolation, Mode=OneWay}" />
+                </DataTemplate>
+            </ctlTb:TableColumn.CellTemplate>
+        </ctlTb:TableColumn>
 
         <ctlTb:TableColumn
             Width="112"
@@ -88,10 +189,7 @@
             Path="Packaged">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:DriversFilterModel">
-                    <ctl:BoolBadge
-                        FalseText="Not Packaged"
-                        TrueText="Packaged"
-                        Value="{x:Bind Packaged, Mode=OneWay}" />
+                    <ctlBdg:Badge Rules="{StaticResource PackagedBadgeRules}" Value="{x:Bind Packaged, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
         </ctlTb:TableColumn>
@@ -119,10 +217,7 @@
             Path="XPSDriver">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:DriversFilterModel">
-                    <ctl:BoolBadge
-                        FalseText="Not Supported"
-                        TrueText="Supported"
-                        Value="{x:Bind XPSDriver, Mode=OneWay}" />
+                    <ctlBdg:Badge Rules="{StaticResource XPSDriverBadgeRules}" Value="{x:Bind XPSDriver, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
         </ctlTb:TableColumn>
@@ -157,8 +252,9 @@
             Path="HardwareID" />
 
         <ctlTb:TableColumn
-            Width="121"
+            Width="Auto"
             Header="Help File Path"
+            MaxAutoWidth="400"
             Path="HelpFilePath" />
 
         <ctlTb:TableColumn
@@ -182,10 +278,7 @@
             Path="Shareable">
             <ctlTb:TableColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:DriversFilterModel">
-                    <ctl:BoolBadge
-                        FalseText="Not Shared"
-                        TrueText="Shared"
-                        Value="{x:Bind Shareable, Mode=OneWay}" />
+                    <ctlBdg:Badge Rules="{StaticResource ShareableBadgeRules}" Value="{x:Bind Shareable, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
         </ctlTb:TableColumn>

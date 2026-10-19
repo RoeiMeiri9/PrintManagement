@@ -16,7 +16,7 @@
         <!--  Dark Theme  -->
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="StatusGreenBrush" Color="#443E9832" />
-            <SolidColorBrush x:Key="StatusOrangeBrush" Color="#3EF49F2C" />
+            <SolidColorBrush x:Key="StatusOrangeBrush" Color="#3EDC8005" />
             <SolidColorBrush x:Key="StatusRedBrush" Color="#44CB2B40" />
             <SolidColorBrush x:Key="StatusDefaultBrush" Color="#338a8a8a" />
         </ResourceDictionary>
