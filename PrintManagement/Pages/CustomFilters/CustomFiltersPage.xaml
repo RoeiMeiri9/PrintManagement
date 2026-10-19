@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:CommunityToolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:converters="using:PrintManagement.Converters"
+    xmlns:ctrlSSC="using:PrintManagement.Controls.SnapSplitterControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:filters="using:PrintManagement.Pages.CustomFilters.Filters"
     xmlns:local="using:PrintManagement.Pages.CustomFilters"
@@ -21,17 +22,21 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <Grid>
+        <Grid x:Name="SplitRoot">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
+                    x:Name="TreeColumn"
                     Width="250"
-                    MinWidth="200"
                     MaxWidth="500" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0">
+            <Border
+                Grid.Column="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                CornerRadius="0">
                 <TreeView
                     x:Name="FiltersTree"
                     Margin="4,7,-3,8"
@@ -74,16 +79,33 @@
                         </DataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-            </StackPanel>
-            <CommunityToolkit:GridSplitter
+            </Border>
+            <ctrlSSC:SnapSplitter
+                x:Name="TreeSplitter"
                 Grid.Column="1"
-                Width="6"
-                HorizontalAlignment="Center"
+                Width="8"
                 VerticalAlignment="Stretch"
+                Background="Transparent"
                 BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                 BorderThickness="0,0,1,0"
-                ResizeBehavior="PreviousAndNext"
-                ResizeDirection="Columns" />
+                PointerCaptureLost="TreeSplitter_PointerCaptureLost"
+                PointerEntered="TreeSplitter_PointerEntered"
+                PointerExited="TreeSplitter_PointerExited"
+                PointerMoved="TreeSplitter_PointerMoved"
+                PointerPressed="TreeSplitter_PointerPressed"
+                PointerReleased="TreeSplitter_PointerReleased">
+                <Border
+                    x:Name="SplitterHighlight"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource ControlStrongFillColorDefaultBrush}"
+                    CornerRadius="1"
+                    IsHitTestVisible="False"
+                    Opacity="0">
+                    <Border.OpacityTransition>
+                        <ScalarTransition Duration="0:0:0.15" />
+                    </Border.OpacityTransition>
+                </Border>
+            </ctrlSSC:SnapSplitter>
 
             <Frame
                 x:Name="FilterSubPage"
