@@ -1,8 +1,8 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using PrintManagement.Models;
 using PrintManagement.Pages.CustomFilters.Components.TreeViewLeaf;
-using PrintManagement.Pages.CustomFilters.Filters;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using PrintManagement.Pages.CustomFilters.SubPages;
 using PrintManagement.Resources;
@@ -22,8 +22,8 @@ public sealed partial class CustomFiltersPage : Page
     private bool _isLoadingPrinters;
     private bool _isLoadingDrivers;
     public ObservableCollection<FilterLeaf> FiltersList { get; } = [];
-    public ObservableCollection<PrinterFilterModel> PrinterFiltersList { get; } = [];
-    public ObservableCollection<DriversFilterModel> DriverFiltersList { get; } = [];
+    public ObservableCollection<PrinterModel> PrinterModelList { get; } = [];
+    public ObservableCollection<DriverModel> DriverModelList { get; } = [];
 
     public string SelectedFilterName
     {
@@ -68,15 +68,15 @@ public sealed partial class CustomFiltersPage : Page
         {
             // Reuse the drivers page's list so the server isn't asked for the same drivers twice.
             // If that load failed (empty list), pass null and let the service fetch them itself.
-            IReadOnlyList<DriversFilterModel>? knownDrivers =
-                DriverFiltersList.Count > 0 ? DriverFiltersList.ToList() : null;
+            IReadOnlyList<DriverModel>? knownDrivers =
+                DriverModelList.Count > 0 ? DriverModelList.ToList() : null;
 
             var printers = await SpoolerService.GetPrintersAsync(
                 serverName: @"\\WIN-HO9KT6LB37V", includeConnections: true, knownDrivers: knownDrivers);
 
-            PrinterFiltersList.Clear();
+            PrinterModelList.Clear();
             foreach (var p in printers)
-                PrinterFiltersList.Add(p);
+                PrinterModelList.Add(p);
         }
         catch (Exception ex)
         {
@@ -98,9 +98,9 @@ public sealed partial class CustomFiltersPage : Page
         {
             var drivers = await SpoolerService.GetDriversAsync(serverName: @"\\WIN-HO9KT6LB37V");
 
-            DriverFiltersList.Clear();
+            DriverModelList.Clear();
             foreach (var d in drivers)
-                DriverFiltersList.Add(d);
+                DriverModelList.Add(d);
         }
         catch (Exception ex)
         {
@@ -133,13 +133,13 @@ public sealed partial class CustomFiltersPage : Page
             DisplayName = "All Printers",
             LeafIcon = Icons.Filter,
             DisplayTotalItems = Visibility.Visible,
-            TotalItems = PrinterFiltersList.Count,
+            TotalItems = PrinterModelList.Count,
             FilterPage = FilterPages.PrinterPage
         };
 
-        PrinterFiltersList.CollectionChanged += (s, args) =>
+        PrinterModelList.CollectionChanged += (s, args) =>
         {
-            allPrintersLeaf.TotalItems = PrinterFiltersList.Count;
+            allPrintersLeaf.TotalItems = PrinterModelList.Count;
         };
 
         printersRoot.Children.Add(allPrintersLeaf);
@@ -180,13 +180,13 @@ public sealed partial class CustomFiltersPage : Page
             DisplayName = "All Drivers",
             LeafIcon = Icons.Filter,
             DisplayTotalItems = Visibility.Visible,
-            TotalItems = DriverFiltersList.Count,
+            TotalItems = DriverModelList.Count,
             FilterPage = FilterPages.DriverPage
         };
 
-        DriverFiltersList.CollectionChanged += (s, args) =>
+        DriverModelList.CollectionChanged += (s, args) =>
         {
-            allDriversLeaf.TotalItems = DriverFiltersList.Count;
+            allDriversLeaf.TotalItems = DriverModelList.Count;
         };
 
         driversRoot.Children.Add(allDriversLeaf);
@@ -234,10 +234,10 @@ public sealed partial class CustomFiltersPage : Page
             switch (leaf.FilterPage)
             {
                 case FilterPages.PrinterPage:
-                    FilterSubPage.Navigate(typeof(PrintersFilter), PrinterFiltersList);
+                    FilterSubPage.Navigate(typeof(PrintersFilter), PrinterModelList);
                     break;
                 case FilterPages.DriverPage:
-                    FilterSubPage.Navigate(typeof(DriversFilter), DriverFiltersList);
+                    FilterSubPage.Navigate(typeof(DriversFilter), DriverModelList);
                     break;
             }
             NavigationStateService.LastSelectedFilterName = leaf.Name;

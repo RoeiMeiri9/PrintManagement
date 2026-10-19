@@ -2,9 +2,9 @@
 using PrintManagement.Services;
 using System.Collections.Generic;
 
-namespace PrintManagement.Pages.CustomFilters.Filters;
+namespace PrintManagement.Models;
 
-public partial class PrinterFilterModel : FilterModler
+public partial class PrinterModel : EntityModel
 {
     private string _name = string.Empty;
     private List<PrinterStatusInfo> _queueStatus = [];

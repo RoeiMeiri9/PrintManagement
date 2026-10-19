@@ -6,7 +6,7 @@ using PrintManagement.Services;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace PrintManagement.Controls.Table;
+namespace PrintManagement.Controls.DataTableControl;
 
 [ContentProperty(Name = nameof(Columns))]
 public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequestMessage>

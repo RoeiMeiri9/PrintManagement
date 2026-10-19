@@ -5,14 +5,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:comp="using:PrintManagement.Pages.CustomFilters.Comparers"
     xmlns:ctlBdg="using:PrintManagement.Controls.BadgeControl"
-    xmlns:ctlTb="using:PrintManagement.Controls.Table"
+    xmlns:ctlTb="using:PrintManagement.Controls.DataTableControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hlps="using:PrintManagement.Pages.CustomFilters.Helpers"
     xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mdl="using:PrintManagement.Models"
     xmlns:res="using:PrintManagement.Resources"
-    xmlns:vm="using:PrintManagement.Pages.CustomFilters.Filters"
-    d:DataContext="{d:DesignInstance Type=vm:PrinterFilterModel}"
+    d:DataContext="{d:DesignInstance Type=mdl:PrinterModel}"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -101,7 +101,7 @@
         x:Name="PrintersTable"
         Grid.Column="2"
         CompactView="{x:Bind IsCompact, Mode=OneWay}"
-        ItemsSource="{x:Bind PrinterFiltersList, Mode=OneWay}">
+        ItemsSource="{x:Bind PrinterModelList, Mode=OneWay}">
 
         <ctlTb:TableColumn
             Width="Auto"
@@ -109,7 +109,7 @@
             Path="Name"
             SortPath="Name">
             <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                <DataTemplate x:DataType="mdl:PrinterModel">
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -140,7 +140,7 @@
             Path="QueueStatus"
             SortPath="QueueStatus">
             <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                <DataTemplate x:DataType="mdl:PrinterModel">
                     <ItemsControl ItemsSource="{x:Bind QueueStatus, Mode=OneWay}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -165,7 +165,7 @@
             Header="Jobs In Queue"
             Path="JobsInQueue">
             <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                <DataTemplate x:DataType="mdl:PrinterModel">
                     <TextBlock Foreground="{x:Bind JobsInQueue, Converter={StaticResource JobsCounterConverter}}" Text="{x:Bind JobsInQueue, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
@@ -209,7 +209,7 @@
             Header="Branch Office"
             Path="BranchOffice">
             <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                <DataTemplate x:DataType="mdl:PrinterModel">
                     <ctlBdg:Badge Rules="{StaticResource BranchOfficeRules}" Value="{x:Bind BranchOffice, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
@@ -225,7 +225,7 @@
             Header="Is Shared"
             Path="IsShared">
             <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                <DataTemplate x:DataType="mdl:PrinterModel">
                     <ctlBdg:Badge Rules="{StaticResource SharedBadgeRules}" Value="{x:Bind IsShared, Mode=OneWay}" />
                 </DataTemplate>
             </ctlTb:TableColumn.CellTemplate>
@@ -247,7 +247,7 @@
             Header="Share Name"
             Path="ShareName">
             <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="vm:PrinterFilterModel">
+                <DataTemplate x:DataType="mdl:PrinterModel">
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                         <TextBlock
                             VerticalAlignment="Center"

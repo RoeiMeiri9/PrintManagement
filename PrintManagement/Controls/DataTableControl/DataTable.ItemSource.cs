@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace PrintManagement.Controls.Table
+namespace PrintManagement.Controls.DataTableControl
 {
     public partial class DataTable
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using PrintManagement.Pages.CustomFilters.Filters;
+using PrintManagement.Models;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using System;
 using System.Collections.Generic;
@@ -74,11 +74,11 @@ public static unsafe partial class SpoolerService
     // ───────────── Printers: public API ─────────────
 
     /// <param name="serverName">null = local machine, otherwise e.g. "\\\\PRINTSRV".</param>
-    public static IReadOnlyList<PrinterFilterModel> GetPrinters(
+    public static IReadOnlyList<PrinterModel> GetPrinters(
         string? serverName = null, bool includeConnections = true,
-        IReadOnlyList<DriversFilterModel>? knownDrivers = null)
+        IReadOnlyList<DriverModel>? knownDrivers = null)
     {
-        Dictionary<string, List<DriversFilterModel>> drivers;
+        Dictionary<string, List<DriverModel>> drivers;
         if (knownDrivers is not null)
         {
             drivers = ToDriverMap(knownDrivers);
@@ -111,7 +111,7 @@ public static unsafe partial class SpoolerService
 
         try
         {
-            var result = QueryBuffer<IReadOnlyList<PrinterFilterModel>>(
+            var result = QueryBuffer<IReadOnlyList<PrinterModel>>(
             (byte* buf, uint size, out uint needed, out uint count) =>
                 PInvoke.EnumPrinters(flags, serverName, 2, buf, size, out needed, out count),
             (buf, count) => ParsePrinters(buf, count, drivers, ports, registryBase, remote: serverName is not null),
@@ -129,14 +129,14 @@ public static unsafe partial class SpoolerService
 
     // ───────────── Printers: parsing ─────────────
 
-    private static List<PrinterFilterModel> ParsePrinters(
+    private static List<PrinterModel> ParsePrinters(
      byte* buffer, uint count,
-     Dictionary<string, List<DriversFilterModel>> drivers,
+     Dictionary<string, List<DriverModel>> drivers,
      Dictionary<string, PortDetails> ports,
      RegistryKey? registryBase, bool remote)
     {
 
-        var result = new List<PrinterFilterModel>((int)count);
+        var result = new List<PrinterModel>((int)count);
         var items = (PRINTER_INFO_2*)buffer;
 
         for (uint i = 0; i < count; i++)
@@ -156,7 +156,7 @@ public static unsafe partial class SpoolerService
             string driverName = S(p.pDriverName);
             string serverDisplayName = FormatServerName(serverRawName);
             string portName = S(p.pPortName);
-            DriversFilterModel? drv = ResolveDriver(rawName, serverRawName, driverName, drivers);  // raw name: it needs the qualified form
+            DriverModel? drv = ResolveDriver(rawName, serverRawName, driverName, drivers);  // raw name: it needs the qualified form
             bool isBranchOffice = IsBranchOffice(registryBase, printerName);
 
             var (kind, summary) = DetermineConnection(p.Attributes, printerName, serverRawName, portName, driverName, isBranchOffice, ports, remote);
@@ -164,7 +164,7 @@ public static unsafe partial class SpoolerService
             Logger.Log($"printerName: {printerName}, serverName: {serverRawName}, formattedServerName: {serverDisplayName}, attributes: {p.Attributes}");
 
 
-            result.Add(new PrinterFilterModel
+            result.Add(new PrinterModel
             {
                 Name = printerName,
                 ServerName = serverDisplayName,

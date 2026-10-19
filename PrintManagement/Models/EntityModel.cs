@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace PrintManagement.Pages.CustomFilters.Filters
+namespace PrintManagement.Models
 {
 
-    public partial class FilterModler : INotifyPropertyChanged
+    public partial class EntityModel : INotifyPropertyChanged
     {
         public const uint DEFAULT_VALUE = 0;
 

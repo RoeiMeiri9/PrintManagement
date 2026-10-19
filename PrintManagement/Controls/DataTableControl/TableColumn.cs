@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Security;
 
-namespace PrintManagement.Controls.Table;
+namespace PrintManagement.Controls.DataTableControl;
 
 public enum TableSortDirection
 {

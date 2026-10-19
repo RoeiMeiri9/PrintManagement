@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <UserControl
-    x:Class="PrintManagement.Controls.Table.DataTable"
+    x:Class="PrintManagement.Controls.DataTableControl.DataTable"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:PrintManagement.Controls.Table"
+    xmlns:local="using:PrintManagement.Controls.DataTableControl"
     xmlns:prim="using:Microsoft.UI.Xaml.Controls.Primitives"
     x:Name="RootDataTable">
 

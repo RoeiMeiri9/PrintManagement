@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PrintManagement.Controls.Table
+namespace PrintManagement.Controls.DataTableControl
 {
     public partial class DataTable
     {

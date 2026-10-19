@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32.SafeHandles;
-using PrintManagement.Pages.CustomFilters.Filters;
+using PrintManagement.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -98,11 +98,11 @@ public static unsafe partial class SpoolerService
             ? RunWithCredentials(c.User, c.Domain, c.Password, action)
             : action();
 
-    public static Task<IReadOnlyList<PrinterFilterModel>> GetPrintersAsync(
+    public static Task<IReadOnlyList<PrinterModel>> GetPrintersAsync(
         string? serverName = null, bool includeConnections = true,
-        IReadOnlyList<DriversFilterModel>? knownDrivers = null)
+        IReadOnlyList<DriverModel>? knownDrivers = null)
         => Task.Run(() => WithCreds(serverName, () => GetPrinters(serverName, includeConnections, knownDrivers)));
 
-    public static Task<IReadOnlyList<DriversFilterModel>> GetDriversAsync(string? serverName = null)
+    public static Task<IReadOnlyList<DriverModel>> GetDriversAsync(string? serverName = null)
         => Task.Run(() => WithCreds(serverName, () => GetDrivers(serverName)));
 }

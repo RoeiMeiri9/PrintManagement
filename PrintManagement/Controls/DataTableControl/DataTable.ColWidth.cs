@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Linq;
 
-namespace PrintManagement.Controls.Table
+namespace PrintManagement.Controls.DataTableControl
 {
     public partial class DataTable
     {

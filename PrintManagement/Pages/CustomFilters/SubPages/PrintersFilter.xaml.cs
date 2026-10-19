@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using PrintManagement.Pages.CustomFilters.Filters;
+using PrintManagement.Models;
 using PrintManagement.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,7 +10,7 @@ namespace PrintManagement.Pages.CustomFilters.SubPages;
 
 public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
 {
-    public ObservableCollection<PrinterFilterModel> PrinterFiltersList { get; set; } = [];
+    public ObservableCollection<PrinterModel> PrinterModelList { get; set; } = [];
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public bool _isCompact = false;
@@ -38,9 +38,9 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is ObservableCollection<PrinterFilterModel> receivedPrinterFiltersList)
+        if (e.Parameter is ObservableCollection<PrinterModel> receivedPrinterModelList)
         {
-            PrinterFiltersList = receivedPrinterFiltersList;
+            PrinterModelList = receivedPrinterModelList;
         }
     }
 

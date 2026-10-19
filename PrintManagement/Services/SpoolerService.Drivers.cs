@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using PrintManagement.Pages.CustomFilters.Filters;
+using PrintManagement.Models;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using System;
 using System.Collections.Generic;
@@ -70,9 +70,9 @@ public static unsafe partial class SpoolerService
     // ───────────── Drivers page: all environments ─────────────
 
     /// <summary>Every driver on the server, across all supported architectures.</summary>
-    public static IReadOnlyList<DriversFilterModel> GetDrivers(string? serverName = null)
+    public static IReadOnlyList<DriverModel> GetDrivers(string? serverName = null)
     {
-        var all = new List<DriversFilterModel>();
+        var all = new List<DriverModel>();
         IsolationConfig? cfg = ReadIsolationConfig(serverName);
         foreach (string env in DriverEnvironments)
         {
@@ -98,7 +98,7 @@ public static unsafe partial class SpoolerService
     // ───────────── Printers page: native architecture only ─────────────
 
     /// <summary>Name → drivers map for the server's native architecture (used to resolve printers).</summary>
-    public static Dictionary<string, List<DriversFilterModel>> FetchDrivers(string? serverName)
+    public static Dictionary<string, List<DriverModel>> FetchDrivers(string? serverName)
     {
         IsolationConfig? cfg = ReadIsolationConfig(serverName);
 
@@ -112,9 +112,9 @@ public static unsafe partial class SpoolerService
         return ToDriverMap(list);
     }
 
-    private static Dictionary<string, List<DriversFilterModel>> ToDriverMap(IEnumerable<DriversFilterModel> list)
+    private static Dictionary<string, List<DriverModel>> ToDriverMap(IEnumerable<DriverModel> list)
     {
-        var map = new Dictionary<string, List<DriversFilterModel>>(StringComparer.OrdinalIgnoreCase);
+        var map = new Dictionary<string, List<DriverModel>>(StringComparer.OrdinalIgnoreCase);
         foreach (var d in list)
         {
             if (!map.TryGetValue(d.DriverName, out var bucket))
@@ -126,9 +126,9 @@ public static unsafe partial class SpoolerService
 
     // ───────────── Parsing ─────────────
 
-    private static List<DriversFilterModel> ParseDrivers(byte* buffer, uint count, string? serverName, IsolationConfig? cfg)
+    private static List<DriverModel> ParseDrivers(byte* buffer, uint count, string? serverName, IsolationConfig? cfg)
     {
-        var result = new List<DriversFilterModel>((int)count);
+        var result = new List<DriverModel>((int)count);
         var items = (DRIVER_INFO_8*)buffer;
 
         for (uint i = 0; i < count; i++)
@@ -140,13 +140,13 @@ public static unsafe partial class SpoolerService
         return result;
     }
 
-    private static DriversFilterModel ToDetails(in DRIVER_INFO_8 d, string? serverName, IsolationConfig? cfg)
+    private static DriverModel ToDetails(in DRIVER_INFO_8 d, string? serverName, IsolationConfig? cfg)
     {
         var attrs = (DriverAttributes)d.dwPrinterDriverAttributes;
         string driverName = Str(d.pName);
         bool packageAware = attrs.HasFlag(DriverAttributes.PackageAware);
 
-        return new DriversFilterModel
+        return new DriverModel
         {
             DriverName = driverName,
             Environment = Str(d.pEnvironment),
@@ -181,9 +181,9 @@ public static unsafe partial class SpoolerService
     /// Ambiguous (e.g. same name as both v3 and v4) → ask the spooler which
     /// driver this specific printer uses. Never guesses.
     /// </summary>
-    private static DriversFilterModel? ResolveDriver(
+    private static DriverModel? ResolveDriver(
     string printerName, string rawServer, string driverName,
-    Dictionary<string, List<DriversFilterModel>> drivers)
+    Dictionary<string, List<DriverModel>> drivers)
     {
         if (driverName.Length == 0 || !drivers.TryGetValue(driverName, out var candidates))
             return null;
@@ -194,8 +194,8 @@ public static unsafe partial class SpoolerService
                ?? candidates.OrderByDescending(c => c.CVersion).First();
     }
 
-    private static DriversFilterModel? GetExactDriver(
-        string printerName, string rawServer, List<DriversFilterModel> candidates)
+    private static DriverModel? GetExactDriver(
+        string printerName, string rawServer, List<DriverModel> candidates)
     {
         // Qualify the name so a remote printer isn't opened on the local spooler.
         string target = rawServer.Length > 0 && !printerName.StartsWith(@"\\")

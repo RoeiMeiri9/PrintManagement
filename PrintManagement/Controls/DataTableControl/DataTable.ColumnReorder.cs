@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Input;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace PrintManagement.Controls.Table
+namespace PrintManagement.Controls.DataTableControl
 {
     public partial class DataTable
     {

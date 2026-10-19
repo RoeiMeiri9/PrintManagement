@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PrintManagement.Controls.Table;
+namespace PrintManagement.Controls.DataTableControl;
 
 public partial class DataTable
 {

@@ -4,13 +4,13 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 
-namespace PrintManagement.Controls.Table;
+namespace PrintManagement.Controls.DataTableControl;
 
 // These are plain data holders. All the UI for a row/cell lives in DataTable.xaml.
 
 /// <summary>
 /// Represents a single row within the table.
-/// Bridges the underlying raw domain object (e.g., PrinterFilterModel) with the UI cells.
+/// Bridges the underlying raw domain object (e.g., PrinterModel) with the UI cells.
 /// </summary>
 public sealed class TableRow
 {

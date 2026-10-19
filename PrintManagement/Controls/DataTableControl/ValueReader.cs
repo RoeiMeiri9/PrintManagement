@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace PrintManagement.Controls.Table;
+namespace PrintManagement.Controls.DataTableControl;
 
 /// <summary>
 /// Reflection helper that extracts property values from data models dynamically at runtime.

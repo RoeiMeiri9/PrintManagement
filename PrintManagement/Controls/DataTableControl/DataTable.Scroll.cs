@@ -11,7 +11,7 @@ using System;
 using System.Diagnostics;
 using Windows.Foundation;
 
-namespace PrintManagement.Controls.Table
+namespace PrintManagement.Controls.DataTableControl
 {
     public partial class DataTable
     {

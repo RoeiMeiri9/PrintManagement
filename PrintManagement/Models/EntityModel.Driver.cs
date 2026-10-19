@@ -1,9 +1,9 @@
 ﻿using PrintManagement.Pages.CustomFilters.Helpers;
 using System;
 
-namespace PrintManagement.Pages.CustomFilters.Filters
+namespace PrintManagement.Models
 {
-    public partial class DriversFilterModel : FilterModler
+    public partial class DriverModel : EntityModel
     {
         private string _driverName = string.Empty;
         private string _environment = string.Empty;
