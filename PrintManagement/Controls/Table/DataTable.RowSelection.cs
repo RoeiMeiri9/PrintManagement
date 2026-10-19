@@ -25,6 +25,6 @@ namespace PrintManagement.Controls.Table
         private static List<object> Unwrap(IList<object> rows) =>
             [.. rows.OfType<TableRow>().Select(r => r.Item)];
 
-        private TableRow? FindRow(object item) => _all.FirstOrDefault(r => ReferenceEquals(r.Item, item));
+        private TableRow? FindRow(object item) => _originalUnsortedRows.FirstOrDefault(r => ReferenceEquals(r.Item, item));
     }
 }

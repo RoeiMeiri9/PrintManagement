@@ -38,36 +38,29 @@ namespace PrintManagement.Controls.Table
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add when e.NewItems != null && e.NewStartingIndex >= 0:
-                    var c1index = e.NewStartingIndex;
+                    var startingIndex = e.NewStartingIndex;
                     foreach (var item in e.NewItems)
                     {
                         if (item == null) continue;
                         var row = new TableRow(this, item);
-                        _all.Insert(Math.Min(c1index++, _all.Count), row);
+                        _originalUnsortedRows.Insert(Math.Min(startingIndex++, _originalUnsortedRows.Count), row);
                         InsertIntoView(row);
                     }
+                    DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+                    {
+                        RecalculateAutoWidths();
+                    });
                     break;
 
                 case NotifyCollectionChangedAction.Remove when e.OldItems != null:
                     foreach (var item in e.OldItems)
                     {
                         if (item == null || FindRow(item) is not { } row) continue;
-                        _all.Remove(row);
+                        _originalUnsortedRows.Remove(row);
                         Rows.Remove(row);
                     }
                     break;
 
-                case NotifyCollectionChangedAction.Add when e.NewItems != null && e.NewStartingIndex >= 0:
-                    var c3index = e.NewStartingIndex;
-                    foreach (var item in e.NewItems)
-                    {
-                        if (item == null) continue;
-                        var row = new TableRow(this, item);
-                        _all.Insert(Math.Min(c3index++, _all.Count), row);
-                        InsertIntoView(row);
-                    }
-                    RecalculateAutoWidths();
-                    break;
 
                 default: // replace / move / reset
                     RebuildRows();
@@ -75,20 +68,28 @@ namespace PrintManagement.Controls.Table
             }
         }
 
-        // a single new item goes straight to its sorted position instead of re-sorting everything
+        /// <summary>
+        /// Inserts a newly added row directly into its sorted position within <see cref="Rows"/>.
+        /// Uses binary search to pinpoint the target index in O(log N) time, avoiding a full table re-sort.
+        /// </summary>
+        /// <param name="row">The new <see cref="TableRow"/> instance to insert.</param>
         private void InsertIntoView(TableRow row)
         {
+            // If no column is currently sorted, append relative to the unsorted source order.
             if (SortColumn is not { } col)
             {
-                Rows.Insert(Math.Min(_all.IndexOf(row), Rows.Count), row);
+                Rows.Insert(Math.Min(_originalUnsortedRows.IndexOf(row), Rows.Count), row);
                 return;
             }
 
             var comparer = GetComparer(col);
             var path = col.EffectiveSortPath;
             var sign = col.SortDirection == TableSortDirection.Ascending ? 1 : -1;
+
+            // Extract the sort key from the new row's data model.
             var key = ValueReader.Read(row.Item, path);
 
+            // Binary search to find the correct sorted insertion index.
             int lo = 0, hi = Rows.Count;
             while (lo < hi)
             {
@@ -106,7 +107,7 @@ namespace PrintManagement.Controls.Table
             // a reorder: same columns, new order. Just move each row's cell; no rebuild, same total width.
             if (e.Action == NotifyCollectionChangedAction.Move)
             {
-                foreach (var row in _all)
+                foreach (var row in _originalUnsortedRows)
                     row.MoveCell(e.OldStartingIndex, e.NewStartingIndex);
                 return;
             }
@@ -157,24 +158,24 @@ namespace PrintManagement.Controls.Table
             var selected = SelectedItem;
 
             // reuse existing TableRows (and so their realized cells) unless columns changed
-            var pool = new Dictionary<object, Queue<TableRow>>(ReferenceEqualityComparer.Instance);
+            var _reusableRowCache = new Dictionary<object, Queue<TableRow>>(ReferenceEqualityComparer.Instance);
             if (!recreateRows)
             {
-                foreach (var row in _all)
+                foreach (var row in _originalUnsortedRows)
                 {
-                    if (!pool.TryGetValue(row.Item, out var queue))
-                        pool[row.Item] = queue = new Queue<TableRow>();
+                    if (!_reusableRowCache.TryGetValue(row.Item, out var queue))
+                        _reusableRowCache[row.Item] = queue = new Queue<TableRow>();
                     queue.Enqueue(row);
                 }
             }
 
-            _all.Clear();
-            if (ItemsSource is IEnumerable source)
+            _originalUnsortedRows.Clear();
+            if (ItemsSource is IEnumerable rawItemsSource)
             {
-                foreach (var item in source)
+                foreach (var item in rawItemsSource)
                 {
                     if (item == null) continue;
-                    _all.Add(pool.TryGetValue(item, out var queue) && queue.Count > 0
+                    _originalUnsortedRows.Add(_reusableRowCache.TryGetValue(item, out var queue) && queue.Count > 0
                         ? queue.Dequeue()
                         : new TableRow(this, item));
                 }

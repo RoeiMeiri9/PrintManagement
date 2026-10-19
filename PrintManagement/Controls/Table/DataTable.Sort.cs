@@ -43,7 +43,7 @@ namespace PrintManagement.Controls.Table
 
         private void ApplySort(object? selectedItem)
         {
-            IEnumerable<TableRow> ordered = _all;
+            IEnumerable<TableRow> ordered = _originalUnsortedRows;
 
             if (SortColumn is { } col)
             {
@@ -51,7 +51,7 @@ namespace PrintManagement.Controls.Table
                 var path = col.EffectiveSortPath;
 
                 // read each row's key once, then let a stable LINQ sort do the work
-                var keyed = _all.Select(r => (Row: r, Key: ValueReader.Read(r.Item, path)));
+                var keyed = _originalUnsortedRows.Select(r => (Row: r, Key: ValueReader.Read(r.Item, path)));
                 ordered = (col.SortDirection == TableSortDirection.Ascending
                         ? keyed.OrderBy(k => k.Key, comparer)
                         : keyed.OrderByDescending(k => k.Key, comparer))

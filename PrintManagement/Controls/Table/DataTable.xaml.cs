@@ -17,7 +17,7 @@ public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequest
     public TableRowCollection Rows { get; } = [];
 
     // every row in the order of the source collection (the unsorted truth)
-    private readonly List<TableRow> _all = [];
+    private readonly List<TableRow> _originalUnsortedRows = [];
 
     private INotifyCollectionChanged? _observedSource;
 
