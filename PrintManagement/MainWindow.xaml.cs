@@ -1,3 +1,4 @@
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -147,7 +148,7 @@ namespace PrintManagement
 
             TitleBarSearchBoxContainer.UpdateLayout();
 
-            DispatcherQueue.TryEnqueue(() =>
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 UpdatePassthroughRegions();
                 if (expanded && focus)
