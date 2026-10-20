@@ -15,9 +15,27 @@
                     <conv:StatusConverter x:Key="StatusToBrushConverter" />
                     <conv:DateConverter x:Key="DateConverter" />
                     <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+                    <conv:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
                     <conv:JobsCounterConverter x:Key="JobsCounterConverter" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <Storyboard x:Key="ShowControlAnimation">
+                <DoubleAnimation
+                    Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                    From="15"
+                    To="0"
+                    Duration="0:0:0.25">
+                    <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+
+                <DoubleAnimation
+                    Storyboard.TargetProperty="Opacity"
+                    From="0"
+                    To="1"
+                    Duration="0:0:0.2" />
+            </Storyboard>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

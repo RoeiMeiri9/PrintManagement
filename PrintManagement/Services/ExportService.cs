@@ -71,9 +71,9 @@ public class ExportService : IExportService
 
         // Read the settings once, not once per cell.
         var options = new CellOptions(
-            IsoDates: SettingsService.ReadSetting(Settings.UseISODateFormatSetting.Value, Settings.UseISODateFormatSetting.defaultValue),
-            LowercaseBools: SettingsService.ReadSetting(Settings.WriteTrueFalseLowercaseSetting.Value, Settings.WriteTrueFalseLowercaseSetting.defaultValue),
-            ShowNotShared: SettingsService.ReadSetting(Settings.ShowNotSharedSetting.Value, Settings.ShowNotSharedSetting.defaultValue));
+            IsoDates: SettingsService.ReadSetting(Settings<bool>.UseISODateFormatSetting),
+            LowercaseBools: SettingsService.ReadSetting(Settings<bool>.WriteTrueFalseLowercaseSetting),
+            ShowNotShared: SettingsService.ReadSetting(Settings<bool>.ShowNotSharedSetting));
 
         // TODO: Remove this log once the export is working well. It's just for debugging.
         Logger.Log($"export options: iso={options.IsoDates}, lowercase={options.LowercaseBools}, showNotShared={options.ShowNotShared}");

@@ -47,6 +47,7 @@
     <None Remove="Assets\Icons\Square44x44Logo.targetsize-48_altform-lightunplated.png" />
     <None Remove="Assets\Icons\Square44x44Logo.targetsize-48_altform-unplated.png" />
     <None Remove="Controls\DataTable.xaml" />
+    <None Remove="Controls\IconGridViewControl\IconGridView.xaml" />
     <None Remove="CustomFiltersPage.xaml" />
     <None Remove="Pages\CommonPageWrapper\CommonPageWrapper.xaml" />
     <None Remove="Pages\CustomFilters\SubPages\DriversFilter.xaml" />
@@ -149,6 +150,9 @@
     <None Update="Assets\Icons\IconGroup51.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\IconGridViewControl\IconGridView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Pages\CommonPageWrapper\CommonPageWrapper.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

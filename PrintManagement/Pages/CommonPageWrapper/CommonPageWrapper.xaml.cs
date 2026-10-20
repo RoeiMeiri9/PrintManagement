@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using PrintManagement.Models.enums;
 using PrintManagement.Pages.CustomFilters;
 using PrintManagement.Services;
 
@@ -15,6 +16,7 @@ public sealed partial class CommonPageWrapper : Page
     {
         InitializeComponent();
         navFrame.Navigate(typeof(CustomFiltersPage));
+        Loaded += CommonPageWrapper_Loaded;
     }
 
     private void ViewMode_Click(object sender, RoutedEventArgs e)
@@ -22,13 +24,14 @@ public sealed partial class CommonPageWrapper : Page
         if (sender is RadioMenuFlyoutItem item)
         {
             UpdateSelectedIcon(item);
+            ViewMode selectedView = item.Name switch
+            {
+                "DetailsView" => ViewMode.Table,
+                "ListView" => ViewMode.List,
+                _ => ViewMode.Tiles
+            };
+            ViewDDSettingsService.CurrentViewMode = selectedView;
         }
-    }
-
-    private void ViewDropDownButton_Loaded(object sender, RoutedEventArgs e)
-    {
-        UpdateSelectedIcon(DefaultDetailsViewItem);
-        CompactViewToggleItem.IsChecked = ViewDDSettingsService.IsCompactView;
     }
 
     private void UpdateSelectedIcon(RadioMenuFlyoutItem item)
@@ -76,5 +79,27 @@ public sealed partial class CommonPageWrapper : Page
         {
             PageName = pageName
         });
+    }
+
+    private void CommonPageWrapper_Loaded(object sender, RoutedEventArgs e)
+    {
+        RadioMenuFlyoutItem selectedItem;
+        ViewMode storedViewMode = ViewDDSettingsService.CurrentViewMode;
+
+        if (storedViewMode == ViewMode.Table)
+        {
+            selectedItem = DetailsView;
+        }
+        else if (storedViewMode == ViewMode.List)
+        {
+            selectedItem = ListView;
+        }
+        else
+        {
+            selectedItem = SmallIconsView;
+        }
+        selectedItem.IsChecked = true;
+        UpdateSelectedIcon(selectedItem);
+        CompactViewToggleItem.IsChecked = ViewDDSettingsService.IsCompactView;
     }
 }

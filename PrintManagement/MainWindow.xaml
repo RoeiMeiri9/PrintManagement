@@ -7,7 +7,7 @@
     xmlns:res="using:PrintManagement.Resources"
     mc:Ignorable="d">
 
-    <Grid x:Name="MainGrid">
+    <Grid x:Name="MainGrid" PointerPressed="Root_PointerPressed">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

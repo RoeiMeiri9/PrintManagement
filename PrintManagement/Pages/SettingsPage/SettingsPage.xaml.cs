@@ -20,16 +20,16 @@ public sealed partial class SettingsPage : Page
     }
     private void LoadSettings()
     {
-        ScrollIndicatorToggle.IsOn = SettingsService.ReadSetting(Settings.ScrollIndicatorSetting.Value, Settings.ScrollIndicatorSetting.defaultValue);
-        StatusBadgeAppearanceToggle.IsOn = SettingsService.ReadSetting(Settings.StatusBadgeAppearanceSetting.Value, Settings.StatusBadgeAppearanceSetting.defaultValue);
-        UseISODateFormatToggle.IsOn = SettingsService.ReadSetting(Settings.UseISODateFormatSetting.Value, Settings.UseISODateFormatSetting.defaultValue);
-        WriteTrueFalseLowercaseToggle.IsOn = SettingsService.ReadSetting(Settings.WriteTrueFalseLowercaseSetting.Value, Settings.WriteTrueFalseLowercaseSetting.defaultValue);
-        ShowNotSharedToggle.IsOn = SettingsService.ReadSetting(Settings.ShowNotSharedSetting.Value, Settings.ShowNotSharedSetting.defaultValue);
+        ScrollIndicatorToggle.IsOn = SettingsService.ReadSetting(Settings<bool>.ScrollIndicatorSetting);
+        StatusBadgeAppearanceToggle.IsOn = SettingsService.ReadSetting(Settings<bool>.StatusBadgeAppearanceSetting);
+        UseISODateFormatToggle.IsOn = SettingsService.ReadSetting(Settings<bool>.UseISODateFormatSetting);
+        WriteTrueFalseLowercaseToggle.IsOn = SettingsService.ReadSetting(Settings<bool>.WriteTrueFalseLowercaseSetting);
+        ShowNotSharedToggle.IsOn = SettingsService.ReadSetting(Settings<bool>.ShowNotSharedSetting);
     }
 
     private void ScrollIndicatorToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        SettingsService.SaveSetting(Settings.ScrollIndicatorSetting.Value, ScrollIndicatorToggle.IsOn);
+        SettingsService.SaveSetting(Settings<bool>.ScrollIndicatorSetting, ScrollIndicatorToggle.IsOn);
     }
 
     private void StatusBadgeAppearanceToggle_Toggled(object sender, RoutedEventArgs e)
@@ -39,16 +39,16 @@ public sealed partial class SettingsPage : Page
 
     private void UseISODateFormatToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        SettingsService.SaveSetting(Settings.UseISODateFormatSetting.Value, UseISODateFormatToggle.IsOn);
+        SettingsService.SaveSetting(Settings<bool>.UseISODateFormatSetting, UseISODateFormatToggle.IsOn);
     }
 
     private void WriteTrueFalseLowercaseToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        SettingsService.SaveSetting(Settings.WriteTrueFalseLowercaseSetting.Value, WriteTrueFalseLowercaseToggle.IsOn);
+        SettingsService.SaveSetting(Settings<bool>.WriteTrueFalseLowercaseSetting, WriteTrueFalseLowercaseToggle.IsOn);
     }
 
     private void ShowNotSharedToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        SettingsService.SaveSetting(Settings.ShowNotSharedSetting.Value, ShowNotSharedToggle.IsOn);
+        SettingsService.SaveSetting(Settings<bool>.ShowNotSharedSetting, ShowNotSharedToggle.IsOn);
     }
 }

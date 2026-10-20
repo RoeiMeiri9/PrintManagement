@@ -8,6 +8,7 @@
     xmlns:ctlTb="using:PrintManagement.Controls.DataTableControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hlps="using:PrintManagement.Pages.CustomFilters.Helpers"
+    xmlns:igc="using:PrintManagement.Controls.IconGridViewControl"
     xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mdl="using:PrintManagement.Models"
@@ -97,184 +98,202 @@
         </ctlBdg:BadgeRuleCollection>
     </Page.Resources>
 
-    <ctlTb:DataTable
-        x:Name="PrintersTable"
-        Grid.Column="2"
-        CompactView="{x:Bind IsCompact, Mode=OneWay}"
-        ItemsSource="{x:Bind PrinterModelList, Mode=OneWay}">
+    <Grid>
+        <igc:IconGridView
+            x:Name="PrintersIconView"
+            ItemsSource="{x:Bind PrinterItemModels, Mode=OneWay}"
+            ViewType="{x:Bind CurrentViewMode, Mode=OneWay}"
+            Visibility="{x:Bind CurrentViewMode, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=NotTable, Mode=OneWay}">
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Printer Name"
-            Path="Name"
-            SortPath="Name">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:PrinterModel">
-                    <Grid ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+            <igc:IconGridView.RenderTransform>
+                <TranslateTransform />
+            </igc:IconGridView.RenderTransform>
+        </igc:IconGridView>
 
-                        <FontIcon
-                            Grid.Column="0"
-                            FontFamily="{x:Bind res:Icons.Printer.Font}"
-                            FontSize="16"
-                            Glyph="{x:Bind res:Icons.Printer.Glyph}" />
+        <ctlTb:DataTable
+            x:Name="PrintersTable"
+            Grid.Column="2"
+            CompactView="{x:Bind IsCompact, Mode=OneWay}"
+            ItemsSource="{x:Bind PrinterModelList, Mode=OneWay}"
+            Visibility="{x:Bind CurrentViewMode, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Table, Mode=OneWay}">
 
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            FontWeight="SemiBold"
-                            Text="{x:Bind Name, Mode=OneWay}"
-                            TextTrimming="CharacterEllipsis" />
-                    </Grid>
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:DataTable.RenderTransform>
+                <TranslateTransform />
+            </ctlTb:DataTable.RenderTransform>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Comparer="{StaticResource StatusComparer}"
-            Header="Queue Status"
-            Path="QueueStatus"
-            SortPath="QueueStatus">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:PrinterModel">
-                    <ItemsControl ItemsSource="{x:Bind QueueStatus, Mode=OneWay}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="4" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="hlps:PrinterStatusInfo">
-                                <ctlBdg:Badge
-                                    DisplayText="{x:Bind Status, Mode=OneWay}"
-                                    Rules="{StaticResource PrinterStatusBadgeRules}"
-                                    Value="{x:Bind Flags, Mode=OneWay}" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Printer Name"
+                Path="Name"
+                SortPath="Name">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:PrinterModel">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-        <ctlTb:TableColumn
-            Width="124"
-            Header="Jobs In Queue"
-            Path="JobsInQueue">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:PrinterModel">
-                    <TextBlock Foreground="{x:Bind JobsInQueue, Converter={StaticResource JobsCounterConverter}}" Text="{x:Bind JobsInQueue, Mode=OneWay}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+                            <FontIcon
+                                Grid.Column="0"
+                                FontFamily="{x:Bind res:Icons.Printer.Font}"
+                                FontSize="16"
+                                Glyph="{x:Bind res:Icons.Printer.Glyph}" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Port Name"
-            MaxAutoWidth="450"
-            Path="PortName" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontWeight="SemiBold"
+                                Text="{x:Bind Name, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="221"
-            Header="Server Name"
-            Path="ServerName" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Comparer="{StaticResource StatusComparer}"
+                Header="Queue Status"
+                Path="QueueStatus"
+                SortPath="QueueStatus">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:PrinterModel">
+                        <ItemsControl ItemsSource="{x:Bind QueueStatus, Mode=OneWay}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="hlps:PrinterStatusInfo">
+                                    <ctlBdg:Badge
+                                        DisplayText="{x:Bind Status, Mode=OneWay}"
+                                        Rules="{StaticResource PrinterStatusBadgeRules}"
+                                        Value="{x:Bind Flags, Mode=OneWay}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Connection Summary"
-            Path="ConnectionSummary" />
+            <ctlTb:TableColumn
+                Width="124"
+                Header="Jobs In Queue"
+                Path="JobsInQueue">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:PrinterModel">
+                        <TextBlock Foreground="{x:Bind JobsInQueue, Converter={StaticResource JobsCounterConverter}}" Text="{x:Bind JobsInQueue, Mode=OneWay}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Driver Name"
-            MaxAutoWidth="450"
-            Path="DriverName" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Port Name"
+                MaxAutoWidth="450"
+                Path="PortName" />
 
-        <ctlTb:TableColumn
-            Width="142"
-            Header="Driver Version"
-            Path="DriverVersion" />
+            <ctlTb:TableColumn
+                Width="221"
+                Header="Server Name"
+                Path="ServerName" />
 
-        <ctlTb:TableColumn
-            Width="173"
-            Header="Driver Type"
-            Path="DriverType" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Connection Summary"
+                Path="ConnectionSummary" />
+
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Driver Name"
+                MaxAutoWidth="450"
+                Path="DriverName" />
+
+            <ctlTb:TableColumn
+                Width="142"
+                Header="Driver Version"
+                Path="DriverVersion" />
+
+            <ctlTb:TableColumn
+                Width="173"
+                Header="Driver Type"
+                Path="DriverType" />
 
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Branch Office"
-            Path="BranchOffice">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:PrinterModel">
-                    <ctlBdg:Badge Rules="{StaticResource BranchOfficeRules}" Value="{x:Bind BranchOffice, Mode=OneWay}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Branch Office"
+                Path="BranchOffice">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:PrinterModel">
+                        <ctlBdg:Badge Rules="{StaticResource BranchOfficeRules}" Value="{x:Bind BranchOffice, Mode=OneWay}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="112"
-            Header="Comments"
-            Path="Comments" />
+            <ctlTb:TableColumn
+                Width="112"
+                Header="Comments"
+                Path="Comments" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Is Shared"
-            Path="IsShared">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:PrinterModel">
-                    <ctlBdg:Badge Rules="{StaticResource SharedBadgeRules}" Value="{x:Bind IsShared, Mode=OneWay}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Is Shared"
+                Path="IsShared">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:PrinterModel">
+                        <ctlBdg:Badge Rules="{StaticResource SharedBadgeRules}" Value="{x:Bind IsShared, Mode=OneWay}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Location"
-            MaxAutoWidth="450"
-            Path="Location" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Location"
+                MaxAutoWidth="450"
+                Path="Location" />
 
-        <ctlTb:TableColumn
-            Width="112"
-            Header="Provider"
-            Path="Provider" />
+            <ctlTb:TableColumn
+                Width="112"
+                Header="Provider"
+                Path="Provider" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Share Name"
-            Path="ShareName">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:PrinterModel">
-                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontStyle="Italic"
-                            Foreground="{ThemeResource TemporaryTextFillColorDisabled}"
-                            Text="&lt; Not Shared &gt;"
-                            Visibility="{x:Bind IsShared, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Text="{x:Bind ShareName, Mode=OneWay}"
-                            TextTrimming="CharacterEllipsis"
-                            Visibility="{x:Bind IsShared, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=hideOnNull}" />
-                    </Grid>
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Share Name"
+                Path="ShareName">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:PrinterModel">
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontStyle="Italic"
+                                Foreground="{ThemeResource TemporaryTextFillColorDisabled}"
+                                Text="&lt; Not Shared &gt;"
+                                Visibility="{x:Bind IsShared, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind ShareName, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
+                                Visibility="{x:Bind IsShared, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=hideOnNull}" />
+                        </Grid>
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="136"
-            Header="Print Processor"
-            Path="PrintProcessor" />
+            <ctlTb:TableColumn
+                Width="136"
+                Header="Print Processor"
+                Path="PrintProcessor" />
 
-        <ctlTb:TableColumn
-            Width="136"
-            Header="Data Type"
-            Path="DataType" />
+            <ctlTb:TableColumn
+                Width="136"
+                Header="Data Type"
+                Path="DataType" />
 
-    </ctlTb:DataTable>
+        </ctlTb:DataTable>
+    </Grid>
 </Page>

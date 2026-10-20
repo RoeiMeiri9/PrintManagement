@@ -1,4 +1,6 @@
-﻿using Windows.Storage;
+﻿using PrintManagement.Resources;
+using System;
+using Windows.Storage;
 
 namespace PrintManagement.Services
 {
@@ -6,18 +8,29 @@ namespace PrintManagement.Services
     {
         private static readonly ApplicationDataContainer LocalSettings = ApplicationData.Current.LocalSettings;
 
-        public static void SaveSetting<T>(string key, T value)
+        public static void SaveSetting<T>(Settings<T> setting, T value)
         {
-            LocalSettings.Values[key] = value;
+            if (value is Enum enumValue)
+            {
+                LocalSettings.Values[setting.Key] = Convert.ToInt32(enumValue);
+            }
+            else
+            {
+                LocalSettings.Values[setting.Key] = value;
+            }
         }
 
-        public static T? ReadSetting<T>(string key, T? defaultValue = default)
+        public static T? ReadSetting<T>(Settings<T> setting)
         {
-            if (LocalSettings.Values.TryGetValue(key, out object? value))
+            if (LocalSettings.Values.TryGetValue(setting.Key, out object? value))
             {
+                if (typeof(T).IsEnum)
+                {
+                    return (T)Enum.ToObject(typeof(T), value);
+                }
                 return (T)value;
             }
-            return defaultValue;
+            return setting.DefaultValue;
         }
     }
 }

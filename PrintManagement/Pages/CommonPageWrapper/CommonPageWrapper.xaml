@@ -31,8 +31,7 @@
                     Height="36"
                     Background="Transparent"
                     BorderBrush="Transparent"
-                    BorderThickness="0"
-                    Loaded="ViewDropDownButton_Loaded">
+                    BorderThickness="0">
                     <DropDownButton.Content>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <ContentPresenter x:Name="SelectedIconPresenter" VerticalAlignment="Center" />
@@ -54,6 +53,7 @@
                             <MenuFlyoutSeparator />
 
                             <RadioMenuFlyoutItem
+                                x:Name="LargeIconsView"
                                 Click="ViewMode_Click"
                                 GroupName="ViewMode"
                                 Text="Large Icons">
@@ -63,6 +63,7 @@
                             </RadioMenuFlyoutItem>
 
                             <RadioMenuFlyoutItem
+                                x:Name="SmallIconsView"
                                 Click="ViewMode_Click"
                                 GroupName="ViewMode"
                                 Text="Small Icons">
@@ -72,6 +73,7 @@
                             </RadioMenuFlyoutItem>
 
                             <RadioMenuFlyoutItem
+                                x:Name="ListView"
                                 Click="ViewMode_Click"
                                 GroupName="ViewMode"
                                 Text="List">
@@ -81,10 +83,9 @@
                             </RadioMenuFlyoutItem>
 
                             <RadioMenuFlyoutItem
-                                x:Name="DefaultDetailsViewItem"
+                                x:Name="DetailsView"
                                 Click="ViewMode_Click"
                                 GroupName="ViewMode"
-                                IsChecked="True"
                                 Text="Details">
                                 <RadioMenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{x:Bind res:Icons.ListDetail.Font}" Glyph="{x:Bind res:Icons.ListDetail.Glyph}" />

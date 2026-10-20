@@ -1,13 +1,16 @@
-﻿namespace PrintManagement.Resources;
+﻿using PrintManagement.Models.enums;
 
-public record Settings(string Value, bool defaultValue)
+namespace PrintManagement.Resources;
+
+public record Settings<T>(string Key, T DefaultValue)
 {
-    public static readonly Settings ScrollIndicatorSetting = new("ShowScrollDirectionIndicator", false);
-    public static readonly Settings StatusBadgeAppearanceSetting = new("StatusBadgeAppearance", true);
-    public static readonly Settings UseISODateFormatSetting = new("UseISODateFormat", true);
-    public static readonly Settings WriteTrueFalseLowercaseSetting = new("WriteTrueFalseLowercase", true);
-    public static readonly Settings ShowNotSharedSetting = new("ShowNotShared", false);
+    public static readonly Settings<bool> ScrollIndicatorSetting = new("ShowScrollDirectionIndicator", false);
+    public static readonly Settings<bool> StatusBadgeAppearanceSetting = new("StatusBadgeAppearance", true);
+    public static readonly Settings<bool> UseISODateFormatSetting = new("UseISODateFormat", true);
+    public static readonly Settings<bool> WriteTrueFalseLowercaseSetting = new("WriteTrueFalseLowercase", true);
+    public static readonly Settings<bool> ShowNotSharedSetting = new("ShowNotShared", false);
 
     // --- View Dropdown Settings ---
-    public static readonly Settings CompactViewSetting = new("CompactView", false);
+    public static readonly Settings<bool> CompactViewSetting = new("CompactView", false);
+    public static readonly Settings<ViewMode> CurrentViewSetting_Filter = new("CurrentViewSetting_Filter", ViewMode.Table);
 }
