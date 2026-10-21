@@ -1,6 +1,8 @@
 ﻿using PrintManagement.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace PrintManagement.Controls.DataTableControl;
@@ -11,7 +13,12 @@ public partial class DataTable
 
     public async void Receive(ExportCsvRequestMessage message)
     {
-        await ExportCsvAsync(message.PageName);
+        try { await ExportCsvAsync(message.PageName); }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+            Logger.Error(ex);
+        }
     }
 
     public async Task ExportCsvAsync(string pageName)

@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,16 +21,23 @@ namespace PrintManagement.Controls.DataTableControl
             set => SetValue(ItemsSourceProperty, value);
         }
 
+        private void AttachSource()
+        {
+            DetachSource();
+            _observedSource = ItemsSource as INotifyCollectionChanged;
+            if (_observedSource != null) _observedSource.CollectionChanged += Source_CollectionChanged;
+        }
+
+        private void DetachSource()
+        {
+            if (_observedSource != null) _observedSource.CollectionChanged -= Source_CollectionChanged;
+            _observedSource = null;
+        }
+
         private void OnItemsSourceChanged(object? newSource)
         {
-            if (_observedSource != null)
-                _observedSource.CollectionChanged -= Source_CollectionChanged;
-
-            _observedSource = newSource as INotifyCollectionChanged;
-
-            if (_observedSource != null)
-                _observedSource.CollectionChanged += Source_CollectionChanged;
-
+            DetachSource();
+            if (IsLoaded) AttachSource();      // before Loaded, the Loaded handler attaches
             RebuildRows(recreateRows: true);
         }
 
@@ -46,9 +54,9 @@ namespace PrintManagement.Controls.DataTableControl
                         _originalUnsortedRows.Insert(Math.Min(startingIndex++, _originalUnsortedRows.Count), row);
                         InsertIntoView(row);
                     }
-                    DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
                     {
-                        RecalculateAutoWidths();
+                        ScheduleAutoWidth();
                     });
                     break;
 
@@ -112,21 +120,23 @@ namespace PrintManagement.Controls.DataTableControl
                 return;
             }
 
-            if (e.OldItems != null)
+            if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                foreach (TableColumn c in e.OldItems)
-                {
-                    c.PropertyChanged -= Column_PropertyChanged;
-                    c.Owner = null;
-                }
+                // Clear() gives no OldItems, so use our own list
+                foreach (var c in _attachedColumns.ToArray())
+                    DetachColumn(c);
+                foreach (var c in Columns)               // normally empty after Clear()
+                    AttachColumn(c);
             }
-            if (e.NewItems != null)
+            else
             {
-                foreach (TableColumn c in e.NewItems)
-                {
-                    c.PropertyChanged += Column_PropertyChanged;
-                    c.Owner = this;
-                }
+                if (e.OldItems != null)
+                    foreach (TableColumn c in e.OldItems)
+                        DetachColumn(c);
+
+                if (e.NewItems != null)
+                    foreach (TableColumn c in e.NewItems)
+                        AttachColumn(c);
             }
 
             UpdateTotalWidth();
@@ -147,6 +157,21 @@ namespace PrintManagement.Controls.DataTableControl
                     OnSortDirectionChanged(col);
                     break;
             }
+        }
+
+        private void AttachColumn(TableColumn c)
+        {
+            if (_attachedColumns.Contains(c)) return;   // never hook twice
+            _attachedColumns.Add(c);
+            c.PropertyChanged += Column_PropertyChanged;
+            c.Owner = this;
+        }
+
+        private void DetachColumn(TableColumn c)
+        {
+            if (!_attachedColumns.Remove(c)) return;    // wasn't hooked
+            c.PropertyChanged -= Column_PropertyChanged;
+            c.Owner = null;
         }
 
         // ---------- Rows ----------
@@ -184,7 +209,7 @@ namespace PrintManagement.Controls.DataTableControl
             ApplySort(selected);
             DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
             {
-                RecalculateAutoWidths();
+                ScheduleAutoWidth();
             });
         }
     }

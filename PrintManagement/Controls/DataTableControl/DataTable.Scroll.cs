@@ -21,7 +21,7 @@ namespace PrintManagement.Controls.DataTableControl
         private bool _rowsPanHooked;
         private bool ShowMarker;
 
-        private void RowsList_Loaded(object sender, RoutedEventArgs e)
+        private void RowsList_Loaded_Initiate_Scroll(object sender, RoutedEventArgs e)
         {
             InitPanning();
 
@@ -30,7 +30,6 @@ namespace PrintManagement.Controls.DataTableControl
                 _rowsPanHooked = true;
                 HookPanStart(RowsList);
             }
-
             // If the template isn't realized yet (e.g. loaded while Collapsed), keep retrying
             // until the layout pass that follows becoming visible creates the ScrollViewer.
             if (!EnsureListScroller())
@@ -68,11 +67,6 @@ namespace PrintManagement.Controls.DataTableControl
             return true;
         }
 
-        private void TryLoadingListScroller()
-        {
-            _listScroller = FindDescendant<ScrollViewer>(RowsList);
-        }
-
         private bool _headerHooked;
 
         private void HeaderList_Loaded(object sender, RoutedEventArgs e)
@@ -80,54 +74,23 @@ namespace PrintManagement.Controls.DataTableControl
             if (_headerHooked) return;
             _headerHooked = true;
 
-            HeaderScroller.PointerWheelChanged += OnScrollPointerWheelChanged;
-
             InitPanning();
             HookPanStart(HeaderScroller);
         }
 
         private void OnScrollPointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
-            var pointerPoint = e.GetCurrentPoint(null);
-            var mouseWheelDelta = pointerPoint.Properties.MouseWheelDelta;
+            if (_listScroller is not { } list) return;
 
-            if (mouseWheelDelta != 0 && sender is ScrollViewer scroller)
-            {
-                var modifiers = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
-                bool isCtrlPressed = (modifiers & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
+            int delta = e.GetCurrentPoint(null).Properties.MouseWheelDelta;
+            if (delta == 0) return;
 
-                if (!isCtrlPressed) return;
+            var state = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
+            if ((state & Windows.UI.Core.CoreVirtualKeyStates.Down) != Windows.UI.Core.CoreVirtualKeyStates.Down) return;
 
-                double scrollFactor = 0.4;
-                double targetOffset = scroller.HorizontalOffset - (mouseWheelDelta * scrollFactor);
-                targetOffset = Math.Max(0, Math.Min(targetOffset, scroller.ScrollableWidth));
-
-                scroller.ChangeView(targetOffset, scroller.VerticalOffset, null, true);
-
-                if (scroller == HeaderScroller && _listScroller != null)
-                {
-                    _listScroller.ChangeView(targetOffset, _listScroller.VerticalOffset, null, true);
-                }
-                else if (scroller == _listScroller)
-                {
-                    HeaderScroller.ChangeView(targetOffset, HeaderScroller.VerticalOffset, null, true);
-                }
-
-                e.Handled = true;
-            }
-        }
-
-        private static T? FindDescendant<T>(DependencyObject root) where T : DependencyObject
-        {
-            int count = VisualTreeHelper.GetChildrenCount(root);
-            for (int i = 0; i < count; i++)
-            {
-                var child = VisualTreeHelper.GetChild(root, i);
-                if (child is T match) return match;
-                var result = FindDescendant<T>(child);
-                if (result != null) return result;
-            }
-            return null;
+            double target = Math.Clamp(list.HorizontalOffset - delta * 0.4, 0, list.ScrollableWidth);
+            list.ChangeView(target, null, null, true);
+            e.Handled = true;
         }
 
         // ---------- Middle-click autoscroll ----------
@@ -158,13 +121,9 @@ namespace PrintManagement.Controls.DataTableControl
             _panInitialized = true;
 
             var overlay = PanCursorOverlay;
-            overlay.Background = new SolidColorBrush(Colors.Transparent); // null brush isn't hit-testable
+            overlay.Background = new SolidColorBrush(Colors.Transparent);
             overlay.Visibility = Visibility.Visible;
             overlay.IsHitTestVisible = false;
-
-
-            BuildPanMarker(overlay);
-
 
             overlay.PointerMoved += OnPanMoved;
             overlay.PointerReleased += OnPanReleased;
@@ -194,6 +153,11 @@ namespace PrintManagement.Controls.DataTableControl
                 return;
             }
 
+            if (_markerCanvas == null)
+            {
+                BuildPanMarker(overlay);
+            }
+
             ShowMarker = SettingsService.ReadSetting(Settings<bool>.ScrollIndicatorSetting);
 
             _isPanning = true;
@@ -217,8 +181,11 @@ namespace PrintManagement.Controls.DataTableControl
             if (!_isPanning) return;
 
             _panCurrent = e.GetCurrentPoint(PanCursorOverlay).Position;
-            UpdatePanMarker(_panCurrent, _markerLine);
-            UpdatePanMarker(_panCurrent, _markerOuterLine);
+            if (ShowMarker)
+            {
+                UpdatePanMarker(_panCurrent, _markerLine);
+                UpdatePanMarker(_panCurrent, _markerOuterLine);
+            }
             e.Handled = true;
         }
 

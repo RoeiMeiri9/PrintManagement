@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using PrintManagement.Services;
@@ -12,6 +13,8 @@ namespace PrintManagement.Controls.DataTableControl;
 public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequestMessage>
 {
     public TableColumnCollection Columns { get; } = [];
+
+    private readonly List<TableColumn> _attachedColumns = [];
 
     /// <summary>What the ListView shows: one TableRow per item, already in sorted order.</summary>
     public TableRowCollection Rows { get; } = [];
@@ -28,13 +31,33 @@ public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequest
     public DataTable(IExportService exportService)
     {
         InitializeComponent();
-        Loaded += OnTableLoaded_SetAutoWidth();
-        Loaded += OnTableLoaded_ApplyCompactViewStyle();
-        Columns.CollectionChanged += Columns_CollectionChanged;
         _exportService = exportService;
+        Columns.CollectionChanged += Columns_CollectionChanged;
 
-        Loaded += (s, e) => WeakReferenceMessenger.Default.Register<ExportCsvRequestMessage>(this);
-        Unloaded += (s, e) => WeakReferenceMessenger.Default.Unregister<ExportCsvRequestMessage>(this);
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
+
+        RowsList.Loaded += RowsList_Loaded_Initiate_Scroll;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        WeakReferenceMessenger.Default.Register<ExportCsvRequestMessage>(this);
+
+        ScheduleAutoWidth();
+
+        if (_observedSource == null && ItemsSource is INotifyCollectionChanged)
+        {
+            AttachSource();
+            RebuildRows();
+        }
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        WeakReferenceMessenger.Default.Unregister<ExportCsvRequestMessage>(this);
+        DetachSource();
+        StopPanning();                        // already exists in DataTable.Scroll.cs
     }
 }
 

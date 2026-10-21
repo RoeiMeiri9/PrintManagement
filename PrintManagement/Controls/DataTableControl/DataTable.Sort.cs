@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,18 +60,36 @@ namespace PrintManagement.Controls.DataTableControl
             }
 
             _suppressSelection = true;
+            bool selectionChanged = false;
+
             try
             {
-                Rows.ReplaceAll(ordered.ToList());
+                var oldSelectedItem = SelectedItem;
+                Rows.ReplaceAll([.. ordered]);
                 if (selectedItem != null)
-                    RowsList.SelectedItem = FindRow(selectedItem);
+                {
+                    var newRow = FindRow(selectedItem);
+                    RowsList.SelectedItem = newRow;
+                    if (newRow == null && oldSelectedItem != null)
+                    {
+                        selectionChanged = true;
+                    }
+                }
             }
-            finally { _suppressSelection = false; }
+            finally
+            {
+                _suppressSelection = false;
+            }
+
+            if (selectionChanged)
+            {
+                SelectionChanged?.Invoke(this, new SelectionChangedEventArgs([], [.. Unwrap(RowsList.SelectedItems)]));
+            }
         }
         private static IComparer<object?> GetComparer(TableColumn col) =>
-    col.Comparer is { } custom
-        ? Comparer<object?>.Create((a, b) => custom.Compare(a, b))
-        : DefaultValueComparer.Instance;
+            col.Comparer is { } custom
+                ? Comparer<object?>.Create((a, b) => custom.Compare(a, b))
+                : DefaultValueComparer.Instance;
     }
 }
 

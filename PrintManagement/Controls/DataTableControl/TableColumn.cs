@@ -26,6 +26,7 @@ public partial class TableColumn : INotifyPropertyChanged
     private TableSortDirection _sortDirection = TableSortDirection.None;
     private DataTemplate? _generatedTemplate;
     internal DataTable? Owner { get; set; }
+    internal bool IsUserSized = false;
     public event PropertyChangedEventHandler? PropertyChanged;
     private void Raise([CallerMemberName] string? n = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
@@ -47,7 +48,7 @@ public partial class TableColumn : INotifyPropertyChanged
     /// <summary>Optional custom cell. Its DataContext is the whole row item.</summary>
     public DataTemplate? CellTemplate { get; set; }
 
-    public String Width
+    public string Width
     {
         get => _importedWidth;
         set
@@ -91,7 +92,11 @@ public partial class TableColumn : INotifyPropertyChanged
     public double DisplayWidth => _isVisible ? _width : 0;
     public Visibility CellVisibility => _isVisible ? Visibility.Visible : Visibility.Collapsed;
 
-    internal void Resize(double delta) => ActualWidth = Math.Max(MinWidth, _width + delta);
+    internal void Resize(double delta)
+    {
+        ActualWidth = Math.Max(MinWidth, _width + delta);
+        IsUserSized = true;
+    }
 
     // ---------- cell template ----------
 

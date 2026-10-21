@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace PrintManagement.Controls.DataTableControl
@@ -18,32 +19,33 @@ namespace PrintManagement.Controls.DataTableControl
             set => SetValue(CompactViewProperty, value);
         }
 
-        private Style? _originalItemStyle;
+        private static readonly Thickness lowPadding = new(8, 6, 8, 6);
+        private static readonly Thickness highPadding = new(8);
 
-        private RoutedEventHandler OnTableLoaded_ApplyCompactViewStyle()
+        private void ItemsControl_Loaded(object sender, RoutedEventArgs e)
         {
-            return (sender, e) =>
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 ApplyCompactViewStyle(CompactView);
-            };
+            });
         }
 
         private void ApplyCompactViewStyle(bool compact)
         {
-            if (RowsList == null) return;
 
-            _originalItemStyle ??= RowsList.ItemContainerStyle;
+            Thickness targetPadding = compact ? lowPadding : highPadding;
 
-            var updatedStyle = new Style(typeof(ListViewItem))
+            if (RowsList != null)
             {
-                BasedOn = _originalItemStyle
-            };
-
-            updatedStyle.Setters.Add(new Setter(Control.PaddingProperty, compact ? new Thickness(4) : new Thickness(4, 6, 4, 6)));
-
-            RowsList.ItemContainerStyle = updatedStyle;
+                for (int i = 0; i < RowsList.Items.Count; i++)
+                {
+                    if (RowsList.ContainerFromIndex(i) is ListViewItem container)
+                    {
+                        container.Padding = targetPadding;
+                    }
+                }
+            }
         }
-
         private void OnCompactViewChanged(object? newValue)
         {
             if (newValue is bool compact)

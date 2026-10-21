@@ -1,21 +1,36 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace PrintManagement.Controls.DataTableControl
 {
     public partial class DataTable
     {
-        public static readonly DependencyProperty ThumbWithProperty =
-    DependencyProperty.Register(nameof(ThumbWith), typeof(double), typeof(DataTable),
-        new PropertyMetadata(8.0, OnThumbWidthChanged));
+        public static readonly DependencyProperty ThumbWidthProperty =
+            DependencyProperty.Register(nameof(ThumbWidth), typeof(double), typeof(DataTable),
+                new PropertyMetadata(8.0, OnThumbWidthChanged));
 
-        public double ThumbWith
+        public double ThumbWidth
         {
-            get => (double)GetValue(ThumbWithProperty);
-            set => SetValue(ThumbWithProperty, value);
+            get => (double)GetValue(ThumbWidthProperty);
+            set => SetValue(ThumbWidthProperty, value);
+        }
+
+        private bool _autoWidthQueued;
+
+        private void ScheduleAutoWidth()
+        {
+            if (_autoWidthQueued) return;
+            _autoWidthQueued = true;
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+                _autoWidthQueued = false;
+                RecalculateAutoWidths();
+            });
         }
 
         private static void OnThumbWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -26,16 +41,11 @@ namespace PrintManagement.Controls.DataTableControl
             }
         }
 
-        private RoutedEventHandler OnTableLoaded_SetAutoWidth()
-        {
-            return (sender, e) => RecalculateAutoWidths();
-        }
-
         public void RecalculateAutoWidths()
         {
             foreach (var column in Columns)
             {
-                if (string.Equals(column.Width, "Auto", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(column.Width, "Auto", StringComparison.OrdinalIgnoreCase) && !column.IsUserSized)
                 {
                     double calculatedWidth = GetMaxWidth(column);
 
@@ -46,7 +56,7 @@ namespace PrintManagement.Controls.DataTableControl
 
                     column.ActualWidth = calculatedWidth;
                 }
-                else if (double.TryParse(column.Width, out double parsedWidth))
+                else if (double.TryParse(column.Width, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedWidth))
                 {
                     column.ActualWidth = parsedWidth;
                 }
@@ -78,8 +88,22 @@ namespace PrintManagement.Controls.DataTableControl
             private set => SetValue(TotalWidthProperty, value);
         }
 
-        private void UpdateTotalWidth() => TotalWidth = Columns.Sum(c => c.DisplayWidth) + ThumbWith;
+        private void UpdateTotalWidth()
+        {
+            // Used to make sure the line will not surpuss the hearder.
+            // The thing is that WinUI is very strange and the header is not truely aligned well with the body,
+            // so hand crafted calculation must be used for making sure the header and the rows are aligned well.
+            // As far as I know: the calculations must be: Thumb width + the difference between the right and left margin.
+            double offsetFromRightSide = ThumbWidth;
 
+            ItemsControl? ic = FindDescendant<ItemsControl>(HeaderScroller);
+            if (ic != null)
+            {
+                offsetFromRightSide += Math.Abs(ic.Margin.Left - ic.Margin.Right);
+            }
+
+            TotalWidth = Columns.Sum(c => c.DisplayWidth) - offsetFromRightSide;
+        }
         // ---------- Double Tapping Thumb ----------
         private void Thumb_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {

@@ -17,13 +17,6 @@ public sealed class TableRow
     // observable at runtime, so the row's ItemsControl follows a column being moved
     private readonly ObservableCollection<TableCell> _cells;
 
-    internal TableRow(DataTable table, object item)
-    {
-        Table = table;
-        Item = item;
-        _cells = [.. table.Columns.Select(c => new TableCell(c, item))];
-    }
-
     /// <summary>
     /// Gets the parent <see cref="DataTable"/> control containing this row.
     /// </summary>
@@ -38,7 +31,15 @@ public sealed class TableRow
     /// <summary>
     /// Gets the collection of cells in this row. Each cell corresponds to a specific table column.
     /// </summary>
-    public IReadOnlyList<TableCell> Cells => _cells;
+    public ReadOnlyObservableCollection<TableCell> Cells { get; }
+
+    internal TableRow(DataTable table, object item)
+    {
+        Table = table;
+        Item = item;
+        _cells = [.. table.Columns.Select(c => new TableCell(c, item))];
+        Cells = new ReadOnlyObservableCollection<TableCell>(_cells);
+    }
 
     internal void MoveCell(int oldIndex, int newIndex) => _cells.Move(oldIndex, newIndex);
 }
@@ -57,7 +58,7 @@ public sealed class TableCell
 
     /// <summary>
     /// Gets the column definition for this cell (contains width, visibility, and layout templates).
-    /// </summary
+    /// </summary>
     public TableColumn Column { get; }
 
     /// <summary>

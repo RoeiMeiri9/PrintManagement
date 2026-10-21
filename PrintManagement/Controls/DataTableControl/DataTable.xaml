@@ -66,7 +66,7 @@
         <DataTemplate x:Key="CellTemplate" x:DataType="local:TableCell">
             <ContentControl
                 Width="{x:Bind Column.DisplayWidth, Mode=OneWay}"
-                Padding="16,0"
+                Padding="8,0,16,0"
                 HorizontalContentAlignment="Left"
                 VerticalContentAlignment="Center"
                 Content="{x:Bind Item}"
@@ -95,7 +95,7 @@
                 VerticalScrollBarVisibility="Disabled"
                 VerticalScrollMode="Disabled">
 
-                <ItemsControl Margin="10,9,8,4" ItemsSource="{x:Bind Columns}">
+                <ItemsControl Margin="8,8,6,4" ItemsSource="{x:Bind Columns}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" />
@@ -159,7 +159,7 @@
                                     Fill="{ThemeResource DividerStrokeColorDefaultBrush}"
                                     IsHitTestVisible="False" />
                                 <prim:Thumb
-                                    Width="{x:Bind Owner.ThumbWith, Mode=OneWay}"
+                                    Width="{x:Bind Owner.ThumbWidth, Mode=OneWay}"
                                     HorizontalAlignment="Right"
                                     Background="Transparent"
                                     DoubleTapped="Thumb_DoubleTapped"
@@ -188,9 +188,8 @@
             <ListView
                 x:Name="RowsList"
                 Grid.Row="1"
-                Padding="6,0,5,0"
+                Padding="4,0,4,0"
                 ItemsSource="{x:Bind Rows}"
-                Loaded="RowsList_Loaded"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 ScrollViewer.HorizontalScrollMode="Enabled"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -202,7 +201,6 @@
                     <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Left" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
-                        <Setter Property="Padding" Value="5" />
                         <Setter Property="MinHeight" Value="10" />
                     </Style>
                 </ListView.ItemContainerStyle>
@@ -211,12 +209,11 @@
                     <DataTemplate x:DataType="local:TableRow">
                         <ItemsControl
                             Width="{x:Bind Table.TotalWidth, Mode=OneWay}"
-                            Margin="0,0"
-                            Padding="0,6"
                             HorizontalAlignment="Left"
                             IsTabStop="False"
                             ItemTemplate="{StaticResource CellTemplate}"
-                            ItemsSource="{x:Bind Cells}">
+                            ItemsSource="{x:Bind Cells}"
+                            Loaded="ItemsControl_Loaded">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Horizontal" />
