@@ -200,20 +200,5 @@ namespace PrintManagement
                 }
             }
         }
-
-        private void Root_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            // If the press landed on (or inside) something focusable, let it handle focus itself
-            var source = e.OriginalSource as DependencyObject;
-            while (source != null)
-            {
-                if (source is Control { IsTabStop: true, IsEnabled: true }) return;
-                source = VisualTreeHelper.GetParent(source);
-            }
-
-            // Otherwise: clicked on nothing focusable, so release focus
-            // (a Page is a Control, so it can take focus; set IsTabStop="True" on it if this returns false)
-            MainGrid.Focus(FocusState.Programmatic);
-        }
     }
 }

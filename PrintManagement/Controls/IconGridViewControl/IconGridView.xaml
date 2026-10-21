@@ -1,3 +1,4 @@
+<!--  IconGridView  -->
 <UserControl
     x:Class="PrintManagement.Controls.IconGridViewControl.IconGridView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -17,6 +18,7 @@
                 FocusVisualPrimaryBrush="{StaticResource AccentAAFillColorDefaultBrush}"
                 GotFocus="Item_GotFocus"
                 IsTabStop="True"
+                LostFocus="Item_LostFocus"
                 PointerPressed="Item_PointerPressed"
                 Tag="{x:Bind}"
                 ToolTipService.ToolTip="{x:Bind Name}"
@@ -68,7 +70,6 @@
         <ScrollViewer
             Background="Transparent"
             HorizontalScrollBarVisibility="Disabled"
-            PointerPressed="Root_PointerPressed"
             VerticalScrollBarVisibility="Auto">
             <ItemsRepeater
                 x:Name="ContentRepeater"

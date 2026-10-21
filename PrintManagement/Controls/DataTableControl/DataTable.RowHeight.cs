@@ -32,7 +32,6 @@ namespace PrintManagement.Controls.DataTableControl
 
         private void ApplyCompactViewStyle(bool compact)
         {
-
             Thickness targetPadding = compact ? lowPadding : highPadding;
 
             if (RowsList != null)

@@ -81,7 +81,7 @@ public sealed partial class ItemModel(string name, Icons icon) : INotifyProperty
     private static readonly Brush SelectedBackgroundBrush = (Brush)Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
     private static readonly Brush SelectedBorderBrush = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
 
-    public Brush BackgroundBrush => _isSelected && _isActive ? SelectedBackgroundBrush : TransparentBrush;
+    public Brush BackgroundBrush => _isActive ? SelectedBackgroundBrush : TransparentBrush;
     public Brush BorderBrush => _isSelected ? SelectedBorderBrush : TransparentBrush;
 
     public event PropertyChangedEventHandler? PropertyChanged;
