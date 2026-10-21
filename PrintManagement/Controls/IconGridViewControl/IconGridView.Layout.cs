@@ -27,7 +27,7 @@ public sealed partial class IconGridView
 
     private void ViewDDSettingsService_IconSize_FilterChanged(object? sender, double newSize)
     {
-        ApplyToItems(ViewType, CompactView);
+        UpdateLayoutMode(ViewType, CompactView);
     }
 
     private void ViewDDSettingsService_CompactViewChanged(object? sender, bool isCompact)
