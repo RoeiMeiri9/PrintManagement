@@ -28,7 +28,6 @@ public sealed partial class ItemModel(string name, Icons icon) : INotifyProperty
         set { if (_padding != value) { _padding = value; OnPropertyChanged(); } }
     }
 
-
     private Orientation _orientation = Orientation.Vertical;
     public Orientation Orientation
     {
@@ -48,6 +47,13 @@ public sealed partial class ItemModel(string name, Icons icon) : INotifyProperty
     {
         get => _textAlignment;
         set { if (_textAlignment != value) { _textAlignment = value; OnPropertyChanged(); } }
+    }
+
+    private double _tileWidth = double.NaN;
+    public double TileWidth
+    {
+        get => _tileWidth;
+        set { if (_tileWidth != value) { _tileWidth = value; OnPropertyChanged(); } }
     }
 
     private bool _isSelected;
@@ -77,11 +83,25 @@ public sealed partial class ItemModel(string name, Icons icon) : INotifyProperty
         }
     }
 
+    private bool _isHovered;   // true = control "has the user's attention": show the fill too
+    public bool IsHovered
+    {
+        get => _isHovered;
+        set
+        {
+            if (_isHovered == value) return;
+            _isHovered = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(BackgroundBrush));
+        }
+    }
+
     private static readonly Brush TransparentBrush = new SolidColorBrush(Colors.Transparent);
     private static readonly Brush SelectedBackgroundBrush = (Brush)Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
-    private static readonly Brush SelectedBorderBrush = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
+    private static readonly Brush HighlighterBackgroundBrush = (Brush)Application.Current.Resources["CardBackgroundFillColorTertiaryBrush"];
+    private static readonly Brush SelectedBorderBrush = (Brush)Application.Current.Resources["FocusStrokeColorOuterBrush"];
 
-    public Brush BackgroundBrush => _isActive ? SelectedBackgroundBrush : TransparentBrush;
+    public Brush BackgroundBrush => _isHovered ? HighlighterBackgroundBrush : _isActive ? _isSelected ? HighlighterBackgroundBrush : SelectedBackgroundBrush : TransparentBrush;
     public Brush BorderBrush => _isSelected ? SelectedBorderBrush : TransparentBrush;
 
     public event PropertyChangedEventHandler? PropertyChanged;

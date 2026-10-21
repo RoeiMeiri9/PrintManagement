@@ -11,14 +11,16 @@
     <UserControl.Resources>
         <DataTemplate x:Key="ItemTemplate" x:DataType="local:ItemModel">
             <ContentControl
+                Width="{x:Bind TileWidth, Mode=OneWay}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Top"
                 HorizontalContentAlignment="Stretch"
                 CornerRadius="4"
-                FocusVisualPrimaryBrush="{StaticResource AccentAAFillColorDefaultBrush}"
                 GotFocus="Item_GotFocus"
                 IsTabStop="True"
                 LostFocus="Item_LostFocus"
+                PointerEntered="Item_PointerEntered"
+                PointerExited="Item_PointerExited"
                 PointerPressed="Item_PointerPressed"
                 Tag="{x:Bind}"
                 ToolTipService.ToolTip="{x:Bind Name}"

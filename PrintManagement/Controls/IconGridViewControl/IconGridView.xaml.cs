@@ -63,4 +63,5 @@ public sealed partial class IconGridView : UserControl
         Loaded += IconGridView_Loaded_Focus;
         Unloaded += IconGridView_Unloaded_Focus;
     }
+
 }

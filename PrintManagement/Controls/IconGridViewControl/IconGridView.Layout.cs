@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Models.enums;
+using PrintManagement.Models.Statics;
 using PrintManagement.Services;
 using System;
 using System.Collections.Specialized;
@@ -74,19 +75,13 @@ public sealed partial class IconGridView
             else
             {
                 double currentIconSize = ViewDDSettingsService.CurrentIconSize_Filter;
+                double spacing = currentIconSize == StaticValues.LargeIcons ? 8 : 4;
 
-                double itemWidth = Math.Max(120, currentIconSize + 40);
-
-                double itemHeight = currentIconSize * 1.3 + 130;
-
-                ContentRepeater.Layout = new UniformGridLayout
+                ContentRepeater.Layout = new CommunityToolkit.WinUI.Controls.WrapLayout
                 {
-                    MinItemWidth = itemWidth,
-                    MinItemHeight = itemHeight,
-                    MinRowSpacing = 8,
-                    MinColumnSpacing = 8,
-                    ItemsJustification = UniformGridLayoutItemsJustification.Start,
-                    ItemsStretch = UniformGridLayoutItemsStretch.None
+                    Orientation = Orientation.Horizontal,
+                    HorizontalSpacing = spacing,
+                    VerticalSpacing = spacing
                 };
             }
         }
@@ -114,6 +109,13 @@ public sealed partial class IconGridView
             {
                 if (item is ItemModel model)
                 {
+                    double targetWidth = isList
+                        ? double.NaN   // list mode stretches via StackLayout
+                        : Math.Max(120, ViewDDSettingsService.CurrentIconSize_Filter + 40);
+
+                    // inside the foreach:
+                    model.TileWidth = targetWidth;
+
                     model.Padding = newPadding;
                     model.Orientation = targetOrientation;
                     model.IconSize = targetSize;
