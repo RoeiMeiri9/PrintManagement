@@ -2,11 +2,10 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Models.enums;
+using PrintManagement.Models.Statics;
 using PrintManagement.Pages.CustomFilters;
 using PrintManagement.Services;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace PrintManagement.Pages.CommonPageWrapper;
 
@@ -19,19 +18,34 @@ public sealed partial class CommonPageWrapper : Page
         Loaded += CommonPageWrapper_Loaded;
     }
 
-    private void ViewMode_Click(object sender, RoutedEventArgs e)
+    private void CommonPageWrapper_Loaded(object sender, RoutedEventArgs e)
     {
-        if (sender is RadioMenuFlyoutItem item)
+        RadioMenuFlyoutItem selectedItem;
+        ViewMode storedViewMode = ViewDDSettingsService.CurrentViewMode_Filter;
+        double iconSize = ViewDDSettingsService.CurrentIconSize_Filter;
+
+        if (storedViewMode == ViewMode.Table)
         {
-            UpdateSelectedIcon(item);
-            ViewMode selectedView = item.Name switch
-            {
-                "DetailsView" => ViewMode.Table,
-                "ListView" => ViewMode.List,
-                _ => ViewMode.Tiles
-            };
-            ViewDDSettingsService.CurrentViewMode = selectedView;
+            selectedItem = DetailsView;
         }
+        else if (storedViewMode == ViewMode.List)
+        {
+            selectedItem = ListView;
+        }
+        else
+        {
+            if (iconSize == StaticValues.SmallIcons)
+            {
+                selectedItem = SmallIconsView;
+            }
+            else
+            {
+                selectedItem = LargeIconsView;
+            }
+        }
+        selectedItem.IsChecked = true;
+        UpdateSelectedIcon(selectedItem);
+        CompactViewToggleItem.IsChecked = ViewDDSettingsService.IsCompactView;
     }
 
     private void UpdateSelectedIcon(RadioMenuFlyoutItem item)
@@ -53,6 +67,30 @@ public sealed partial class CommonPageWrapper : Page
             {
                 Symbol = symbolIcon.Symbol
             };
+        }
+    }
+
+    private void ViewMode_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is RadioMenuFlyoutItem item)
+        {
+            UpdateSelectedIcon(item);
+            ViewMode selectedView = item.Name switch
+            {
+                "DetailsView" => ViewMode.Table,
+                "ListView" => ViewMode.List,
+                _ => ViewMode.Tiles
+            };
+            if (selectedView == ViewMode.Tiles)
+            {
+                ViewDDSettingsService.CurrentIconSize_Filter = item.Name switch
+                {
+                    "SmallIconsView" => StaticValues.SmallIcons,
+                    _ => StaticValues.LargeIcons
+                };
+            }
+
+            ViewDDSettingsService.CurrentViewMode_Filter = selectedView;
         }
     }
 
@@ -79,27 +117,5 @@ public sealed partial class CommonPageWrapper : Page
         {
             PageName = pageName
         });
-    }
-
-    private void CommonPageWrapper_Loaded(object sender, RoutedEventArgs e)
-    {
-        RadioMenuFlyoutItem selectedItem;
-        ViewMode storedViewMode = ViewDDSettingsService.CurrentViewMode;
-
-        if (storedViewMode == ViewMode.Table)
-        {
-            selectedItem = DetailsView;
-        }
-        else if (storedViewMode == ViewMode.List)
-        {
-            selectedItem = ListView;
-        }
-        else
-        {
-            selectedItem = SmallIconsView;
-        }
-        selectedItem.IsChecked = true;
-        UpdateSelectedIcon(selectedItem);
-        CompactViewToggleItem.IsChecked = ViewDDSettingsService.IsCompactView;
     }
 }

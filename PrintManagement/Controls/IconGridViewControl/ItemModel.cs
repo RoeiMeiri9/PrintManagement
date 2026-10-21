@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using PrintManagement.Models.Statics;
 using PrintManagement.Resources;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -13,12 +14,20 @@ public sealed partial class ItemModel(string name, Icons icon) : INotifyProperty
     public string Name { get; } = name;
     public Icons Icon { get; } = icon;
 
-    private double _iconSize = 32.0;
+    private double _iconSize = StaticValues.SmallIcons;
     public double IconSize
     {
         get => _iconSize;
         set { if (_iconSize != value) { _iconSize = value; OnPropertyChanged(); } }
     }
+
+    private Thickness _padding = new(10, 8, 10, 8);
+    public Thickness Padding
+    {
+        get => _padding;
+        set { if (_padding != value) { _padding = value; OnPropertyChanged(); } }
+    }
+
 
     private Orientation _orientation = Orientation.Vertical;
     public Orientation Orientation

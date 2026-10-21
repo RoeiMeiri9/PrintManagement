@@ -1,4 +1,5 @@
 ﻿using PrintManagement.Models.enums;
+using PrintManagement.Models.Statics;
 
 namespace PrintManagement.Resources;
 
@@ -13,4 +14,5 @@ public record Settings<T>(string Key, T DefaultValue)
     // --- View Dropdown Settings ---
     public static readonly Settings<bool> CompactViewSetting = new("CompactView", false);
     public static readonly Settings<ViewMode> CurrentViewSetting_Filter = new("CurrentViewSetting_Filter", ViewMode.Table);
+    public static readonly Settings<double> IconSizeSetting_Filter = new("IconSizeSetting_Filter", StaticValues.SmallIcons);
 }

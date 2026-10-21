@@ -227,9 +227,6 @@
                 </ListView.ItemTemplate>
             </ListView>
         </Grid>
-        <local:PanOverlay
-            x:Name="PanCursorOverlay"
-            Background="#55FF0000"
-            Visibility="Visible" />
+        <local:PanOverlay x:Name="PanCursorOverlay" Visibility="Visible" />
     </Grid>
 </UserControl>

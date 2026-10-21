@@ -17,25 +17,60 @@ namespace PrintManagement.Controls.DataTableControl
     {
         // ---------- Horizontal Scroll ----------
         private ScrollViewer? _listScroller;
-
+        private bool _listScrollerHooked;
+        private bool _rowsPanHooked;
         private bool ShowMarker;
 
         private void RowsList_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_listScroller != null) return;
-            _listScroller = FindDescendant<ScrollViewer>(RowsList);
+            InitPanning();
 
-            if (_listScroller != null)
+            if (!_rowsPanHooked)
             {
-                // The header follows the list horizontally (this also covers panning).
-                _listScroller.ViewChanged += (_, _) =>
-                    HeaderScroller.ChangeView(_listScroller.HorizontalOffset, null, null, true);
-
-                _listScroller.PointerWheelChanged += OnScrollPointerWheelChanged;
+                _rowsPanHooked = true;
+                HookPanStart(RowsList);
             }
 
-            InitPanning();
-            HookPanStart(RowsList);
+            // If the template isn't realized yet (e.g. loaded while Collapsed), keep retrying
+            // until the layout pass that follows becoming visible creates the ScrollViewer.
+            if (!EnsureListScroller())
+            {
+                RowsList.LayoutUpdated -= RowsList_LayoutUpdated; // avoid double subscription
+                RowsList.LayoutUpdated += RowsList_LayoutUpdated;
+            }
+        }
+
+        private void RowsList_LayoutUpdated(object? sender, object e)
+        {
+            if (EnsureListScroller())
+                RowsList.LayoutUpdated -= RowsList_LayoutUpdated;
+        }
+
+        /// <summary>Finds the ListView's ScrollViewer and hooks it exactly once. Returns true when ready.</summary>
+        private bool EnsureListScroller()
+        {
+            if (_listScrollerHooked) return true;
+
+            _listScroller ??= FindDescendant<ScrollViewer>(RowsList);
+            if (_listScroller == null) return false;
+
+            _listScrollerHooked = true;
+
+            // The header follows the list horizontally (this also covers panning).
+            _listScroller.ViewChanged += (_, _) =>
+                HeaderScroller.ChangeView(_listScroller.HorizontalOffset, null, null, true);
+
+            _listScroller.PointerWheelChanged += OnScrollPointerWheelChanged;
+
+            // Sync the header in case the list was already scrolled before we hooked in.
+            HeaderScroller.ChangeView(_listScroller.HorizontalOffset, null, null, true);
+
+            return true;
+        }
+
+        private void TryLoadingListScroller()
+        {
+            _listScroller = FindDescendant<ScrollViewer>(RowsList);
         }
 
         private bool _headerHooked;
@@ -145,7 +180,8 @@ namespace PrintManagement.Controls.DataTableControl
 
         private void OnPanPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (_isPanning || _listScroller == null) return;
+            if (_isPanning) return;
+            if (!EnsureListScroller() || _listScroller == null) return;   // was: _listScroller == null check
 
             var point = e.GetCurrentPoint(PanCursorOverlay);
             if (!point.Properties.IsMiddleButtonPressed) return;
@@ -213,7 +249,7 @@ namespace PrintManagement.Controls.DataTableControl
 
         private void OnPanRendering(object? sender, object e)
         {
-            var scroller = _listScroller;
+            var scroller = _listScroller;        // remove the TryLoadingListScroller() fallback
             if (!_isPanning || scroller == null) return;
 
             // Scale by frame time so speed doesn't depend on the display's refresh rate.

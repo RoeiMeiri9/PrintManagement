@@ -54,7 +54,7 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     public PrintersFilter()
     {
         IsCompact = ViewDDSettingsService.IsCompactView;
-        CurrentViewMode = ViewDDSettingsService.CurrentViewMode;
+        CurrentViewMode = ViewDDSettingsService.CurrentViewMode_Filter;
         Loaded += PrintersFilter_Loaded;
         Unloaded += PrintersFilter_Unloaded;
         InitializeComponent();
@@ -93,13 +93,13 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     private void PrintersFilter_Loaded(object sender, RoutedEventArgs e)
     {
         ViewDDSettingsService.CompactViewChanged += OnCompactViewChanged;
-        ViewDDSettingsService.ViewModeChanged += OnViewModeChanged;
+        ViewDDSettingsService.ViewMode_FilterChanged += OnViewModeChanged;
     }
 
     private void PrintersFilter_Unloaded(object sender, RoutedEventArgs e)
     {
         ViewDDSettingsService.CompactViewChanged -= OnCompactViewChanged;
-        ViewDDSettingsService.ViewModeChanged += OnViewModeChanged;
+        ViewDDSettingsService.ViewMode_FilterChanged -= OnViewModeChanged;
     }
 
     private void OnCompactViewChanged(object? sender, bool isCompactView)
@@ -112,6 +112,7 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
         CurrentViewMode = viewMode;
         AnimateCurrentView();
     }
+
     private void AnimateCurrentView()
     {
         UIElement targetElement = CurrentViewMode == ViewMode.Table

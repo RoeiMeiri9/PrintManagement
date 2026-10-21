@@ -8,6 +8,7 @@
     xmlns:ctlTb="using:PrintManagement.Controls.DataTableControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hlps="using:PrintManagement.Pages.CustomFilters.Helpers"
+    xmlns:igc="using:PrintManagement.Controls.IconGridViewControl"
     xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mdl="using:PrintManagement.Models"
@@ -108,185 +109,202 @@
                 GlyphFontFamily="{x:Bind res:Icons.ErrorBadge12.Font}" />
         </ctlBdg:BadgeRuleCollection>
     </Page.Resources>
+    <Grid>
+        <igc:IconGridView
+            x:Name="DriversIconView"
+            ItemsSource="{x:Bind DriversItemModels, Mode=OneWay}"
+            ViewType="{x:Bind CurrentViewMode, Mode=OneWay}"
+            Visibility="{x:Bind CurrentViewMode, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=NotTable, Mode=OneWay}">
 
-    <ctlTb:DataTable
-        x:Name="PrintersTable"
-        Grid.Column="2"
-        CompactView="{x:Bind IsCompact, Mode=OneWay}"
-        ItemsSource="{x:Bind DriverModelList, Mode=OneWay}">
+            <igc:IconGridView.RenderTransform>
+                <TranslateTransform />
+            </igc:IconGridView.RenderTransform>
+        </igc:IconGridView>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Driver Name"
-            IsPrimary="True"
-            Path="DriverName">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:DriverModel">
-                    <Grid ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+        <ctlTb:DataTable
+            x:Name="DriversTable"
+            Grid.Column="2"
+            CompactView="{x:Bind IsCompact, Mode=OneWay}"
+            ItemsSource="{x:Bind DriverModelList, Mode=OneWay}"
+            Visibility="{x:Bind CurrentViewMode, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Table, Mode=OneWay}">
 
-                        <FontIcon
-                            Grid.Column="0"
-                            FontFamily="{x:Bind res:Icons.Driver.Font}"
-                            FontSize="16"
-                            Glyph="{x:Bind res:Icons.Driver.Glyph}" />
+            <ctlTb:DataTable.RenderTransform>
+                <TranslateTransform />
+            </ctlTb:DataTable.RenderTransform>
 
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            FontWeight="SemiBold"
-                            Text="{x:Bind DriverName, Mode=OneWay}"
-                            TextTrimming="CharacterEllipsis" />
-                    </Grid>
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Driver Name"
+                IsPrimary="True"
+                Path="DriverName">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:DriverModel">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <FontIcon
+                                Grid.Column="0"
+                                FontFamily="{x:Bind res:Icons.Driver.Font}"
+                                FontSize="16"
+                                Glyph="{x:Bind res:Icons.Driver.Glyph}" />
+
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontWeight="SemiBold"
+                                Text="{x:Bind DriverName, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
 
 
-        <ctlTb:TableColumn
-            Width="152"
-            Header="Environment"
-            Path="Environment" />
+            <ctlTb:TableColumn
+                Width="152"
+                Header="Environment"
+                Path="Environment" />
 
-        <ctlTb:TableColumn
-            Width="151"
-            Header="Driver Version"
-            Path="DriverVersion" />
+            <ctlTb:TableColumn
+                Width="151"
+                Header="Driver Version"
+                Path="DriverVersion" />
 
-        <ctlTb:TableColumn
-            Width="130"
-            Header="Driver Isolation"
-            Path="DriverIsolation">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:DriverModel">
-                    <ctlBdg:Badge Rules="{StaticResource DriverIsolationBadgeRules}" Value="{x:Bind DriverIsolation, Mode=OneWay}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="130"
+                Header="Driver Isolation"
+                Path="DriverIsolation">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:DriverModel">
+                        <ctlBdg:Badge Rules="{StaticResource DriverIsolationBadgeRules}" Value="{x:Bind DriverIsolation, Mode=OneWay}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="112"
-            Header="Provider"
-            Path="Provider" />
+            <ctlTb:TableColumn
+                Width="112"
+                Header="Provider"
+                Path="Provider" />
 
-        <ctlTb:TableColumn
-            Width="221"
-            Header="Server Name"
-            Path="ServerName" />
+            <ctlTb:TableColumn
+                Width="221"
+                Header="Server Name"
+                Path="ServerName" />
 
-        <ctlTb:TableColumn
-            Width="129"
-            Header="Print Processor"
-            Path="PrintProcessor" />
+            <ctlTb:TableColumn
+                Width="129"
+                Header="Print Processor"
+                Path="PrintProcessor" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Packaged"
-            Path="Packaged">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:DriverModel">
-                    <ctlBdg:Badge Rules="{StaticResource PackagedBadgeRules}" Value="{x:Bind Packaged, Mode=OneWay}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Packaged"
+                Path="Packaged">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:DriverModel">
+                        <ctlBdg:Badge Rules="{StaticResource PackagedBadgeRules}" Value="{x:Bind Packaged, Mode=OneWay}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Driver Date"
-            Path="DriverDate">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:DriverModel">
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind DriverDate, Converter={StaticResource DateConverter}}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Driver Date"
+                Path="DriverDate">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:DriverModel">
+                        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind DriverDate, Converter={StaticResource DateConverter}}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Inf Path"
-            MaxAutoWidth="800"
-            Path="InfPath" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Inf Path"
+                MaxAutoWidth="800"
+                Path="InfPath" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="XPS Driver"
-            Path="XPSDriver">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:DriverModel">
-                    <ctlBdg:Badge Rules="{StaticResource XPSDriverBadgeRules}" Value="{x:Bind XPSDriver, Mode=OneWay}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="XPS Driver"
+                Path="XPSDriver">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:DriverModel">
+                        <ctlBdg:Badge Rules="{StaticResource XPSDriverBadgeRules}" Value="{x:Bind XPSDriver, Mode=OneWay}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Config File Path"
-            MaxAutoWidth="870"
-            Path="ConfigFilePath" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Config File Path"
+                MaxAutoWidth="870"
+                Path="ConfigFilePath" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Data File Path"
-            MaxAutoWidth="800"
-            Path="DataFilePath" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Data File Path"
+                MaxAutoWidth="800"
+                Path="DataFilePath" />
 
-        <ctlTb:TableColumn
-            Width="141"
-            Header="Default Datatype"
-            Path="DefaultDatatype" />
+            <ctlTb:TableColumn
+                Width="141"
+                Header="Default Datatype"
+                Path="DefaultDatatype" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Driver File Path"
-            MaxAutoWidth="870"
-            Path="DriverFilePath" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Driver File Path"
+                MaxAutoWidth="870"
+                Path="DriverFilePath" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Hardware ID"
-            MaxAutoWidth="400"
-            Path="HardwareID" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Hardware ID"
+                MaxAutoWidth="400"
+                Path="HardwareID" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Help File Path"
-            MaxAutoWidth="400"
-            Path="HelpFilePath" />
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Help File Path"
+                MaxAutoWidth="400"
+                Path="HelpFilePath" />
 
-        <ctlTb:TableColumn
-            Width="151"
-            Header="Language Monitor"
-            Path="LanguageMonitor" />
+            <ctlTb:TableColumn
+                Width="151"
+                Header="Language Monitor"
+                Path="LanguageMonitor" />
 
-        <ctlTb:TableColumn
-            Width="119"
-            Header="Manufacturer"
-            Path="Manufacturer" />
+            <ctlTb:TableColumn
+                Width="119"
+                Header="Manufacturer"
+                Path="Manufacturer" />
 
-        <ctlTb:TableColumn
-            Width="112"
-            Header="OEM URL"
-            Path="OEMURL" />
+            <ctlTb:TableColumn
+                Width="112"
+                Header="OEM URL"
+                Path="OEMURL" />
 
-        <ctlTb:TableColumn
-            Width="Auto"
-            Header="Shareable"
-            Path="Shareable">
-            <ctlTb:TableColumn.CellTemplate>
-                <DataTemplate x:DataType="mdl:DriverModel">
-                    <ctlBdg:Badge Rules="{StaticResource ShareableBadgeRules}" Value="{x:Bind Shareable, Mode=OneWay}" />
-                </DataTemplate>
-            </ctlTb:TableColumn.CellTemplate>
-        </ctlTb:TableColumn>
+            <ctlTb:TableColumn
+                Width="Auto"
+                Header="Shareable"
+                Path="Shareable">
+                <ctlTb:TableColumn.CellTemplate>
+                    <DataTemplate x:DataType="mdl:DriverModel">
+                        <ctlBdg:Badge Rules="{StaticResource ShareableBadgeRules}" Value="{x:Bind Shareable, Mode=OneWay}" />
+                    </DataTemplate>
+                </ctlTb:TableColumn.CellTemplate>
+            </ctlTb:TableColumn>
 
-        <ctlTb:TableColumn
-            Width="173"
-            Header="Type"
-            Path="Type" />
+            <ctlTb:TableColumn
+                Width="173"
+                Header="Type"
+                Path="Type" />
 
-    </ctlTb:DataTable>
+        </ctlTb:DataTable>
+    </Grid>
 </Page>

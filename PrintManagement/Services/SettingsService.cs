@@ -20,7 +20,7 @@ namespace PrintManagement.Services
             }
         }
 
-        public static T? ReadSetting<T>(Settings<T> setting)
+        public static T ReadSetting<T>(Settings<T> setting)
         {
             if (LocalSettings.Values.TryGetValue(setting.Key, out object? value))
             {

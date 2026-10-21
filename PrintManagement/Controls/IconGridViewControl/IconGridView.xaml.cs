@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using PrintManagement.Models.enums;
+using PrintManagement.Services;
+using System;
 using System.Collections.Specialized;
 
 namespace PrintManagement.Controls.IconGridViewControl;
@@ -36,41 +38,83 @@ public sealed partial class IconGridView : UserControl
         set => SetValue(ViewTypeProperty, value);
     }
 
+    public static readonly DependencyProperty CompactViewProperty =
+       DependencyProperty.Register(
+           nameof(CompactView),
+           typeof(bool),
+           typeof(IconGridView),
+           new PropertyMetadata(false, (d, e) => (d as IconGridView)?.OnCompactViewChanged((bool)e.NewValue)));
+
+    public bool CompactView
+    {
+        get => (bool)GetValue(CompactViewProperty);
+        set => SetValue(CompactViewProperty, value);
+    }
+
+
     private INotifyCollectionChanged? _observed;
+
+    private static readonly Thickness DefaultPadding = new(10, 8, 10, 8);
+    private static readonly Thickness ShrinkedPadding = new(10, 6, 10, 6);
 
     #endregion
     public IconGridView()
     {
         InitializeComponent();
         Loaded += IconGridView_Loaded;
+        Unloaded += IconGridView_Unloaded;
+    }
+
+
+    private void IconGridView_Loaded(object sender, RoutedEventArgs e)
+    {
+        ViewType = ViewDDSettingsService.CurrentViewMode_Filter;
+        CompactView = ViewDDSettingsService.IsCompactView;
+        ViewDDSettingsService.IconSize_FilterChanged += ViewDDSettingsService_IconSize_FilterChanged;
+        ViewDDSettingsService.CompactViewChanged += ViewDDSettingsService_CompactViewChanged;
+        UpdateLayoutMode(ViewType, CompactView);
+    }
+
+    private void IconGridView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewDDSettingsService.IconSize_FilterChanged -= ViewDDSettingsService_IconSize_FilterChanged;
+        ViewDDSettingsService.CompactViewChanged -= ViewDDSettingsService_CompactViewChanged;
+    }
+
+    private void ViewDDSettingsService_IconSize_FilterChanged(object? sender, double newSize)
+    {
+        ApplyToItems(ViewType, CompactView);
+    }
+
+    private void ViewDDSettingsService_CompactViewChanged(object? sender, bool isCompact)
+    {
+        UpdateLayoutMode(ViewType, isCompact);
     }
 
     private void OnCollectionChanged(object? s, NotifyCollectionChangedEventArgs e)
     {
-        // Only new items need styling, but re-applying to all is cheap and simple
-        ApplyToItems(ViewType);
+        ApplyToItems(ViewType, CompactView);
     }
-
-    private void IconGridView_Loaded(object sender, RoutedEventArgs e)
-    {
-        UpdateLayoutMode(ViewType);
-    }
-
     private void OnItemsSourceChanged()
     {
         if (_observed != null) _observed.CollectionChanged -= OnCollectionChanged;
         _observed = ItemsSource as INotifyCollectionChanged;
         if (_observed != null) _observed.CollectionChanged += OnCollectionChanged;
 
-        UpdateLayoutMode(ViewType);
+        UpdateLayoutMode(ViewType, CompactView);
+    }
+
+    private void OnCompactViewChanged(bool isCompact)
+    {
+        UpdateLayoutMode(ViewType, isCompact);
     }
 
     private void OnViewTypeChanged(ViewMode newMode)
     {
-        UpdateLayoutMode(newMode);
+        UpdateLayoutMode(newMode, CompactView);
     }
 
-    private void UpdateLayoutMode(ViewMode mode)
+    private void UpdateLayoutMode(ViewMode mode, bool isCompact)
     {
         bool isList = (mode == ViewMode.List);
 
@@ -81,31 +125,43 @@ public sealed partial class IconGridView : UserControl
                 ContentRepeater.Layout = new StackLayout
                 {
                     Orientation = Orientation.Vertical,
-                    Spacing = 4
+                    Spacing = isCompact ? 0.0 : 2.0,
                 };
             }
             else
             {
+                double currentIconSize = ViewDDSettingsService.CurrentIconSize_Filter;
+
+                double itemWidth = Math.Max(120, currentIconSize + 40);
+
+                double itemHeight = currentIconSize * 1.3 + 130;
+
                 ContentRepeater.Layout = new UniformGridLayout
                 {
-                    MinItemWidth = 90,
-                    MinItemHeight = 80,
+                    MinItemWidth = itemWidth,
+                    MinItemHeight = itemHeight,
                     MinRowSpacing = 8,
                     MinColumnSpacing = 8,
-                    ItemsJustification = UniformGridLayoutItemsJustification.Start
+                    ItemsJustification = UniformGridLayoutItemsJustification.Start,
+                    ItemsStretch = UniformGridLayoutItemsStretch.None
                 };
             }
         }
 
-        ApplyToItems(mode);
+        ApplyToItems(mode, isCompact);
     }
 
-    private void ApplyToItems(ViewMode mode)
+    private void ApplyToItems(ViewMode mode, bool isCompact)
     {
         bool isList = (mode == ViewMode.List);
 
         Orientation targetOrientation = isList ? Orientation.Horizontal : Orientation.Vertical;
-        double targetSize = isList ? 18.0 : 36.0;
+
+        double targetSize = isList ? 18.0 : ViewDDSettingsService.CurrentIconSize_Filter;
+
+
+        Thickness newPadding = isList ? isCompact ? ShrinkedPadding : DefaultPadding : DefaultPadding;
+
         HorizontalAlignment targetAlignment = isList ? HorizontalAlignment.Stretch : HorizontalAlignment.Center;
         TextAlignment targetTextAlignment = isList ? TextAlignment.Left : TextAlignment.Center;
 
@@ -115,6 +171,7 @@ public sealed partial class IconGridView : UserControl
             {
                 if (item is ItemModel model)
                 {
+                    model.Padding = newPadding;
                     model.Orientation = targetOrientation;
                     model.IconSize = targetSize;
                     model.Alignment = targetAlignment;

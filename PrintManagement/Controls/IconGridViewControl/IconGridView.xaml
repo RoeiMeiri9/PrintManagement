@@ -10,8 +10,8 @@
     <UserControl.Resources>
         <DataTemplate x:Key="ItemTemplate" x:DataType="local:ItemModel">
             <ContentControl
-                HorizontalAlignment="{x:Bind Alignment, Mode=OneWay}"
-                VerticalAlignment="Center"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
                 HorizontalContentAlignment="Stretch"
                 CornerRadius="4"
                 FocusVisualPrimaryBrush="{StaticResource AccentAAFillColorDefaultBrush}"
@@ -19,20 +19,22 @@
                 IsTabStop="True"
                 PointerPressed="Item_PointerPressed"
                 Tag="{x:Bind}"
+                ToolTipService.ToolTip="{x:Bind Name}"
                 UseSystemFocusVisuals="True">
 
                 <Border
-                    Padding="6"
+                    HorizontalAlignment="Stretch"
                     Background="{x:Bind BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{x:Bind BorderBrush, Mode=OneWay}"
                     BorderThickness="2"
                     CornerRadius="4">
 
                     <StackPanel
-                        HorizontalAlignment="{x:Bind Alignment, Mode=OneWay}"
+                        Padding="{x:Bind Padding, Mode=OneWay}"
+                        HorizontalAlignment="Stretch"
                         VerticalAlignment="Center"
                         Orientation="{x:Bind Orientation, Mode=OneWay}"
-                        Spacing="4">
+                        Spacing="6">
 
                         <FontIcon
                             HorizontalAlignment="{x:Bind Alignment, Mode=OneWay}"
@@ -43,10 +45,12 @@
 
                         <TextBlock
                             VerticalAlignment="Center"
+                            FontSize="12"
+                            MaxLines="5"
                             Text="{x:Bind Name}"
                             TextAlignment="{x:Bind TextAlignment, Mode=OneWay}"
                             TextTrimming="CharacterEllipsis"
-                            TextWrapping="NoWrap" />
+                            TextWrapping="WrapWholeWords" />
                     </StackPanel>
                 </Border>
             </ContentControl>
@@ -62,13 +66,13 @@
             Opacity="0" />
 
         <ScrollViewer
-            Margin="8"
             Background="Transparent"
             HorizontalScrollBarVisibility="Disabled"
             PointerPressed="Root_PointerPressed"
             VerticalScrollBarVisibility="Auto">
             <ItemsRepeater
                 x:Name="ContentRepeater"
+                Margin="8"
                 ItemTemplate="{StaticResource ItemTemplate}"
                 ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
                 TabFocusNavigation="Local"
