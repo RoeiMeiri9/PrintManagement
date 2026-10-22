@@ -47,7 +47,7 @@ internal static class CredentialsService
                 return Split(cred.UserName, cred.Password);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // FindAllByResource throws "element not found" when nothing is stored; that's the normal case.
         }

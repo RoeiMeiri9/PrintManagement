@@ -51,6 +51,20 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
         }
     }
 
+    private bool _isLoading = true; // מתחיל טעינה כבר בעלייה
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
+        {
+            if (_isLoading != value)
+            {
+                _isLoading = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLoading)));
+            }
+        }
+    }
+
     public PrintersFilter()
     {
         IsCompact = ViewDDSettingsService.IsCompactView;

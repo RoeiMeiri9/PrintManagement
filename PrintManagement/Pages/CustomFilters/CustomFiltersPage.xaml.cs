@@ -10,13 +10,14 @@ using PrintManagement.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace PrintManagement.Pages.CustomFilters;
 
-public sealed partial class CustomFiltersPage : Page
+public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
 {
     public FilterLeaf? SelectedFilterLeaf;
     private bool _isLoadingPrinters;
@@ -41,6 +42,24 @@ public sealed partial class CustomFiltersPage : Page
 
     public string ActiveSubPageName => FilterSubPage.Content?.GetType().Name ?? string.Empty;
 
+    private bool _isLoading = true;
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
+        {
+            if (_isLoading != value)
+            {
+                _isLoading = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLoading)));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+
     public CustomFiltersPage()
     {
         InitializeComponent();
@@ -57,6 +76,7 @@ public sealed partial class CustomFiltersPage : Page
         var sw = Stopwatch.StartNew();
         await LoadDriversAsync();
         await LoadPrintersAsync();
+        IsLoading = false;
         Logger.Log($"initial load: {sw.ElapsedMilliseconds} ms");
     }
 

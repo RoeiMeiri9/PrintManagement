@@ -8,7 +8,9 @@ namespace PrintManagement.Converters
     {
         public object? Convert(object value, Type targetType, object parameter, string language)
         {
-            bool hideOnNull = parameter?.ToString() == "hideOnNull";
+            string? paramaterAsString = parameter?.ToString();
+
+            bool hideOnNull = paramaterAsString == "hideOnNull" || paramaterAsString == "hideOnFalse";
 
             if (value is false)
             {
