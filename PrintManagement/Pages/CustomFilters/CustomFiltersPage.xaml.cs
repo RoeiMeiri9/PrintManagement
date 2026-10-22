@@ -1,6 +1,8 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using PrintManagement.Helpers.CustomCollections;
+using PrintManagement.Interfaces;
 using PrintManagement.Models;
 using PrintManagement.Pages.CustomFilters.Components.TreeViewLeaf;
 using PrintManagement.Pages.CustomFilters.Helpers;
@@ -17,14 +19,13 @@ using System.Threading.Tasks;
 
 namespace PrintManagement.Pages.CustomFilters;
 
-public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
+public sealed partial class CustomFiltersPage : Page, INavigationCommands
 {
-    public FilterLeaf? SelectedFilterLeaf;
     private bool _isLoadingPrinters;
     private bool _isLoadingDrivers;
     public ObservableCollection<FilterLeaf> FiltersList { get; } = [];
-    public ObservableCollection<PrinterModel> PrinterModelList { get; } = [];
-    public ObservableCollection<DriverModel> DriverModelList { get; } = [];
+    public BulkObservableCollection<PrinterModel> PrinterModelList { get; } = [];
+    public BulkObservableCollection<DriverModel> DriverModelList { get; } = [];
 
     //private readonly string _serverName = "";
     private readonly string _serverName = @"\\WIN-HO9KT6LB37V";
@@ -57,27 +58,115 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
         }
     }
 
+
+
+    private readonly Stack<FilterLeaf> _backStack = new();
+    private readonly Stack<FilterLeaf> _forwardStack = new();
+    private bool _isNavigatingHistory = false;
+    public bool _canRefreshan = true;
+    public bool CanRefresh
+    {
+        get => _canRefreshan;
+        set
+        {
+            if (_canRefreshan != value)
+            {
+                _canRefreshan = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanRefresh)));
+            }
+        }
+    }
+
+    public bool _canGoUp = false;
+    public bool CanGoUp
+    {
+        get => _canGoUp;
+        set
+        {
+            if (_canGoUp != value)
+            {
+                _canGoUp = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoUp)));
+            }
+        }
+    }
+    public bool CanGoBack => _backStack.Count > 0;
+    public bool CanGoForward => _forwardStack.Count > 0;
+
+
+    private string _backTargetName = string.Empty;
+    public string BackTargetName
+    {
+        get => _backTargetName;
+        set { if (_backTargetName != value) { _backTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BackTargetName))); } }
+    }
+
+    private string _forwardTargetName = string.Empty;
+    public string ForwardTargetName
+    {
+        get => _forwardTargetName;
+        set { if (_forwardTargetName != value) { _forwardTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ForwardTargetName))); } }
+    }
+
+    private string _upTargetName = string.Empty;
+    public string UpTargetName
+    {
+        get => _upTargetName;
+        set { if (_upTargetName != value) { _upTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UpTargetName))); } }
+    }
+
+    private string _refreshTargetName = string.Empty;
+    public string RefereshTargetName
+    {
+        get => _refreshTargetName;
+        set { if (_refreshTargetName != value) { _refreshTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RefereshTargetName))); } }
+    }
+
+    private static readonly string PrintersRootName = "Printers";
+    private static readonly string DriversRootName = "Drivers";
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    private bool _isInitialized = false;
 
     public CustomFiltersPage()
     {
         InitializeComponent();
-        Loaded += LoadFilters;
-        Loaded += async (_, _) => await LoadAllAsync();
+        Loaded += (s, e) =>
+        {
+            if (_isInitialized) return;
+            _isInitialized = true;
+
+            LoadFilters(s, e);
+            _ = LoadAllAsync();
+        };
     }
 
     /// <summary>
     /// Drivers first, because the printers load reuses that list instead of asking the server again.
     /// The filter tree is built once, at the end, so it never shows a half-loaded count.
     /// </summary>
+    private bool _isLoadingAll;
+
     private async Task LoadAllAsync()
     {
-        var sw = Stopwatch.StartNew();
-        await LoadDriversAsync();
-        await LoadPrintersAsync();
-        IsLoading = false;
-        Logger.Log($"initial load: {sw.ElapsedMilliseconds} ms");
+        if (_isLoadingAll) return;
+        _isLoadingAll = true;
+        IsLoading = true;
+        CanRefresh = false;
+        try
+        {
+            var sw = Stopwatch.StartNew();
+            await LoadDriversAsync();
+            await LoadPrintersAsync();
+            Logger.Log($"load: {sw.ElapsedMilliseconds} ms");
+        }
+        finally
+        {
+            IsLoading = false;
+            CanRefresh = true;
+            _isLoadingAll = false;
+        }
     }
 
 
@@ -96,9 +185,7 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
             var printers = await SpoolerService.GetPrintersAsync(
                 serverName: _serverName, includeConnections: true, knownDrivers: knownDrivers);
 
-            PrinterModelList.Clear();
-            foreach (var p in printers)
-                PrinterModelList.Add(p);
+            PrinterModelList.ReplaceAll(printers);
         }
         catch (Exception ex)
         {
@@ -120,9 +207,7 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
         {
             var drivers = await SpoolerService.GetDriversAsync(serverName: _serverName);
 
-            DriverModelList.Clear();
-            foreach (var d in drivers)
-                DriverModelList.Add(d);
+            DriverModelList.ReplaceAll(drivers);
         }
         catch (Exception ex)
         {
@@ -141,10 +226,11 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
         FiltersList.Clear();
         var printersRoot = new FilterLeaf
         {
-            Name = "Printers",
+            Name = PrintersRootName,
             DisplayName = "Printers",
             LeafIcon = Icons.Printer,
-            FilterPage = FilterPages.PrinterPage
+            FilterPage = FilterPages.PrinterPage,
+            IsRoot = true
         };
 
         // Adding sub leafs
@@ -168,8 +254,8 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
 
         printersRoot.Children.Add(new FilterLeaf
         {
-            Name = "PrintersNorReady",
-            DisplayName = "Printers Nor Ready",
+            Name = "PrintersNotReady",
+            DisplayName = "Printers Not Ready",
             LeafIcon = Icons.Filter,
             FilterPage = FilterPages.PrinterPage
 
@@ -188,10 +274,11 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
         // --- Drivers Root Leaf ---
         var driversRoot = new FilterLeaf
         {
-            Name = "Drivers",
+            Name = DriversRootName,
             DisplayName = "Drivers",
             LeafIcon = Icons.Driver,
-            FilterPage = FilterPages.DriverPage
+            FilterPage = FilterPages.DriverPage,
+            IsRoot = true
         };
 
         // Adding sub leafs
@@ -222,24 +309,24 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
     {
         string targetName = NavigationStateService.LastSelectedFilterName ?? "AllPrinters";
 
-        FilterLeaf? selectedLeaf = FindLeaf(FiltersList, targetName, FiltersTree);
+        FilterLeaf? selectedLeaf = FindLeaf(FiltersList, targetName);
 
         if (selectedLeaf != null)
         {
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 FiltersTree.SelectedItem = selectedLeaf;
             });
         }
     }
-    public static FilterLeaf? FindLeaf(IEnumerable<FilterLeaf> nodes, string targetName, TreeView FiltersTree)
+    public static FilterLeaf? FindLeaf(IEnumerable<FilterLeaf> nodes, string targetName)
     {
         foreach (var node in nodes)
         {
             if (node.Name == targetName)
                 return node;
 
-            var foundInDescendants = FindLeaf(node.Children, targetName, FiltersTree);
+            var foundInDescendants = FindLeaf(node.Children, targetName);
             if (foundInDescendants != null)
             {
                 node.IsExpanded = true;
@@ -253,6 +340,12 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
     {
         if (e.AddedItems.FirstOrDefault() is FilterLeaf leaf)
         {
+            if (!_isNavigatingHistory && e.RemovedItems.FirstOrDefault() is FilterLeaf oldLeaf && oldLeaf != leaf)
+            {
+                _backStack.Push(oldLeaf);
+                _forwardStack.Clear();
+            }
+
             switch (leaf.FilterPage)
             {
                 case FilterPages.PrinterPage:
@@ -262,7 +355,96 @@ public sealed partial class CustomFiltersPage : Page, INotifyPropertyChanged
                     FilterSubPage.Navigate(typeof(DriversFilter), DriverModelList);
                     break;
             }
+
             NavigationStateService.LastSelectedFilterName = leaf.Name;
+
+            UpdateNavigationStates(leaf);
         }
+    }
+
+    private void UpdateNavigationStates(FilterLeaf? current)
+    {
+        if (current is not null)
+        {
+            CanGoUp = !current.IsRoot;
+            RefereshTargetName = current.DisplayName;
+            UpTargetName = current.IsRoot
+                ? string.Empty
+                : (current.FilterPage == FilterPages.PrinterPage ? PrintersRootName : DriversRootName);
+        }
+
+        BackTargetName = _backStack.Count > 0 ? _backStack.Peek().DisplayName : string.Empty;
+        ForwardTargetName = _forwardStack.Count > 0 ? _forwardStack.Peek().DisplayName : string.Empty;
+
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoBack)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoForward)));
+    }
+
+    public void GoBack()
+    {
+        if (_backStack.Count == 0) return;
+
+        if (FiltersTree.SelectedItem is FilterLeaf currentLeaf)
+        {
+            _forwardStack.Push(currentLeaf); // דוחפים את הנוכחי לקדימה
+        }
+
+        var previousLeaf = _backStack.Pop();
+        _isNavigatingHistory = true;
+        FiltersTree.SelectedItem = previousLeaf; // מעבר לבחירה הקודמת
+        _isNavigatingHistory = false;
+
+        UpdateNavigationStates(previousLeaf);
+    }
+
+    public void GoForward()
+    {
+        if (_forwardStack.Count == 0) return;
+
+        if (FiltersTree.SelectedItem is FilterLeaf currentLeaf)
+        {
+            _backStack.Push(currentLeaf); // דוחפים את הנוכחי לאחורה
+        }
+
+        var nextLeaf = _forwardStack.Pop();
+        _isNavigatingHistory = true;
+        FiltersTree.SelectedItem = nextLeaf; // מעבר לבחירה הבאה
+        _isNavigatingHistory = false;
+
+        UpdateNavigationStates(nextLeaf);
+    }
+
+    public void GoUp()
+    {
+        if (FiltersTree.SelectedItem is FilterLeaf leaf)
+        {
+            string targetName = leaf.FilterPage switch
+            {
+                FilterPages.PrinterPage => PrintersRootName,
+                _ => DriversRootName
+            };
+
+            FilterLeaf? selectedLeaf = FindLeaf(FiltersList, targetName);
+            if (selectedLeaf != null && selectedLeaf != leaf)
+            {
+                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                {
+                    _backStack.Push(leaf);
+                    _forwardStack.Clear();
+
+                    _isNavigatingHistory = true;
+                    FiltersTree.SelectedItem = selectedLeaf;
+                    _isNavigatingHistory = false;
+
+                    UpdateNavigationStates(selectedLeaf);
+                });
+            }
+        }
+    }
+
+    public async void Refresh()
+    {
+        try { await LoadAllAsync(); }
+        catch (Exception ex) { Logger.Error(ex); }
     }
 }

@@ -1,13 +1,15 @@
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using PrintManagement.Controls.IconGridViewControl;
 using PrintManagement.Helpers.ControlHelpers;
+using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Models;
 using PrintManagement.Models.enums;
 using PrintManagement.Resources;
 using PrintManagement.Services;
-using System.Collections.ObjectModel;
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
@@ -15,7 +17,7 @@ namespace PrintManagement.Pages.CustomFilters.SubPages;
 
 public sealed partial class DriversFilter : Page, INotifyPropertyChanged
 {
-    public ObservableCollection<DriverModel> DriverModelList { get; set; } = [];
+    public BulkObservableCollection<DriverModel> DriverModelList { get; set; } = [];
 
     public ItemModelCollection DriversItemModels { get; } = [];
 
@@ -49,6 +51,7 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
         }
     }
 
+
     public DriversFilter()
     {
         CurrentViewMode = ViewDDSettingsService.CurrentViewMode_Filter;
@@ -63,18 +66,47 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is ObservableCollection<DriverModel> receivedDriverModelList)
+        if (e.Parameter is BulkObservableCollection<DriverModel> receivedDriverModelList)
         {
             DriverModelList = receivedDriverModelList;
 
             DriverModelList.CollectionChanged += DriverModelList_CollectionChanged;
+            DriverModelList.ReplaceAllCompleted += OnReplaceAllCompleted;
+            DriversTable.TableReadyForAnimation += CallAnimateCurrentView;
 
             RebuildItemModels();
         }
     }
 
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+
+        DriverModelList?.CollectionChanged -= DriverModelList_CollectionChanged;
+        DriversTable.TableReadyForAnimation -= CallAnimateCurrentView;
+    }
+
+    private void CallAnimateCurrentView(object? sender, EventArgs e)
+    {
+        DriversTable.Opacity = 1;
+        DriversTable.IsHitTestVisible = true;
+        AnimateCurrentView();
+    }
+
+    private void OnReplaceAllCompleted(object? sender, EventArgs e)
+    {
+        DriverModelList.ReplaceAllCompleted -= OnReplaceAllCompleted;
+
+        // מריצים את האנימציה או מציגים את הטבלה רק עכשיו, כשהכל מוכן ויציב!
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+        {
+            AnimateCurrentView();
+        });
+    }
+
     private void DriverModelList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        AnimateCurrentView();
         RebuildItemModels();
     }
 
@@ -114,10 +146,10 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
 
     private void AnimateCurrentView()
     {
+
         UIElement targetElement = CurrentViewMode == ViewMode.Table
             ? DriversTable
             : DriversIconView;
-
         AnimationHelpers.PlayEntranceAnimation(targetElement);
     }
 }

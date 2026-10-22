@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using PrintManagement.Interfaces;
 using PrintManagement.Models.enums;
 using PrintManagement.Models.Statics;
 using PrintManagement.Pages.CustomFilters;
@@ -102,7 +103,6 @@ public sealed partial class CommonPageWrapper : Page
         }
     }
 
-
     private void ExportButton_Click(object sender, RoutedEventArgs e)
     {
         string pageName = string.Empty;
@@ -117,5 +117,37 @@ public sealed partial class CommonPageWrapper : Page
         {
             PageName = pageName
         });
+    }
+
+    private void UpButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (navFrame.Content is INavigationCommands navCommands && navCommands.CanGoUp)
+        {
+            navCommands.GoUp();
+        }
+    }
+
+    private void RefreshButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (navFrame.Content is INavigationCommands navCommands)
+        {
+            navCommands.Refresh();
+        }
+    }
+
+    private void BackButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (navFrame.Content is INavigationCommands navCommands && navCommands.CanGoBack)
+        {
+            navCommands.GoBack();
+        }
+    }
+
+    private void ForwardButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (navFrame.Content is INavigationCommands navCommands && navCommands.CanGoForward)
+        {
+            navCommands.GoForward();
+        }
     }
 }

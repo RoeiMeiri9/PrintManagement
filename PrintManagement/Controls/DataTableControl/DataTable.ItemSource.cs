@@ -25,12 +25,12 @@ namespace PrintManagement.Controls.DataTableControl
         {
             DetachSource();
             _observedSource = ItemsSource as INotifyCollectionChanged;
-            if (_observedSource != null) _observedSource.CollectionChanged += Source_CollectionChanged;
+            _observedSource?.CollectionChanged += Source_CollectionChanged;
         }
 
         private void DetachSource()
         {
-            if (_observedSource != null) _observedSource.CollectionChanged -= Source_CollectionChanged;
+            _observedSource?.CollectionChanged -= Source_CollectionChanged;
             _observedSource = null;
         }
 
@@ -38,6 +38,8 @@ namespace PrintManagement.Controls.DataTableControl
         {
             DetachSource();
             if (IsLoaded) AttachSource();      // before Loaded, the Loaded handler attaches
+            ResetReadinessGate();
+
             RebuildRows(recreateRows: true);
         }
 
@@ -207,7 +209,10 @@ namespace PrintManagement.Controls.DataTableControl
             }
 
             ApplySort(selected);
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+
+            TaskCompleted(TableInitialTasks.DataLoaded);
+
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 ScheduleAutoWidth();
             });

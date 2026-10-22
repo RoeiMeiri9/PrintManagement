@@ -67,6 +67,7 @@ namespace PrintManagement.Controls.DataTableControl
             }
 
             UpdateTotalWidth();
+            TaskCompleted(TableInitialTasks.AutoWidthCalculated);
         }
 
         // ---------- Dragging Thumb ----------

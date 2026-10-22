@@ -1,13 +1,15 @@
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using PrintManagement.Controls.IconGridViewControl;
 using PrintManagement.Helpers.ControlHelpers;
+using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Models;
 using PrintManagement.Models.enums;
 using PrintManagement.Resources;
 using PrintManagement.Services;
-using System.Collections.ObjectModel;
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
@@ -15,7 +17,7 @@ namespace PrintManagement.Pages.CustomFilters.SubPages;
 
 public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
 {
-    public ObservableCollection<PrinterModel> PrinterModelList { get; set; } = [];
+    public BulkObservableCollection<PrinterModel> PrinterModelList { get; set; } = [];
 
     public ItemModelCollection PrinterItemModels { get; } = [];
 
@@ -65,6 +67,8 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
         }
     }
 
+    bool _hasTableEntered = false;
+
     public PrintersFilter()
     {
         IsCompact = ViewDDSettingsService.IsCompactView;
@@ -78,21 +82,44 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is ObservableCollection<PrinterModel> receivedPrinterModelList)
+        if (e.Parameter is BulkObservableCollection<PrinterModel> receivedPrinterModelList)
         {
             PrinterModelList = receivedPrinterModelList;
-
             PrinterModelList.CollectionChanged += PrinterModelList_CollectionChanged;
+            PrintersTable.TableReadyForAnimation += CallAnimateCurrentView;
 
             RebuildItemModels();
         }
     }
 
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+
+        PrinterModelList?.CollectionChanged -= PrinterModelList_CollectionChanged;
+        PrintersTable.TableReadyForAnimation -= CallAnimateCurrentView;
+    }
+
+    private void CallAnimateCurrentView(object? sender, EventArgs e)
+    {
+        PrintersTable.Opacity = 1;
+        PrintersTable.IsHitTestVisible = true;
+        AnimateCurrentView();
+    }
+
     private void PrinterModelList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         RebuildItemModels();
-    }
+        if (!_hasTableEntered)
+        {
+            _hasTableEntered = true;
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+                AnimateCurrentView();
+            });
+        }
 
+    }
 
     private void RebuildItemModels()
     {
@@ -124,7 +151,8 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     private void OnViewModeChanged(object? sender, ViewMode viewMode)
     {
         CurrentViewMode = viewMode;
-        AnimateCurrentView();
+        if (_hasTableEntered)
+            AnimateCurrentView();
     }
 
     private void AnimateCurrentView()

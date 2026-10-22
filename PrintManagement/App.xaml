@@ -17,6 +17,7 @@
                     <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
                     <conv:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
                     <conv:JobsCounterConverter x:Key="JobsCounterConverter" />
+                    <conv:FormatStringConverter x:Key="FormatStringConverter" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <Storyboard x:Key="ShowControlAnimation">

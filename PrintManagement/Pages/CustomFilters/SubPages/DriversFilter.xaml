@@ -125,7 +125,9 @@
             x:Name="DriversTable"
             Grid.Column="2"
             CompactView="{x:Bind IsCompact, Mode=OneWay}"
+            IsHitTestVisible="False"
             ItemsSource="{x:Bind DriverModelList, Mode=OneWay}"
+            Opacity="0"
             Visibility="{x:Bind CurrentViewMode, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Table, Mode=OneWay}">
 
             <ctlTb:DataTable.RenderTransform>

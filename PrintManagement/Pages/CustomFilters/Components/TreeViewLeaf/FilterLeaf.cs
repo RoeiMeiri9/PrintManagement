@@ -31,7 +31,7 @@ public partial class FilterLeaf : INotifyPropertyChanged
     public bool IsExpanded { get; set; } = false;
     public FilterPages FilterPage { get; set; } = FilterPages.PrinterPage;
     public ObservableCollection<FilterLeaf> Children { get; set; } = [];
-
+    public bool IsRoot = false;
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

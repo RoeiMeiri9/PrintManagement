@@ -75,7 +75,7 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid x:Name="RootGrid">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

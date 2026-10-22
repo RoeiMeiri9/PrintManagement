@@ -43,6 +43,7 @@ namespace PrintManagement.Controls.DataTableControl
                         container.Padding = targetPadding;
                     }
                 }
+                TaskCompleted(TableInitialTasks.PaddingSet);
             }
         }
         private void OnCompactViewChanged(object? newValue)
