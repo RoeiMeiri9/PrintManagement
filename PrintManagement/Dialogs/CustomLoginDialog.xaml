@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="PrintManagement.Dialogs.CustomLoginDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="Enter network credentials"
+    PrimaryButtonText="OK"
+    CloseButtonText="Cancel"
+    DefaultButton="Primary"
+    PrimaryButtonClick="OnPrimaryButtonClick">
+
+    <StackPanel Spacing="12" MinWidth="400">
+        <TextBlock x:Name="ServerNameText" TextWrapping="Wrap" />
+
+        <TextBox x:Name="UsernameBox"
+                 PlaceholderText="User name"
+                 Margin="0,12,0,0" />
+        <PasswordBox x:Name="PasswordBox"
+                     PlaceholderText="Password" />
+
+        <CheckBox x:Name="RememberMeCheckBox"
+                  Content="Remember my credentials" />
+
+        <TextBlock x:Name="ErrorText"
+                   Visibility="Collapsed"
+                   TextWrapping="Wrap"
+                   Foreground="{ThemeResource SystemFillColorCautionBrush}" />
+    </StackPanel>
+</ContentDialog>

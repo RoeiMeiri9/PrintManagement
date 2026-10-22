@@ -20,6 +20,7 @@
     <Page Remove="Controls\DataTable\**" />
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="Assets\Fonts\FluentSystemIcons-Filled.ttf" />
     <Content Remove="Assets\Icons\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\Icons\BadgeLogo.scale-125.png" />
     <Content Remove="Assets\Icons\BadgeLogo.scale-150.png" />
@@ -49,6 +50,7 @@
     <None Remove="Controls\DataTable.xaml" />
     <None Remove="Controls\IconGridViewControl\IconGridView.xaml" />
     <None Remove="CustomFiltersPage.xaml" />
+    <None Remove="Dialogs\CustomLoginDialog.xaml" />
     <None Remove="Pages\CommonPageWrapper\CommonPageWrapper.xaml" />
     <None Remove="Pages\CustomFilters\SubPages\DriversFilter.xaml" />
     <None Remove="Pages\CustomFilters\SubPages\PrintersFilter.xaml" />
@@ -139,6 +141,9 @@
     <Content Update="Assets\Fonts\Segoe Fluent Icons.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Update="Assets\Fonts\FluentSystemIcons-Filled.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Icons\CustomIconSet\CompactView.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -151,6 +156,9 @@
     <None Update="Assets\Icons\IconGroup51.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Page Update="Dialogs\CustomLoginDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\IconGridViewControl\IconGridView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -208,6 +216,7 @@
 		<GenerateTestArtifacts>False</GenerateTestArtifacts>
 		<AppxBundle>Never</AppxBundle>
 		<HoursBetweenUpdateChecks>24</HoursBetweenUpdateChecks>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
   
 	<ItemGroup>

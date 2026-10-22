@@ -7,8 +7,11 @@ public class Icons(string glyph, FontFamily? font = null)
     public static FontFamily SegoeFluentFont =>
         (FontFamily)Application.Current.Resources["SegoeFluentFont"];
 
-    public static FontFamily ExtendedSegoeFluentFont =>
-        (FontFamily)Application.Current.Resources["ExtendedSegoeFluentFont"];
+    public static FontFamily ExtendedSegoeFluentFont_Regular =>
+        (FontFamily)Application.Current.Resources["ExtendedSegoeFluentFont_Regular"];
+
+    public static FontFamily ExtendedSegoeFluentFont_Filled =>
+    (FontFamily)Application.Current.Resources["ExtendedSegoeFluentFont_Filled"];
 
     public string Glyph { get; } = glyph;
     public FontFamily Font { get; } = font ?? SegoeFluentFont;
@@ -22,14 +25,15 @@ public class Icons(string glyph, FontFamily? font = null)
     public static readonly Icons Filter = new("\uE71C");
     public static readonly Icons NetworkPrinter = new("\uEDA5");
     public static readonly Icons Printer = new("\uE749");
+    public static readonly Icons Printer_Filled = new("\uF635", ExtendedSegoeFluentFont_Filled);
 
     // --- Controls ---
     // - view sublist -
     public static readonly Icons Add = new("\uE710");
     public static readonly Icons ViewAll = new("\uE8A9");
     public static readonly Icons AllApps = new("\uE71D");
-    public static readonly Icons AppTitle = new("\uF12B", font: ExtendedSegoeFluentFont);
-    public static readonly Icons ListDetail = new("\uE065", font: ExtendedSegoeFluentFont);
+    public static readonly Icons AppTitle = new("\uF12B", font: ExtendedSegoeFluentFont_Regular);
+    public static readonly Icons ListDetail = new("\uE065", font: ExtendedSegoeFluentFont_Regular);
 
     // - controls row -
     public static readonly Icons Share = new("\uE72D");
@@ -41,18 +45,19 @@ public class Icons(string glyph, FontFamily? font = null)
 
     // --- Filters ---
     // - Tree -
-    public static readonly Icons Driver = new("\U000F013D", font: ExtendedSegoeFluentFont);
+    public static readonly Icons Driver = new("\U000F013D", font: ExtendedSegoeFluentFont_Regular);
+    public static readonly Icons Driver_Filled = new("\U000F013C", font: ExtendedSegoeFluentFont_Filled);
 
     // --- Table ---
     public static readonly Icons ChevronUp = new("\uE70D");
     public static readonly Icons ChevronDown = new("\uE70E");
 
     // --- Settings ---
-    public static readonly Icons ArrowOut = new("\uE10D", font: ExtendedSegoeFluentFont);
+    public static readonly Icons ArrowOut = new("\uE10D", font: ExtendedSegoeFluentFont_Regular);
     public static readonly Icons Color = new("\uE790");
     public static readonly Icons Calendar = new("\uE787");
-    public static readonly Icons TextChangeCaseRegular = new("\uF7B3", font: ExtendedSegoeFluentFont);
-    public static readonly Icons CodeRegular = new("\uF2F0", font: ExtendedSegoeFluentFont);
+    public static readonly Icons TextChangeCaseRegular = new("\uF7B3", font: ExtendedSegoeFluentFont_Regular);
+    public static readonly Icons CodeRegular = new("\uF2F0", font: ExtendedSegoeFluentFont_Regular);
 
     // --- Badge ---
     public static readonly Icons ErrorBadge12 = new("\uEDAE");

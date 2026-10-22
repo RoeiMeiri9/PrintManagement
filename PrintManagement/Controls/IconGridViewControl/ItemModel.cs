@@ -95,13 +95,27 @@ public sealed partial class ItemModel(string name, Icons icon) : INotifyProperty
             OnPropertyChanged(nameof(BackgroundBrush));
         }
     }
+    private static readonly bool isDarkMode = App.Current.RequestedTheme == ApplicationTheme.Dark;
 
     private static readonly Brush TransparentBrush = new SolidColorBrush(Colors.Transparent);
-    private static readonly Brush SelectedBackgroundBrush = (Brush)Application.Current.Resources["CardBackgroundFillColorDefaultBrush"];
-    private static readonly Brush HighlighterBackgroundBrush = (Brush)Application.Current.Resources["CardBackgroundFillColorTertiaryBrush"];
-    private static readonly Brush SelectedBorderBrush = (Brush)Application.Current.Resources["FocusStrokeColorOuterBrush"];
+    private static readonly Brush Rest = (Brush)Application.Current.Resources["SubtleFillColorTertiaryBrush"];
+    private static readonly Brush Hover = (Brush)Application.Current.Resources["SubtleFillColorTertiaryBrush"];
+    private static readonly Brush Pressed = (Brush)Application.Current.Resources[isDarkMode ? "ControlFillColorDefaultBrush" : "SubtleFillColorSecondaryBrush"];
+    private static readonly Brush SelectedBorderBrush = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
 
-    public Brush BackgroundBrush => _isHovered ? HighlighterBackgroundBrush : _isActive ? _isSelected ? HighlighterBackgroundBrush : SelectedBackgroundBrush : TransparentBrush;
+    public Brush BackgroundBrush
+    {
+        get
+        {
+            if (_isHovered)
+                return _isActive ? Hover : Pressed;
+
+            if (_isActive)
+                return Pressed;
+
+            return TransparentBrush;
+        }
+    }
     public Brush BorderBrush => _isSelected ? SelectedBorderBrush : TransparentBrush;
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -25,6 +25,8 @@ public sealed partial class CustomFiltersPage : Page
     public ObservableCollection<PrinterModel> PrinterModelList { get; } = [];
     public ObservableCollection<DriverModel> DriverModelList { get; } = [];
 
+    //private readonly string _serverName = "";
+    private readonly string _serverName = @"\\WIN-HO9KT6LB37V";
     public string SelectedFilterName
     {
         get
@@ -72,7 +74,7 @@ public sealed partial class CustomFiltersPage : Page
                 DriverModelList.Count > 0 ? DriverModelList.ToList() : null;
 
             var printers = await SpoolerService.GetPrintersAsync(
-                serverName: @"\\WIN-HO9KT6LB37V", includeConnections: true, knownDrivers: knownDrivers);
+                serverName: _serverName, includeConnections: true, knownDrivers: knownDrivers);
 
             PrinterModelList.Clear();
             foreach (var p in printers)
@@ -96,7 +98,7 @@ public sealed partial class CustomFiltersPage : Page
 
         try
         {
-            var drivers = await SpoolerService.GetDriversAsync(serverName: @"\\WIN-HO9KT6LB37V");
+            var drivers = await SpoolerService.GetDriversAsync(serverName: _serverName);
 
             DriverModelList.Clear();
             foreach (var d in drivers)

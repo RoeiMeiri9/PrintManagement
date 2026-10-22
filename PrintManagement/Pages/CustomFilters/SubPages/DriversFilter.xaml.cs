@@ -84,7 +84,7 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
         DriversItemModels.Clear();
         foreach (var driver in DriverModelList)
         {
-            var itemModel = new ItemModel(driver.DriverName ?? "Unknown Driver", Icons.Driver);
+            var itemModel = new ItemModel(driver.DriverName ?? "Unknown Driver", Icons.Driver_Filled);
             DriversItemModels.Add(itemModel);
         }
     }

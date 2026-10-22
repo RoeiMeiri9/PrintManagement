@@ -26,7 +26,6 @@ namespace PrintManagement
         {
             InitializeComponent();
             UnhandledException += (_, e) => System.Diagnostics.Debug.WriteLine(e.Exception);
-            SpoolerService.Credentials = ("printtest", "WIN-HO9KT6LB37V", "Aa123456@#$fg");
             Services = ConfigureServices;
         }
 

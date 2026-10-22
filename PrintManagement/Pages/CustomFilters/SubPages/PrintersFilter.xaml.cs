@@ -85,7 +85,7 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
         PrinterItemModels.Clear();
         foreach (var printer in PrinterModelList)
         {
-            var itemModel = new ItemModel(printer.Name ?? "Unknown Printer", Icons.Printer);
+            var itemModel = new ItemModel(printer.Name ?? "Unknown Printer", Icons.Printer_Filled);
             PrinterItemModels.Add(itemModel);
         }
     }

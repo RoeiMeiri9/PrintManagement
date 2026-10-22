@@ -89,12 +89,10 @@ public static unsafe partial class SpoolerService
             try
             {
                 drivers = FetchDrivers(serverName);
-                Logger.Log($"drivers fetched: {drivers.Count}");
             }
-            catch (Win32Exception ex)
+            catch (Win32Exception)
             {
-                Logger.Log($"Driver enumeration failed: {ex.Message} (Win32 {ex.NativeErrorCode})");
-                drivers = new(StringComparer.OrdinalIgnoreCase);
+                drivers = [with(StringComparer.OrdinalIgnoreCase)];
             }
         }
 
@@ -144,7 +142,6 @@ public static unsafe partial class SpoolerService
             ref readonly PRINTER_INFO_2 p = ref items[i];
             string rawName = S(p.pPrinterName);
             string serverRawName = S(p.pServerName);
-            bool isNetworkConnection = (p.Attributes & PRINTER_ATTRIBUTE_NETWORK) != 0;
 
             // Enumerating a remote server returns "\\SRV\Printer"; show it as the MMC does.
             string printerName =

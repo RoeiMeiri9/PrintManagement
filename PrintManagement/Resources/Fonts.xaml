@@ -4,5 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PrintManagement.Resources">
     <FontFamily x:Key="SegoeFluentFont">ms-appx:///Assets/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
-    <FontFamily x:Key="ExtendedSegoeFluentFont">ms-appx:///Assets/Fonts/FluentSystemIcons-Regular.ttf#FluentSystemIcons-Regular</FontFamily>
+    <FontFamily x:Key="ExtendedSegoeFluentFont_Regular">ms-appx:///Assets/Fonts/FluentSystemIcons-Regular.ttf#FluentSystemIcons-Regular</FontFamily>
+    <FontFamily x:Key="ExtendedSegoeFluentFont_Filled">ms-appx:///Assets/Fonts/FluentSystemIcons-Filled.ttf#FluentSystemIcons-Filled</FontFamily>
 </ResourceDictionary>

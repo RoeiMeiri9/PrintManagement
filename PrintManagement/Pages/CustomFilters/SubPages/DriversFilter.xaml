@@ -147,9 +147,9 @@
 
                             <FontIcon
                                 Grid.Column="0"
-                                FontFamily="{x:Bind res:Icons.Driver.Font}"
+                                FontFamily="{x:Bind res:Icons.Driver_Filled.Font}"
                                 FontSize="16"
-                                Glyph="{x:Bind res:Icons.Driver.Glyph}" />
+                                Glyph="{x:Bind res:Icons.Driver_Filled.Glyph}" />
 
                             <TextBlock
                                 Grid.Column="1"
