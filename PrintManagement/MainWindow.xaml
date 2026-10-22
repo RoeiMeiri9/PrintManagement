@@ -15,6 +15,8 @@
         <TitleBar
             x:Name="titleBar"
             Height="54"
+            Margin="{x:Bind TitleMargin, Mode=OneWay}"
+            BackRequested="TitleBar_BackRequested"
             IsBackButtonVisible="{x:Bind navFrame.CanGoBack, Mode=OneWay}"
             IsPaneToggleButtonVisible="False"
             PaneToggleRequested="TitleBar_PaneToggleRequested">

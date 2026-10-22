@@ -7,14 +7,14 @@
     xmlns:converters="using:PrintManagement.Converters"
     xmlns:ctrlSSC="using:PrintManagement.Controls.SnapSplitterControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:filters="using:PrintManagement.Pages.CustomFilters.Filters"
+    xmlns:filters="using:PrintManagement.Pages.CustomFilters"
     xmlns:local="using:PrintManagement.Pages.CustomFilters"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prim="using:Microsoft.UI.Xaml.Controls.Primitives"
     xmlns:res="using:PrintManagement.Resources"
     xmlns:tvf="using:PrintManagement.Pages.CustomFilters.Components.TreeViewLeaf"
     x:Name="PageRoot"
-    d:DataContext="{d:DesignInstance Type=filters:FilterModler}"
+    d:DataContext="{d:DesignInstance Type=local:CustomFiltersPage}"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -101,7 +101,7 @@
                     Width="48"
                     Height="48"
                     IsActive="True" />
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Loading..." />
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Loading ..." />
             </StackPanel>
 
             <Frame
