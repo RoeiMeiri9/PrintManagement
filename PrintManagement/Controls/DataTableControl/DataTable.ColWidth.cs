@@ -22,6 +22,10 @@ namespace PrintManagement.Controls.DataTableControl
 
         private bool _autoWidthQueued;
 
+        private const int AutoWidthSampleRows = 200;
+        private static readonly Windows.Foundation.Size Unbounded =
+            new(double.PositiveInfinity, double.PositiveInfinity);
+
         private void ScheduleAutoWidth()
         {
             if (_autoWidthQueued) return;
@@ -43,16 +47,16 @@ namespace PrintManagement.Controls.DataTableControl
 
         public void RecalculateAutoWidths()
         {
+            double rowPadding = GetCellContainerPadding();   // identical for every column
+
             foreach (var column in Columns)
             {
                 if (string.Equals(column.Width, "Auto", StringComparison.OrdinalIgnoreCase) && !column.IsUserSized)
                 {
-                    double calculatedWidth = GetMaxWidth(column);
+                    double calculatedWidth = GetMaxWidth(column, rowPadding, AutoWidthSampleRows);
 
                     if (column.MaxAutoWidth.HasValue && calculatedWidth > column.MaxAutoWidth.Value)
-                    {
                         calculatedWidth = column.MaxAutoWidth.Value;
-                    }
 
                     column.ActualWidth = calculatedWidth;
                 }
@@ -89,6 +93,8 @@ namespace PrintManagement.Controls.DataTableControl
             private set => SetValue(TotalWidthProperty, value);
         }
 
+        private ItemsControl? _headerItemsControl;
+
         private void UpdateTotalWidth()
         {
             // Used to make sure the line will not surpuss the hearder.
@@ -97,11 +103,9 @@ namespace PrintManagement.Controls.DataTableControl
             // As far as I know: the calculations must be: Thumb width + the difference between the right and left margin.
             double offsetFromRightSide = ThumbWidth;
 
-            ItemsControl? ic = FindDescendant<ItemsControl>(HeaderScroller);
-            if (ic != null)
-            {
+            _headerItemsControl ??= FindDescendant<ItemsControl>(HeaderScroller);
+            if (_headerItemsControl is { } ic)
                 offsetFromRightSide += Math.Abs(ic.Margin.Left - ic.Margin.Right);
-            }
 
             TotalWidth = Columns.Sum(c => c.DisplayWidth) - offsetFromRightSide;
         }
@@ -110,21 +114,41 @@ namespace PrintManagement.Controls.DataTableControl
         {
             if (sender is FrameworkElement { DataContext: TableColumn col })
             {
-                col.ActualWidth = GetMaxWidth(col);
+                // explicit user action: measure every row, no cap
+                col.ActualWidth = GetMaxWidth(col, GetCellContainerPadding());
             }
         }
 
-        private double GetMaxWidth(TableColumn col)
+        private double GetMaxWidth(TableColumn col, double rowPadding, int maxRows = int.MaxValue)
         {
-            double rowPadding = GetCellContainerPadding();
             double width = GetHeaderCellWidth(col);
 
-            foreach (var row in Rows)
+            // One template instance per column. Each row just swaps the DataContext and re-measures.
+            if (col.EffectiveTemplate?.LoadContent() is FrameworkElement probe)
             {
-                width = Math.Max(width, GetCellWidth(col, row) + rowPadding);
+                int colIndex = Columns.IndexOf(col);
+
+                foreach (var row in Rows.Take(maxRows))
+                {
+                    if (FindCell(row, col, colIndex) is not { } cell) continue;
+
+                    probe.DataContext = cell.Item;
+                    probe.Measure(Unbounded);
+                    width = Math.Max(width, probe.DesiredSize.Width + rowPadding);
+                }
             }
 
             return Math.Max(width, col.MinWidth + rowPadding);
+        }
+
+        private static TableCell? FindCell(TableRow row, TableColumn col, int colIndex)
+        {
+            // Cells mirror the column order (MoveCell relies on that), so the index is the fast path.
+            var cell = row.Cells.ElementAtOrDefault(colIndex);
+            if (!(cell is not null && cell.Column.Equals(col))) System.Diagnostics.Debug.WriteLine("Safty net for FindCell was used!");
+            return cell is not null && cell.Column.Equals(col)
+                ? cell
+                : row.Cells.FirstOrDefault(c => c.Column.Equals(col));   // safety net
         }
 
         private static double GetHeaderCellWidth(TableColumn col)
@@ -175,7 +199,6 @@ namespace PrintManagement.Controls.DataTableControl
                 if (cellObject is FrameworkElement cellContainer)
                 {
                     cellContainer.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-                    cellContainer.Arrange(new Windows.Foundation.Rect(0, 0, cellContainer.DesiredSize.Width, cellContainer.DesiredSize.Height));
                     return cellContainer.DesiredSize.Width;
                 }
             }

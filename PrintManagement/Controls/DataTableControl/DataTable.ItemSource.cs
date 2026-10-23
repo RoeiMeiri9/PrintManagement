@@ -56,10 +56,7 @@ namespace PrintManagement.Controls.DataTableControl
                         _originalUnsortedRows.Insert(Math.Min(startingIndex++, _originalUnsortedRows.Count), row);
                         InsertIntoView(row);
                     }
-                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                    {
-                        ScheduleAutoWidth();
-                    });
+                    ScheduleAutoWidth();
                     break;
 
                 case NotifyCollectionChangedAction.Remove when e.OldItems != null:
@@ -140,11 +137,28 @@ namespace PrintManagement.Controls.DataTableControl
                     foreach (TableColumn c in e.NewItems)
                         AttachColumn(c);
             }
-
             UpdateTotalWidth();
 
-            // every row's cells depend on the column list, so they have to be recreated
-            RebuildRows(recreateRows: true);
+            // No rows yet (typical while XAML adds the columns): nothing to recreate.
+            // OnItemsSourceChanged builds the rows against the final column list.
+            if (_originalUnsortedRows.Count == 0)
+                return;
+
+            QueueColumnRebuild();
+        }
+
+        private bool _columnRebuildQueued;
+
+        private void QueueColumnRebuild()
+        {
+            if (_columnRebuildQueued) return;
+            _columnRebuildQueued = true;
+
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+            {
+                _columnRebuildQueued = false;
+                RebuildRows(recreateRows: true);
+            });
         }
 
         private void Column_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -212,10 +226,7 @@ namespace PrintManagement.Controls.DataTableControl
 
             TaskCompleted(TableInitialTasks.DataLoaded);
 
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                ScheduleAutoWidth();
-            });
+            ScheduleAutoWidth();
         }
     }
 }

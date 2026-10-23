@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace PrintManagement.Controls.DataTableControl
@@ -22,14 +21,6 @@ namespace PrintManagement.Controls.DataTableControl
         private static readonly Thickness lowPadding = new(8, 6, 8, 6);
         private static readonly Thickness highPadding = new(8);
 
-        private void ItemsControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                ApplyCompactViewStyle(CompactView);
-            });
-        }
-
         private void ApplyCompactViewStyle(bool compact)
         {
             Thickness targetPadding = compact ? lowPadding : highPadding;
@@ -43,7 +34,6 @@ namespace PrintManagement.Controls.DataTableControl
                         container.Padding = targetPadding;
                     }
                 }
-                TaskCompleted(TableInitialTasks.PaddingSet);
             }
         }
         private void OnCompactViewChanged(object? newValue)

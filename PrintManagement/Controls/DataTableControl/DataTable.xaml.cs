@@ -31,6 +31,8 @@ public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequest
     public DataTable(IExportService exportService)
     {
         InitializeComponent();
+        RowsList.ContainerContentChanging += (_, args) =>
+            args.ItemContainer.Padding = CompactView ? lowPadding : highPadding;
         _exportService = exportService;
         Columns.CollectionChanged += Columns_CollectionChanged;
 
@@ -39,7 +41,7 @@ public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequest
 
         RowsList.Loaded += RowsList_Loaded_Initiate_Scroll;
     }
-
+    private bool _unloadedOnce;
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         WeakReferenceMessenger.Default.Register<ExportCsvRequestMessage>(this);
@@ -49,15 +51,18 @@ public sealed partial class DataTable : UserControl, IRecipient<ExportCsvRequest
         if (_observedSource == null && ItemsSource is INotifyCollectionChanged)
         {
             AttachSource();
-            RebuildRows();
+            if (_unloadedOnce) RebuildRows();
         }
+        if (ItemsSource is null) TaskCompleted(TableInitialTasks.DataLoaded);
     }
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
+        _unloadedOnce = true;
         WeakReferenceMessenger.Default.Unregister<ExportCsvRequestMessage>(this);
         DetachSource();
         StopPanning();                        // already exists in DataTable.Scroll.cs
+        _headerItemsControl = null;
     }
 }
 

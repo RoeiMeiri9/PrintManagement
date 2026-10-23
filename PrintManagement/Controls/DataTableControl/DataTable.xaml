@@ -212,8 +212,7 @@
                             HorizontalAlignment="Left"
                             IsTabStop="False"
                             ItemTemplate="{StaticResource CellTemplate}"
-                            ItemsSource="{x:Bind Cells}"
-                            Loaded="ItemsControl_Loaded">
+                            ItemsSource="{x:Bind Cells}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Horizontal" />

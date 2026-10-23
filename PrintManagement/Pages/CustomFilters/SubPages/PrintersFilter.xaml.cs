@@ -1,4 +1,3 @@
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -67,8 +66,6 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
         }
     }
 
-    bool _hasTableEntered = false;
-
     public PrintersFilter()
     {
         IsCompact = ViewDDSettingsService.IsCompactView;
@@ -84,6 +81,8 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
 
         if (e.Parameter is BulkObservableCollection<PrinterModel> receivedPrinterModelList)
         {
+            DetachListHandlers();
+
             PrinterModelList = receivedPrinterModelList;
             PrinterModelList.CollectionChanged += PrinterModelList_CollectionChanged;
             PrintersTable.TableReadyForAnimation += CallAnimateCurrentView;
@@ -95,7 +94,11 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
+        DetachListHandlers();
+    }
 
+    private void DetachListHandlers()
+    {
         PrinterModelList?.CollectionChanged -= PrinterModelList_CollectionChanged;
         PrintersTable.TableReadyForAnimation -= CallAnimateCurrentView;
     }
@@ -109,16 +112,8 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
 
     private void PrinterModelList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        AnimateCurrentView();
         RebuildItemModels();
-        if (!_hasTableEntered)
-        {
-            _hasTableEntered = true;
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                AnimateCurrentView();
-            });
-        }
-
     }
 
     private void RebuildItemModels()
@@ -151,8 +146,7 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     private void OnViewModeChanged(object? sender, ViewMode viewMode)
     {
         CurrentViewMode = viewMode;
-        if (_hasTableEntered)
-            AnimateCurrentView();
+        AnimateCurrentView();
     }
 
     private void AnimateCurrentView()

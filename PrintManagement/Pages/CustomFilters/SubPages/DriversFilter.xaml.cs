@@ -1,4 +1,3 @@
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -51,12 +50,10 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
         }
     }
 
-
     public DriversFilter()
     {
         CurrentViewMode = ViewDDSettingsService.CurrentViewMode_Filter;
         IsCompact = ViewDDSettingsService.IsCompactView;
-
         Loaded += DriversFilter_Loaded;
         Unloaded += DriversFilter_Unloaded;
         InitializeComponent();
@@ -68,10 +65,10 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
 
         if (e.Parameter is BulkObservableCollection<DriverModel> receivedDriverModelList)
         {
-            DriverModelList = receivedDriverModelList;
+            DetachListHandlers();
 
+            DriverModelList = receivedDriverModelList;
             DriverModelList.CollectionChanged += DriverModelList_CollectionChanged;
-            DriverModelList.ReplaceAllCompleted += OnReplaceAllCompleted;
             DriversTable.TableReadyForAnimation += CallAnimateCurrentView;
 
             RebuildItemModels();
@@ -81,7 +78,11 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
+        DetachListHandlers();
+    }
 
+    private void DetachListHandlers()
+    {
         DriverModelList?.CollectionChanged -= DriverModelList_CollectionChanged;
         DriversTable.TableReadyForAnimation -= CallAnimateCurrentView;
     }
@@ -91,17 +92,6 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
         DriversTable.Opacity = 1;
         DriversTable.IsHitTestVisible = true;
         AnimateCurrentView();
-    }
-
-    private void OnReplaceAllCompleted(object? sender, EventArgs e)
-    {
-        DriverModelList.ReplaceAllCompleted -= OnReplaceAllCompleted;
-
-        // מריצים את האנימציה או מציגים את הטבלה רק עכשיו, כשהכל מוכן ויציב!
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
-        {
-            AnimateCurrentView();
-        });
     }
 
     private void DriverModelList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -146,7 +136,6 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
 
     private void AnimateCurrentView()
     {
-
         UIElement targetElement = CurrentViewMode == ViewMode.Table
             ? DriversTable
             : DriversIconView;
