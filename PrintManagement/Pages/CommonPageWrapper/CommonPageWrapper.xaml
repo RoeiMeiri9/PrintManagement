@@ -13,7 +13,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition x:Name="Controls" Height="auto" />
-            <RowDefinition x:Name="Frame" Height="*" />
+            <RowDefinition x:Name="MainContentRow" Height="*" />
         </Grid.RowDefinitions>
         <Grid
             Grid.Row="0"

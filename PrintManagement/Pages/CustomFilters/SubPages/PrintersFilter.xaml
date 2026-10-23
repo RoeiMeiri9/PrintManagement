@@ -170,9 +170,9 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="hlps:PrinterStatusInfo">
                                     <ctlBdg:Badge
-                                        DisplayText="{x:Bind Status, Mode=OneWay}"
+                                        DisplayText="{x:Bind Status, Mode=OneTime}"
                                         Rules="{StaticResource PrinterStatusBadgeRules}"
-                                        Value="{x:Bind Flags, Mode=OneWay}" />
+                                        Value="{x:Bind Flags, Mode=OneTime}" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

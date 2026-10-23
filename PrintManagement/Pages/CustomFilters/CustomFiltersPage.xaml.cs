@@ -137,7 +137,7 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             if (_isInitialized) return;
             _isInitialized = true;
 
-            LoadFilters(s, e);
+            LoadFilters();
             _ = LoadAllAsync();
         };
     }
@@ -220,7 +220,7 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         }
     }
 
-    private void LoadFilters(object sender, RoutedEventArgs e)
+    private void LoadFilters()
     {
         // --- Printers Root Leaf ---
         FiltersList.Clear();
