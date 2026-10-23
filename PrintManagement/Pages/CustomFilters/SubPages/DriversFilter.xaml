@@ -11,9 +11,9 @@
     xmlns:igc="using:PrintManagement.Controls.IconGridViewControl"
     xmlns:local="using:PrintManagement.Pages.CustomFilters.SubPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:mdl="using:PrintManagement.Models"
+    xmlns:ntt="using:PrintManagement.Models.Entity"
     xmlns:res="using:PrintManagement.Resources"
-    d:DataContext="{d:DesignInstance Type=mdl:PrinterModel}"
+    d:DataContext="{d:DesignInstance Type=ntt:PrinterModel}"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -141,7 +141,7 @@
                 IsPrimary="True"
                 Path="DriverName">
                 <ctlTb:TableColumn.CellTemplate>
-                    <DataTemplate x:DataType="mdl:DriverModel">
+                    <DataTemplate x:DataType="ntt:DriverModel">
                         <Grid ColumnSpacing="12">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -182,7 +182,7 @@
                 Header="Driver Isolation"
                 Path="DriverIsolation">
                 <ctlTb:TableColumn.CellTemplate>
-                    <DataTemplate x:DataType="mdl:DriverModel">
+                    <DataTemplate x:DataType="ntt:DriverModel">
                         <ctlBdg:Badge Rules="{StaticResource DriverIsolationBadgeRules}" Value="{x:Bind DriverIsolation, Mode=OneWay}" />
                     </DataTemplate>
                 </ctlTb:TableColumn.CellTemplate>
@@ -208,7 +208,7 @@
                 Header="Packaged"
                 Path="Packaged">
                 <ctlTb:TableColumn.CellTemplate>
-                    <DataTemplate x:DataType="mdl:DriverModel">
+                    <DataTemplate x:DataType="ntt:DriverModel">
                         <ctlBdg:Badge Rules="{StaticResource PackagedBadgeRules}" Value="{x:Bind Packaged, Mode=OneWay}" />
                     </DataTemplate>
                 </ctlTb:TableColumn.CellTemplate>
@@ -219,7 +219,7 @@
                 Header="Driver Date"
                 Path="DriverDate">
                 <ctlTb:TableColumn.CellTemplate>
-                    <DataTemplate x:DataType="mdl:DriverModel">
+                    <DataTemplate x:DataType="ntt:DriverModel">
                         <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind DriverDate, Converter={StaticResource DateConverter}}" />
                     </DataTemplate>
                 </ctlTb:TableColumn.CellTemplate>
@@ -236,7 +236,7 @@
                 Header="XPS Driver"
                 Path="XPSDriver">
                 <ctlTb:TableColumn.CellTemplate>
-                    <DataTemplate x:DataType="mdl:DriverModel">
+                    <DataTemplate x:DataType="ntt:DriverModel">
                         <ctlBdg:Badge Rules="{StaticResource XPSDriverBadgeRules}" Value="{x:Bind XPSDriver, Mode=OneWay}" />
                     </DataTemplate>
                 </ctlTb:TableColumn.CellTemplate>
@@ -297,7 +297,7 @@
                 Header="Shareable"
                 Path="Shareable">
                 <ctlTb:TableColumn.CellTemplate>
-                    <DataTemplate x:DataType="mdl:DriverModel">
+                    <DataTemplate x:DataType="ntt:DriverModel">
                         <ctlBdg:Badge Rules="{StaticResource ShareableBadgeRules}" Value="{x:Bind Shareable, Mode=OneWay}" />
                     </DataTemplate>
                 </ctlTb:TableColumn.CellTemplate>

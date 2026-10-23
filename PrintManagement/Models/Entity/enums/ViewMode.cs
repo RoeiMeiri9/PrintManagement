@@ -1,4 +1,4 @@
-﻿namespace PrintManagement.Models.enums;
+﻿namespace PrintManagement.Models.Entity.enums;
 
 /// <summary>
 /// Controls the view type of the IconGridViewControl

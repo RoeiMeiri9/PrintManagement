@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
-using PrintManagement.Models.enums;
+using PrintManagement.Models.Entity.enums;
 using System;
 
 namespace PrintManagement.Converters;

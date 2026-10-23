@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using PrintManagement.Models;
+using PrintManagement.Models.Entity;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using System;
 using System.Collections.Generic;
@@ -65,7 +65,7 @@ public enum DriverAttributes : uint
 public static unsafe partial class SpoolerService
 {
     private static readonly string[] DriverEnvironments =
-        { "Windows x64", "Windows NT x86", "Windows ARM64" };
+        ["Windows x64", "Windows NT x86", "Windows ARM64"];
 
     // ───────────── Drivers page: all environments ─────────────
 
@@ -80,7 +80,7 @@ public static unsafe partial class SpoolerService
             {
                 // If serverName (injectd into the pName variable) is NULL, the function enumerates the local printer drivers.
                 all.AddRange(QueryBuffer(
-                    (byte* buf, uint size, out uint needed, out uint count) =>
+                    (buf, size, out needed, out count) =>
                         PInvoke.EnumPrinterDrivers(serverName, env, 8, buf, size, out needed, out count),
                     (buf, count) => ParseDrivers(buf, count, serverName, cfg),
                     []));
@@ -104,7 +104,7 @@ public static unsafe partial class SpoolerService
 
         // If serverName (injectd into the pName variable) is NULL, the function enumerates the local printer drivers.
         var list = QueryBuffer(
-            (byte* buf, uint size, out uint needed, out uint count) =>
+            (buf, size, out needed, out count) =>
                 PInvoke.EnumPrinterDrivers(serverName, null, 8, buf, size, out needed, out count),
             (buf, count) => ParseDrivers(buf, count, serverName, cfg),
             []);

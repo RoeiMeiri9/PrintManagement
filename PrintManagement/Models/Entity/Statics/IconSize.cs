@@ -1,4 +1,4 @@
-﻿namespace PrintManagement.Models.Statics;
+﻿namespace PrintManagement.Models.Entity.Statics;
 
 public static class StaticValues
 {

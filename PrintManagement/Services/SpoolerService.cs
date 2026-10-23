@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32.SafeHandles;
-using PrintManagement.Models;
+using PrintManagement.Models.Entity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

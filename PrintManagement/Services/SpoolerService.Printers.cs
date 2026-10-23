@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using PrintManagement.Models;
+using PrintManagement.Models.Entity;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using System;
 using System.Collections.Generic;
@@ -110,7 +110,7 @@ public static unsafe partial class SpoolerService
         try
         {
             var result = QueryBuffer<IReadOnlyList<PrinterModel>>(
-            (byte* buf, uint size, out uint needed, out uint count) =>
+            (buf, size, out needed, out count) =>
                 PInvoke.EnumPrinters(flags, serverName, 2, buf, size, out needed, out count),
             (buf, count) => ParsePrinters(buf, count, drivers, ports, registryBase, remote: serverName is not null),
             []);
@@ -223,7 +223,7 @@ public static unsafe partial class SpoolerService
         try
         {
             var ports = QueryBuffer<List<PortDetails>>(
-                (byte* buf, uint size, out uint needed, out uint count) =>
+                (buf, size, out needed, out count) =>
                 {
                     // fixed on a null string yields a null pointer, which means "local machine"
                     fixed (char* pServer = serverName)

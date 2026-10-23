@@ -222,4 +222,8 @@
 	<ItemGroup>
 	  <PRIResource Remove="Controls\DataTable\**" />
 	</ItemGroup>
+  
+	<ItemGroup>
+	  <Folder Include="Models\Filter\" />
+	</ItemGroup>
 </Project>

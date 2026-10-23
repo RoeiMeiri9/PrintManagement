@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using PrintManagement.Models.enums;
+using PrintManagement.Models.Entity.enums;
 using System.Collections.Specialized;
 
 namespace PrintManagement.Controls.IconGridViewControl;

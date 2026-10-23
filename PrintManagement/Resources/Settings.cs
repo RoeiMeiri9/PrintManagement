@@ -1,5 +1,5 @@
-﻿using PrintManagement.Models.enums;
-using PrintManagement.Models.Statics;
+﻿using PrintManagement.Models.Entity.enums;
+using PrintManagement.Models.Entity.Statics;
 
 namespace PrintManagement.Resources;
 

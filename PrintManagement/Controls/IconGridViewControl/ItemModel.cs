@@ -2,7 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using PrintManagement.Models.Statics;
+using PrintManagement.Models.Entity.Statics;
 using PrintManagement.Resources;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;

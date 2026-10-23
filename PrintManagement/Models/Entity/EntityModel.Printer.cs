@@ -2,7 +2,7 @@
 using PrintManagement.Services;
 using System.Collections.Generic;
 
-namespace PrintManagement.Models;
+namespace PrintManagement.Models.Entity;
 
 public partial class PrinterModel : EntityModel
 {

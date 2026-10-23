@@ -2,8 +2,8 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Interfaces;
-using PrintManagement.Models.enums;
-using PrintManagement.Models.Statics;
+using PrintManagement.Models.Entity.enums;
+using PrintManagement.Models.Entity.Statics;
 using PrintManagement.Pages.CustomFilters;
 using PrintManagement.Services;
 

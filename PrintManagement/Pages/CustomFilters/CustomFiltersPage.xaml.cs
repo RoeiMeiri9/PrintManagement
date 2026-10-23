@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Interfaces;
-using PrintManagement.Models;
+using PrintManagement.Models.Entity;
 using PrintManagement.Pages.CustomFilters.Components.TreeViewLeaf;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using PrintManagement.Pages.CustomFilters.SubPages;

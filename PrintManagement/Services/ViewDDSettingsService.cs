@@ -1,4 +1,4 @@
-﻿using PrintManagement.Models.enums;
+﻿using PrintManagement.Models.Entity.enums;
 using PrintManagement.Resources;
 using System;
 using System.Collections.Generic;
