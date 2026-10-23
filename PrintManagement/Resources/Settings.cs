@@ -7,6 +7,7 @@ public record Settings<T>(string Key, T DefaultValue)
 {
     public static readonly Settings<bool> ScrollIndicatorSetting = new("ShowScrollDirectionIndicator", false);
     public static readonly Settings<bool> StatusBadgeAppearanceSetting = new("StatusBadgeAppearance", true);
+    public static readonly Settings<int> RefreshSpeedSetting = new("RefreshSpeed", 5);
     public static readonly Settings<bool> UseISODateFormatSetting = new("UseISODateFormat", true);
     public static readonly Settings<bool> WriteTrueFalseLowercaseSetting = new("WriteTrueFalseLowercase", true);
     public static readonly Settings<bool> ShowNotSharedSetting = new("ShowNotShared", false);

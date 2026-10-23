@@ -56,6 +56,24 @@
                     <ToggleSwitch x:Name="StatusBadgeAppearanceToggle" Toggled="StatusBadgeAppearanceToggle_Toggled" />
                 </controls:SettingsCard>
 
+                <controls:SettingsCard Description="Set how frequent should the display be refreshed." Header="Refresh Speed">
+                    <controls:SettingsCard.HeaderIcon>
+                        <FontIcon FontFamily="{x:Bind res:Icons.SpeedMedium.Font}" Glyph="{x:Bind res:Icons.SpeedMedium.Glyph}" />
+                    </controls:SettingsCard.HeaderIcon>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock x:Name="RefreshSpeedText" Margin="0,2,0,0" />
+                        <Slider
+                            x:Name="RefreshSpeedSlider"
+                            AutomationProperties.Name="RefreshSpeedSlider"
+                            Maximum="5"
+                            Minimum="0"
+                            SnapsTo="Ticks"
+                            TickFrequency="1"
+                            TickPlacement="Outside"
+                            ValueChanged="Slider_ValueChanged" />
+                    </StackPanel>
+                </controls:SettingsCard>
+
                 <!--  Export Section  -->
 
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Export" />

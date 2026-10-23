@@ -1,5 +1,6 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Interfaces;
 using PrintManagement.Models.Entity;
@@ -15,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PrintManagement.Pages.CustomFilters;
@@ -26,6 +28,10 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
     public ObservableCollection<FilterLeaf> FiltersList { get; } = [];
     public BulkObservableCollection<PrinterModel> PrinterModelList { get; } = [];
     public BulkObservableCollection<DriverModel> DriverModelList { get; } = [];
+
+    private PrinterWatcher? _watcher;
+    private CancellationTokenSource? _watcherCts;
+    private DispatcherQueueTimer? _recountTimer;
 
     private readonly string _serverName = "";
     //private readonly string _serverName = @"\\WIN-HO9KT6LB37V";
@@ -129,6 +135,23 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         };
     }
 
+    private bool _pageActive;
+
+    // in the constructor's Loaded handler, as the first line: _pageActive = true;
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        _pageActive = true;
+        if (_isInitialized && !_isLoadingAll) StartWatcher();   // cached page coming back
+    }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+        StopWatcher();
+    }
+
     // ---- Loading Drivers and Printers ----
 
     /// <summary>
@@ -145,10 +168,8 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         CanRefresh = false;
         try
         {
-            var sw = Stopwatch.StartNew();
             await LoadDriversAsync();
             await LoadPrintersAsync();
-            Logger.Log($"load: {sw.ElapsedMilliseconds} ms");
         }
         finally
         {
@@ -158,6 +179,8 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         }
 
         UpdateFilterCountsAfterDataLoaded();
+
+        StartWatcher();
     }
 
     private async Task LoadPrintersAsync()
@@ -374,6 +397,68 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
                 RecalculateNodeCounts(child, dataList);
             }
         }
+    }
+
+    // ---- Watching Printers ----
+
+    private void StartWatcher()
+    {
+        if (!_pageActive || _watcher is not null) return;
+
+        // Debounce: bursts of changes cause one recount, 400 ms after the last one
+        _recountTimer = DispatcherQueue.CreateTimer();
+        _recountTimer.Interval = TimeSpan.FromMilliseconds(400);
+        _recountTimer.IsRepeating = false;
+        _recountTimer.Tick += (_, _) => UpdateFilterCountsAfterDataLoaded();
+
+        double refereshSpeed = SettingsService.ReadSetting(Settings<int>.RefreshSpeedSetting);
+        if (refereshSpeed == -1) return;
+        _watcher = new PrinterWatcher(_serverName, TimeSpan.FromSeconds(refereshSpeed));
+        _watcher.Changed += OnPrintersChanged;
+
+        _watcherCts = new CancellationTokenSource();
+        _ = _watcher.RunAsync(_watcherCts.Token);
+    }
+
+    private void OnPrintersChanged(IReadOnlyList<PrinterPulse> pulses)
+    {
+        // Called on a background thread, so hop to the UI thread first
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (_watcher is null || _isLoadingAll) return;   // a full refresh is replacing the models right now
+
+            var anyUpdated = false;
+            foreach (var pulse in pulses)
+            {
+                var model = PrinterModelList.FirstOrDefault(m =>
+                    string.Equals(m.Name, pulse.Name, StringComparison.OrdinalIgnoreCase));
+                if (model is null) continue;   // new printer: a manual Refresh picks it up
+
+                model.QueueStatus = PrinterStatusHelper.FormatQueueStatus(pulse.Status); // new list, so the setter fires
+                model.JobsInQueue = pulse.Jobs;
+                anyUpdated = true;
+            }
+
+            if (anyUpdated)
+            {
+                _recountTimer?.Stop();
+                _recountTimer?.Start();
+            }
+        });
+    }
+
+    private void StopWatcher()
+    {
+        Debug.WriteLine("StopWatcher called");
+        _pageActive = false;
+
+        _watcher?.Changed -= OnPrintersChanged;   // releases the page reference
+        _watcherCts?.Cancel();
+        _watcherCts?.Dispose();
+        _watcherCts = null;
+        _recountTimer?.Stop();
+        _recountTimer = null;
+        _watcher = null;
     }
 
     // ---- Navigation ----

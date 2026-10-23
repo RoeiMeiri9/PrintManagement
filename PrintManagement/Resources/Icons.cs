@@ -55,6 +55,7 @@ public class Icons(string glyph, FontFamily? font = null)
     // --- Settings ---
     public static readonly Icons ArrowOut = new("\uE10D", font: ExtendedSegoeFluentFont_Regular);
     public static readonly Icons Color = new("\uE790");
+    public static readonly Icons SpeedMedium = new("\uEC49");
     public static readonly Icons Calendar = new("\uE787");
     public static readonly Icons TextChangeCaseRegular = new("\uF7B3", font: ExtendedSegoeFluentFont_Regular);
     public static readonly Icons CodeRegular = new("\uF2F0", font: ExtendedSegoeFluentFont_Regular);
