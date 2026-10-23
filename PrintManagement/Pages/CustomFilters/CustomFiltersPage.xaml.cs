@@ -1,9 +1,9 @@
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Interfaces;
 using PrintManagement.Models.Entity;
+using PrintManagement.Models.Filter;
 using PrintManagement.Pages.CustomFilters.Components.TreeViewLeaf;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using PrintManagement.Pages.CustomFilters.SubPages;
@@ -27,8 +27,8 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
     public BulkObservableCollection<PrinterModel> PrinterModelList { get; } = [];
     public BulkObservableCollection<DriverModel> DriverModelList { get; } = [];
 
-    //private readonly string _serverName = "";
-    private readonly string _serverName = @"\\WIN-HO9KT6LB37V";
+    private readonly string _serverName = "";
+    //private readonly string _serverName = @"\\WIN-HO9KT6LB37V";
     public string SelectedFilterName
     {
         get
@@ -58,11 +58,8 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         }
     }
 
+    private readonly FilterNavigationHistory _navHistory = new();
 
-
-    private readonly Stack<FilterLeaf> _backStack = new();
-    private readonly Stack<FilterLeaf> _forwardStack = new();
-    private bool _isNavigatingHistory = false;
     public bool _canRefreshan = true;
     public bool CanRefresh
     {
@@ -90,23 +87,12 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             }
         }
     }
-    public bool CanGoBack => _backStack.Count > 0;
-    public bool CanGoForward => _forwardStack.Count > 0;
 
+    public bool CanGoBack => _navHistory.CanGoBack;
+    public bool CanGoForward => _navHistory.CanGoForward;
 
-    private string _backTargetName = string.Empty;
-    public string BackTargetName
-    {
-        get => _backTargetName;
-        set { if (_backTargetName != value) { _backTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BackTargetName))); } }
-    }
-
-    private string _forwardTargetName = string.Empty;
-    public string ForwardTargetName
-    {
-        get => _forwardTargetName;
-        set { if (_forwardTargetName != value) { _forwardTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ForwardTargetName))); } }
-    }
+    public string BackTargetName => _navHistory.BackTargetName;
+    public string ForwardTargetName => _navHistory.ForwardTargetName;
 
     private string _upTargetName = string.Empty;
     public string UpTargetName
@@ -129,18 +115,21 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
 
     private bool _isInitialized = false;
 
+
     public CustomFiltersPage()
     {
         InitializeComponent();
-        Loaded += (s, e) =>
+        Loaded += async (s, e) =>
         {
             if (_isInitialized) return;
             _isInitialized = true;
 
-            LoadFilters();
             _ = LoadAllAsync();
+            await LoadFiltersAsync();
         };
     }
+
+    // ---- Loading Drivers and Printers ----
 
     /// <summary>
     /// Drivers first, because the printers load reuses that list instead of asking the server again.
@@ -167,8 +156,9 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             CanRefresh = true;
             _isLoadingAll = false;
         }
-    }
 
+        UpdateFilterCountsAfterDataLoaded();
+    }
 
     private async Task LoadPrintersAsync()
     {
@@ -220,86 +210,68 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         }
     }
 
-    private void LoadFilters()
+    // ---- Filters ----
+
+    private readonly Guid AllPrintersLeafID = new("b83c27e3-5482-4136-9815-568285521b40");
+    private readonly Guid AllDriversLeafID = new("b83c27e3-5482-4136-9815-568285521b41");
+
+    private async Task LoadFiltersAsync()
     {
-        // --- Printers Root Leaf ---
         FiltersList.Clear();
-        var printersRoot = new FilterLeaf
+
+        var printerDefaults = new[]
         {
-            Name = PrintersRootName,
-            DisplayName = "Printers",
-            LeafIcon = Icons.Printer,
-            FilterPage = FilterPages.PrinterPage,
-            IsRoot = true
+            new GenericFilterDefinition
+            {
+                Name = "Printers Not Ready",
+                Criteria = new Dictionary<string, FilterRule>(StringComparer.OrdinalIgnoreCase)
+                {
+                    {
+                        "QueueStatus",
+                        new FilterRule
+                        {
+                            Condition = FilterCondition.NotEquals,
+                            Value = "Ready"
+                        }
+                    }
+                }
+            },
+            new GenericFilterDefinition
+            {
+                Name = "Printers With Jobs",
+                Criteria = new Dictionary<string, FilterRule>(StringComparer.OrdinalIgnoreCase)
+                {
+                    {
+                        "JobsInQueue",
+                        new FilterRule
+                        {
+                            Condition = FilterCondition.GreaterThan,
+                            Value = "0"
+                        }
+                    }
+                }
+            }
         };
 
-        // Adding sub leafs
-
-        var allPrintersLeaf = new FilterLeaf
-        {
-            Name = "AllPrinters",
-            DisplayName = "All Printers",
-            LeafIcon = Icons.Filter,
-            DisplayTotalItems = Visibility.Visible,
-            TotalItems = PrinterModelList.Count,
-            FilterPage = FilterPages.PrinterPage
-        };
-
-        PrinterModelList.CollectionChanged += (s, args) =>
-        {
-            allPrintersLeaf.TotalItems = PrinterModelList.Count;
-        };
-
-        printersRoot.Children.Add(allPrintersLeaf);
-
-        printersRoot.Children.Add(new FilterLeaf
-        {
-            Name = "PrintersNotReady",
-            DisplayName = "Printers Not Ready",
-            LeafIcon = Icons.Filter,
-            FilterPage = FilterPages.PrinterPage
-
-        });
-        printersRoot.Children.Add(new FilterLeaf
-        {
-            Name = "PrintersWithJobs",
-            DisplayName = "Printers With Jobs",
-            LeafIcon = Icons.Filter,
-            FilterPage = FilterPages.PrinterPage
-
-        });
-
+        var printersRoot = await FilterLeafHelpers.BuildEntityRootLeafAsync<PrinterModel>(
+            rootName: PrintersRootName,
+            rootIcon: Icons.Printer,
+            pageType: FilterPages.PrinterPage,
+            totalItems: PrinterModelList.Count,
+            countCalculator: filter => FilterEngine.Count(PrinterModelList, filter), // <--- כאן הקסם קורה!
+            specialAllId: AllPrintersLeafID,
+            defaultSeedFilters: printerDefaults
+        );
         FiltersList.Add(printersRoot);
 
-        // --- Drivers Root Leaf ---
-        var driversRoot = new FilterLeaf
-        {
-            Name = DriversRootName,
-            DisplayName = "Drivers",
-            LeafIcon = Icons.Driver,
-            FilterPage = FilterPages.DriverPage,
-            IsRoot = true
-        };
-
-        // Adding sub leafs
-
-        var allDriversLeaf = new FilterLeaf
-        {
-            Name = "AllDrivers",
-            DisplayName = "All Drivers",
-            LeafIcon = Icons.Filter,
-            DisplayTotalItems = Visibility.Visible,
-            TotalItems = DriverModelList.Count,
-            FilterPage = FilterPages.DriverPage
-        };
-
-        DriverModelList.CollectionChanged += (s, args) =>
-        {
-            allDriversLeaf.TotalItems = DriverModelList.Count;
-        };
-
-        driversRoot.Children.Add(allDriversLeaf);
-
+        var driversRoot = await FilterLeafHelpers.BuildEntityRootLeafAsync<DriverModel>(
+            rootName: DriversRootName,
+            rootIcon: Icons.Driver,
+            pageType: FilterPages.DriverPage,
+            totalItems: DriverModelList.Count,
+            countCalculator: filter => FilterEngine.Count(DriverModelList, filter), // <--- כאן הקסם קורה!
+            specialAllId: AllDriversLeafID
+        );
         FiltersList.Add(driversRoot);
 
         SetSelectedLeaf();
@@ -307,9 +279,9 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
 
     private void SetSelectedLeaf()
     {
-        string targetName = NavigationStateService.LastSelectedFilterName ?? "AllPrinters";
+        Guid targetID = NavigationStateService.LastSelectedFilterID ?? FiltersList[0].Children.First().ID;
 
-        FilterLeaf? selectedLeaf = FindLeaf(FiltersList, targetName);
+        FilterLeaf? selectedLeaf = FindLeaf(FiltersList, targetID);
 
         if (selectedLeaf != null)
         {
@@ -319,14 +291,15 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             });
         }
     }
-    public static FilterLeaf? FindLeaf(IEnumerable<FilterLeaf> nodes, string targetName)
+
+    public static FilterLeaf? FindLeaf(IEnumerable<FilterLeaf> nodes, Guid targetID)
     {
         foreach (var node in nodes)
         {
-            if (node.Name == targetName)
+            if (node.ID == targetID)
                 return node;
 
-            var foundInDescendants = FindLeaf(node.Children, targetName);
+            var foundInDescendants = FindLeaf(node.Children, targetID);
             if (foundInDescendants != null)
             {
                 node.IsExpanded = true;
@@ -340,104 +313,108 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
     {
         if (e.AddedItems.FirstOrDefault() is FilterLeaf leaf)
         {
-            if (!_isNavigatingHistory && e.RemovedItems.FirstOrDefault() is FilterLeaf oldLeaf && oldLeaf != leaf)
-            {
-                _backStack.Push(oldLeaf);
-                _forwardStack.Clear();
-            }
+            var oldLeaf = e.RemovedItems.FirstOrDefault() as FilterLeaf;
+
+            // מעדכנים את ההיסטוריה הנקייה
+            _navHistory.OnSelectionChanged(oldLeaf, leaf);
 
             switch (leaf.FilterPage)
             {
                 case FilterPages.PrinterPage:
-                    FilterSubPage.Navigate(typeof(PrintersFilter), PrinterModelList);
+                    FilterSubPage.Navigate(typeof(PrintersFilter), (list: PrinterModelList, filter: leaf.Filter));
                     break;
                 case FilterPages.DriverPage:
-                    FilterSubPage.Navigate(typeof(DriversFilter), DriverModelList);
+                    FilterSubPage.Navigate(typeof(DriversFilter), (list: DriverModelList, filter: leaf.Filter));
                     break;
             }
 
-            NavigationStateService.LastSelectedFilterName = leaf.Name;
-
+            NavigationStateService.LastSelectedFilterID = leaf.ID;
             UpdateNavigationStates(leaf);
         }
     }
+
+    private void UpdateFilterCountsAfterDataLoaded()
+    {
+        foreach (var rootNode in FiltersList)
+        {
+            if (rootNode.FilterPage == FilterPages.PrinterPage)
+            {
+                if (PrinterModelList != null && PrinterModelList.Any())
+                {
+                    rootNode.TotalItems = PrinterModelList.Count;
+
+                    RecalculateNodeCounts(rootNode, PrinterModelList);
+                }
+            }
+            else if (rootNode.FilterPage == FilterPages.DriverPage)
+            {
+                if (DriverModelList != null && DriverModelList.Any())
+                {
+                    rootNode.TotalItems = DriverModelList.Count;
+
+                    RecalculateNodeCounts(rootNode, DriverModelList);
+                }
+            }
+        }
+    }
+
+    private void RecalculateNodeCounts<T>(FilterLeaf node, BulkObservableCollection<T> dataList)
+    {
+        if (node == null) return;
+
+        if (node.Filter.Criteria != null)
+        {
+            node.TotalItems = FilterEngine.Count(dataList, node.Filter);
+        }
+
+        if (node.Children != null)
+        {
+            foreach (var child in node.Children)
+            {
+                RecalculateNodeCounts(child, dataList);
+            }
+        }
+    }
+
+    // ---- Navigation ----
 
     private void UpdateNavigationStates(FilterLeaf? current)
     {
         if (current is not null)
         {
             CanGoUp = !current.IsRoot;
-            RefereshTargetName = current.DisplayName;
-            UpTargetName = current.IsRoot
-                ? string.Empty
-                : (current.FilterPage == FilterPages.PrinterPage ? PrintersRootName : DriversRootName);
+            RefereshTargetName = current.Name;
+            UpTargetName = current.IsRoot ? string.Empty : (current.FilterPage == FilterPages.PrinterPage ? PrintersRootName : DriversRootName);
         }
-
-        BackTargetName = _backStack.Count > 0 ? _backStack.Peek().DisplayName : string.Empty;
-        ForwardTargetName = _forwardStack.Count > 0 ? _forwardStack.Peek().DisplayName : string.Empty;
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoBack)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoForward)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BackTargetName)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ForwardTargetName)));
     }
 
     public void GoBack()
     {
-        if (_backStack.Count == 0) return;
-
-        if (FiltersTree.SelectedItem is FilterLeaf currentLeaf)
-        {
-            _forwardStack.Push(currentLeaf); // דוחפים את הנוכחי לקדימה
-        }
-
-        var previousLeaf = _backStack.Pop();
-        _isNavigatingHistory = true;
-        FiltersTree.SelectedItem = previousLeaf; // מעבר לבחירה הקודמת
-        _isNavigatingHistory = false;
-
-        UpdateNavigationStates(previousLeaf);
+        var current = FiltersTree.SelectedItem as FilterLeaf;
+        _navHistory.GoBack(current, leaf => FiltersTree.SelectedItem = leaf);
     }
 
     public void GoForward()
     {
-        if (_forwardStack.Count == 0) return;
-
-        if (FiltersTree.SelectedItem is FilterLeaf currentLeaf)
-        {
-            _backStack.Push(currentLeaf); // דוחפים את הנוכחי לאחורה
-        }
-
-        var nextLeaf = _forwardStack.Pop();
-        _isNavigatingHistory = true;
-        FiltersTree.SelectedItem = nextLeaf; // מעבר לבחירה הבאה
-        _isNavigatingHistory = false;
-
-        UpdateNavigationStates(nextLeaf);
+        var current = FiltersTree.SelectedItem as FilterLeaf;
+        _navHistory.GoForward(current, leaf => FiltersTree.SelectedItem = leaf);
     }
 
     public void GoUp()
     {
-        if (FiltersTree.SelectedItem is FilterLeaf leaf)
+        if (FiltersTree.SelectedItem is FilterLeaf leaf && !leaf.IsRoot)
         {
-            string targetName = leaf.FilterPage switch
+            string targetRootName = leaf.FilterPage == FilterPages.PrinterPage ? PrintersRootName : DriversRootName;
+            var rootLeaf = FiltersList.FirstOrDefault(f => f.Name == targetRootName);
+
+            if (rootLeaf != null)
             {
-                FilterPages.PrinterPage => PrintersRootName,
-                _ => DriversRootName
-            };
-
-            FilterLeaf? selectedLeaf = FindLeaf(FiltersList, targetName);
-            if (selectedLeaf != null && selectedLeaf != leaf)
-            {
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                {
-                    _backStack.Push(leaf);
-                    _forwardStack.Clear();
-
-                    _isNavigatingHistory = true;
-                    FiltersTree.SelectedItem = selectedLeaf;
-                    _isNavigatingHistory = false;
-
-                    UpdateNavigationStates(selectedLeaf);
-                });
+                _navHistory.GoTo(leaf, rootLeaf, target => FiltersTree.SelectedItem = target);
             }
         }
     }

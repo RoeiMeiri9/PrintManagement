@@ -38,6 +38,8 @@ public record PrinterStatusInfo
 {
     public string Status { get; set; } = string.Empty;
     public PrinterStatusFlags Flags { get; set; }
+
+    public override string ToString() => Status;
 }
 
 public partial class PrinterStatusHelper
@@ -45,7 +47,6 @@ public partial class PrinterStatusHelper
 
     public static List<PrinterStatusInfo> FormatQueueStatus(uint status)
     {
-        // אם הסטטוס הוא 0, זה אומר שהמדפסת במצב תקין ומוכנה לחלוטין (Ready)
         List<PrinterStatusInfo> defaultStatusList = [new PrinterStatusInfo { Status = "Ready", Flags = PrinterStatusFlags.Ready }];
 
         if (status == 0)

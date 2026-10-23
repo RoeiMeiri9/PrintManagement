@@ -6,6 +6,7 @@ using PrintManagement.Helpers.ControlHelpers;
 using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Models.Entity;
 using PrintManagement.Models.Entity.enums;
+using PrintManagement.Models.Filter;
 using PrintManagement.Resources;
 using PrintManagement.Services;
 using System;
@@ -63,11 +64,11 @@ public sealed partial class DriversFilter : Page, INotifyPropertyChanged
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is BulkObservableCollection<DriverModel> receivedDriverModelList)
+        if (e.Parameter is (BulkObservableCollection<DriverModel> list, GenericFilterDefinition filter))
         {
             DetachListHandlers();
 
-            DriverModelList = receivedDriverModelList;
+            DriverModelList.ReplaceAll(FilterEngine.Apply(list, filter));
             DriverModelList.CollectionChanged += DriverModelList_CollectionChanged;
             DriversTable.TableReadyForAnimation += CallAnimateCurrentView;
 

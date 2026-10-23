@@ -1,7 +1,9 @@
-﻿namespace PrintManagement.Services
+﻿using System;
+
+namespace PrintManagement.Services
 {
     internal class NavigationStateService
     {
-        public static string? LastSelectedFilterName { get; set; }
+        public static Guid? LastSelectedFilterID { get; set; }
     }
 }

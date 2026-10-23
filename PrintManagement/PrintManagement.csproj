@@ -12,6 +12,7 @@
     <WinUISDKReferences>false</WinUISDKReferences>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
+	<PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Controls\DataTable\**" />
@@ -221,9 +222,5 @@
   
 	<ItemGroup>
 	  <PRIResource Remove="Controls\DataTable\**" />
-	</ItemGroup>
-  
-	<ItemGroup>
-	  <Folder Include="Models\Filter\" />
 	</ItemGroup>
 </Project>

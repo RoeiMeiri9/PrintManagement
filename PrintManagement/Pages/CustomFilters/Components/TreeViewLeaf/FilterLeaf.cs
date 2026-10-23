@@ -1,6 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
+using PrintManagement.Models.Filter;
 using PrintManagement.Pages.CustomFilters.Helpers;
 using PrintManagement.Resources;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -24,8 +26,8 @@ public partial class FilterLeaf : INotifyPropertyChanged
             }
         }
     }
+    public Guid ID { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
-    public string DisplayName { get; set; } = string.Empty;
     public Icons LeafIcon { get; set; } = Icons.Filter;
     public Visibility DisplayTotalItems { get; set; } = Visibility.Collapsed;
     public bool IsExpanded { get; set; } = false;
@@ -36,4 +38,5 @@ public partial class FilterLeaf : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+    public GenericFilterDefinition Filter { get; set; } = new();
 }

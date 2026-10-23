@@ -6,6 +6,7 @@ using PrintManagement.Helpers.ControlHelpers;
 using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Models.Entity;
 using PrintManagement.Models.Entity.enums;
+using PrintManagement.Models.Filter;
 using PrintManagement.Resources;
 using PrintManagement.Services;
 using System;
@@ -79,11 +80,11 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is BulkObservableCollection<PrinterModel> receivedPrinterModelList)
+        if (e.Parameter is (BulkObservableCollection<PrinterModel> list, GenericFilterDefinition filter))
         {
             DetachListHandlers();
 
-            PrinterModelList = receivedPrinterModelList;
+            PrinterModelList.ReplaceAll(FilterEngine.Apply(list, filter));
             PrinterModelList.CollectionChanged += PrinterModelList_CollectionChanged;
             PrintersTable.TableReadyForAnimation += CallAnimateCurrentView;
 
