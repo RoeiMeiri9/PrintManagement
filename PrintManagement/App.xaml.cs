@@ -15,7 +15,8 @@ namespace PrintManagement
     {
         private Window? _window;
         public static IServiceProvider Services { get; private set; } = null!;
-
+        public static ISubWindowService SubWindows { get; private set; } = null!;
+        public static readonly FilterStorageService ffs = new();
         public static Window? MainWindow => (Current as App)?._window;
 
         /// <summary>
@@ -33,9 +34,10 @@ namespace PrintManagement
         /// Invoked when the application is launched.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             _window = new MainWindow();
+            SubWindows = new SubWindowService(_window, ffs);
             _window.Activate();
         }
 

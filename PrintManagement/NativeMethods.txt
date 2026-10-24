@@ -12,5 +12,6 @@ CallWindowProc
 MINMAXINFO
 WINDOW_LONG_PTR_INDEX
 WNDPROC
+GetDpiForWindow
 
 LogonUser

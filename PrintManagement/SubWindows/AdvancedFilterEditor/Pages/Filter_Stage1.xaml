@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="PrintManagement.SubWindows.AdvancedFilterEditor.Pages.Filter_Stage1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:PrintManagement.SubWindows.AdvancedFilterEditor.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Orientation="Vertical" Spacing="24">
+
+        <!--  Header: title + secondary subtitle  -->
+        <StackPanel Spacing="4">
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Name your filter" />
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource BodyTextBlockStyle}"
+                Text="This name appears under Custom Filters in the Print Management tree."
+                TextWrapping="Wrap" />
+        </StackPanel>
+
+        <!--  Form  -->
+        <StackPanel Spacing="16">
+            <TextBox
+                x:Name="FilterName"
+                Header="Name"
+                Text="{x:Bind Draft.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBox
+                x:Name="FilterDescription"
+                MinHeight="96"
+                MaxHeight="164"
+                AcceptsReturn="True"
+                Header="Description (optional)"
+                IsSpellCheckEnabled="True"
+                PlaceholderText="What does this filter show?"
+                Text="{x:Bind Draft.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap" />
+
+            <Border
+                Padding="16,12"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource ControlCornerRadius}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="Show item count" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Display the number of matching items next to the filter name."
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <ToggleSwitch
+                        Grid.Column="1"
+                        MinWidth="0"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="Show item count"
+                        IsOn="{x:Bind Draft.DisplayTotalItems, Mode=TwoWay}"
+                        OffContent=""
+                        OnContent="" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</Page>

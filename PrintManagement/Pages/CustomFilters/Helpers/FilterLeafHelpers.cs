@@ -20,6 +20,8 @@ public partial class FilterLeafHelpers
     Icons rootIcon,
     FilterPages pageType,
     int totalItems,
+    string description,
+    string rootDescription,
     Func<GenericFilterDefinition, int> countCalculator, // <--- פה ההלפר מקבל את כלי החישוב מהעמוד
     Guid? specialAllId = null,
     IEnumerable<GenericFilterDefinition>? defaultSeedFilters = null)
@@ -39,7 +41,9 @@ public partial class FilterLeafHelpers
             Name = rootName,
             LeafIcon = rootIcon,
             FilterPage = pageType,
-            IsRoot = true
+            IsRoot = true,
+            DisplayFlyoutContextMenu = false,
+            Description = rootDescription
         };
 
         // פילטר "הכל"
@@ -51,6 +55,8 @@ public partial class FilterLeafHelpers
             DisplayTotalItems = Visibility.Visible,
             TotalItems = totalItems,
             FilterPage = pageType,
+            Description = description,
+            DisplayFlyoutContextMenu = false
         });
 
         // הוספת שאר הפילטרים עם החישוב הדינמי שהגיע מהעמוד
@@ -64,7 +70,9 @@ public partial class FilterLeafHelpers
                 DisplayTotalItems = filter.DisplayTotalItems == true ? Visibility.Visible : Visibility.Collapsed,
                 TotalItems = countCalculator(filter), // <--- מפעילים את החישוב כאן!
                 FilterPage = pageType,
-                Filter = filter
+                Filter = filter,
+                Description = filter.Description ?? string.Empty,
+                DisplayFlyoutContextMenu = true
             });
         }
 

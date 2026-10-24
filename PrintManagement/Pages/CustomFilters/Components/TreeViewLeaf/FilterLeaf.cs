@@ -50,5 +50,7 @@ public partial class FilterLeaf : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+    public string Description { get; set; } = string.Empty;
     public GenericFilterDefinition Filter { get; set; } = new();
+    public bool DisplayFlyoutContextMenu { get; set; }
 }

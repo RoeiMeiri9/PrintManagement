@@ -1,5 +1,8 @@
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using PrintManagement.Helpers.CustomCollections;
 using PrintManagement.Interfaces;
@@ -16,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +27,7 @@ namespace PrintManagement.Pages.CustomFilters;
 
 public sealed partial class CustomFiltersPage : Page, INavigationCommands
 {
+    #region Dependency Properties
     private bool _isLoadingPrinters;
     private bool _isLoadingDrivers;
     public ObservableCollection<FilterLeaf> FiltersList { get; } = [];
@@ -117,11 +122,23 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
     private static readonly string PrintersRootName = "Printers";
     private static readonly string DriversRootName = "Drivers";
 
+    private readonly Guid AllPrintersLeafID = new("b83c27e3-5482-4136-9815-568285521b40");
+    private readonly Guid AllDriversLeafID = new("b83c27e3-5482-4136-9815-568285521b41");
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private bool _isInitialized = false;
 
     private bool _firstLeafSelection;
+
+    private bool _pageActive;
+
+    private object? _lastSelectedNodeData = null;
+
+    private bool _isLoadingAll;
+
+
+    #endregion
 
     public CustomFiltersPage()
     {
@@ -131,26 +148,29 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             if (_isInitialized) return;
             _isInitialized = true;
 
+            var menu = (MenuFlyout)Resources["FilterMenu"];
+            SetIcon(menu, "Edit Filter", Icons.Edit);
+            SetIcon(menu, "Duplicate Filter", Icons.Copy);
+            SetIcon(menu, "Remove Filter", Icons.Delete);
+
             _ = LoadAllAsync();
             await LoadFiltersAsync();
         };
     }
-
-    private bool _pageActive;
-
-    private object? _lastSelectedNodeData = null;
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
         _pageActive = true;
         _firstLeafSelection = true;
+        App.SubWindows.FilterSaved += OnFilterSaved;
         if (_isInitialized && !_isLoadingAll) StartWatcher();   // cached page coming back
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
+        App.SubWindows.FilterSaved -= OnFilterSaved;
         StopWatcher();
     }
 
@@ -160,7 +180,6 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
     /// Drivers first, because the printers load reuses that list instead of asking the server again.
     /// The filter tree is built once, at the end, so it never shows a half-loaded count.
     /// </summary>
-    private bool _isLoadingAll;
 
     private async Task LoadAllAsync()
     {
@@ -237,55 +256,20 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
 
     // ---- Filters ----
 
-    private readonly Guid AllPrintersLeafID = new("b83c27e3-5482-4136-9815-568285521b40");
-    private readonly Guid AllDriversLeafID = new("b83c27e3-5482-4136-9815-568285521b41");
-
     private async Task LoadFiltersAsync()
     {
         FiltersList.Clear();
-
-        var printerDefaults = new[]
-        {
-            new GenericFilterDefinition
-            {
-                Name = "Printers Not Ready",
-                Criteria = new Dictionary<string, FilterRule>(StringComparer.OrdinalIgnoreCase)
-                {
-                    {
-                        "QueueStatus",
-                        new FilterRule
-                        {
-                            Condition = FilterCondition.NotEquals,
-                            Value = "Ready"
-                        }
-                    }
-                }
-            },
-            new GenericFilterDefinition
-            {
-                Name = "Printers With Jobs",
-                Criteria = new Dictionary<string, FilterRule>(StringComparer.OrdinalIgnoreCase)
-                {
-                    {
-                        "JobsInQueue",
-                        new FilterRule
-                        {
-                            Condition = FilterCondition.GreaterThan,
-                            Value = "0"
-                        }
-                    }
-                }
-            }
-        };
 
         var printersRoot = await FilterLeafHelpers.BuildEntityRootLeafAsync<PrinterModel>(
             rootName: PrintersRootName,
             rootIcon: Icons.Printer,
             pageType: FilterPages.PrinterPage,
             totalItems: PrinterModelList.Count,
+            description: "Shows all printers",
+            rootDescription: "A quick overview of your filters and what needs attention.",
             countCalculator: filter => FilterEngine.Count(PrinterModelList, filter), // <--- כאן הקסם קורה!
             specialAllId: AllPrintersLeafID,
-            defaultSeedFilters: printerDefaults
+            defaultSeedFilters: InitialFilters.PrinterDefaults
         );
         FiltersList.Add(printersRoot);
 
@@ -294,6 +278,8 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             rootIcon: Icons.Driver,
             pageType: FilterPages.DriverPage,
             totalItems: DriverModelList.Count,
+            description: "Shows all drivers",
+            rootDescription: "A quick overview of your filters and what needs attention.",
             countCalculator: filter => FilterEngine.Count(DriverModelList, filter), // <--- כאן הקסם קורה!
             specialAllId: AllDriversLeafID
         );
@@ -409,6 +395,16 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         }
     }
 
+    private static void SetIcon(MenuFlyout menu, string text, dynamic icon)
+    {
+        var item = menu.Items.OfType<MenuFlyoutItem>().First(i => i.Text == text);
+        item.Icon = new FontIcon
+        {
+            FontFamily = icon.Font,
+            Glyph = icon.Glyph
+        };
+    }
+
     // ---- Watching Printers ----
 
     private void StartWatcher()
@@ -520,12 +516,17 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         catch (Exception ex) { Logger.Error(ex); }
     }
 
-    private void AddFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void AddFilter_Printer_Click(object sender, RoutedEventArgs e)
     {
-
+        App.SubWindows.ShowFilterEditor<PrinterModel>();
     }
 
-    private void CollapseAllFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void AddFilter_Driver_Click(object sender, RoutedEventArgs e)
+    {
+        App.SubWindows.ShowFilterEditor<DriverModel>();
+    }
+
+    private void CollapseAllFilter_Click(object sender, RoutedEventArgs e)
     {
         foreach (FilterLeaf leaf in FiltersList)
         {
@@ -533,23 +534,134 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         }
     }
 
-    private void EditFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void EditFilter_Click(object sender, RoutedEventArgs e)
     {
+        if (_contextLeaf is not { } leaf) return;
+        if (leaf.FilterPage == FilterPages.PrinterPage)
+            App.SubWindows.ShowFilterEditor<PrinterModel>(leaf.Filter);
+        else
+            App.SubWindows.ShowFilterEditor<DriverModel>(leaf.Filter);
+
 
     }
 
-    private void DuplicateFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private async void DuplicateFilter_Click(object sender, RoutedEventArgs e)
     {
+        if (_contextLeaf is not { } leaf) return;
 
+        if (leaf.FilterPage == FilterPages.PrinterPage)
+            await DuplicateAsync<PrinterModel>(leaf.Filter);
+        else
+            await DuplicateAsync<DriverModel>(leaf.Filter);
+
+        await ReloadFiltersAsync();
     }
 
-    private void DeleteFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private async void OnFilterSaved(object? s, GenericFilterDefinition def)
     {
+        try { await ReloadFiltersAsync(); }
+        catch (Exception ex) { Logger.Error(ex); }
+    }
 
+    private async void DeleteFilter_Click(object sender, RoutedEventArgs e)
+    {
+        if (_contextLeaf is not { } leaf) return;
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot,                       // required in WinUI 3
+            Title = "Remove filter?",
+            Content = $"“{leaf.Filter.Name}” will be permanently removed.",
+            PrimaryButtonText = "Remove",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        if (leaf.FilterPage == FilterPages.PrinterPage)
+            await App.ffs.DeleteAsync<PrinterModel>(leaf.Filter.ID);
+        else
+            await App.ffs.DeleteAsync<DriverModel>(leaf.Filter.ID);
+
+        await ReloadFiltersAsync();   // replace with whatever refreshes your tree
+    }
+
+    private static async Task DuplicateAsync<TEntity>(GenericFilterDefinition source)
+    where TEntity : EntityModel
+    {
+        // JSON round-trip = deep copy, so the original is never touched
+        var copy = JsonSerializer.Deserialize<GenericFilterDefinition>(
+            JsonSerializer.Serialize(source))!;
+
+        copy.ID = Guid.NewGuid();                  // new identity, otherwise it would overwrite the original
+        copy.Name = $"{source.Name} (copy)";
+
+        await App.ffs.SaveAsync<TEntity>(copy);
     }
 
     private void FiltersTree_Expanding(TreeView sender, TreeViewExpandingEventArgs args)
     {
         sender.SelectedItem = _lastSelectedNodeData;
+    }
+
+    private FilterLeaf? _contextLeaf;
+
+    private void TreeViewItem_ContextRequested(UIElement sender, ContextRequestedEventArgs args)
+    {
+        DependencyObject? node = args.OriginalSource as DependencyObject;
+        while (node is not null and not TreeViewItem)
+            node = VisualTreeHelper.GetParent(node);
+
+        if (node is not TreeViewItem container) return;
+
+        args.Handled = true;
+
+        if (FiltersTree.ItemFromContainer(container) is not FilterLeaf leaf) return;
+        if (!leaf.DisplayFlyoutContextMenu) return;
+
+        _contextLeaf = leaf;
+
+        var flyout = (MenuFlyout)Resources["FilterMenu"];
+        if (args.TryGetPosition(container, out var point))
+            flyout.ShowAt(container, point);
+        else
+            flyout.ShowAt(container);   // keyboard (Menu key / Shift+F10)
+    }
+
+    private async Task ReloadFiltersAsync(Guid? removedId = null)
+    {
+        // Rebuilding the tree creates new leaf objects, so remember what was expanded
+        var expanded = new HashSet<Guid>();
+        CollectExpanded(FiltersList, expanded);
+
+        // If the selected filter was deleted, fall back to the first leaf
+        if (removedId is not null && NavigationStateService.LastSelectedFilterID == removedId)
+            NavigationStateService.LastSelectedFilterID = null;
+
+        // Without this, SelectionChanged ignores "the same ID" and the sub page keeps showing
+        // the old (pre-edit) filter object
+        _firstLeafSelection = true;
+
+        await LoadFiltersAsync();
+        RestoreExpanded(FiltersList, expanded);
+    }
+
+    private static void CollectExpanded(IEnumerable<FilterLeaf> nodes, HashSet<Guid> result)
+    {
+        foreach (var n in nodes)
+        {
+            if (n.IsExpanded) result.Add(n.ID);
+            CollectExpanded(n.Children, result);
+        }
+    }
+
+    private static void RestoreExpanded(IEnumerable<FilterLeaf> nodes, HashSet<Guid> expanded)
+    {
+        foreach (var n in nodes)
+        {
+            if (expanded.Contains(n.ID)) n.IsExpanded = true;
+            RestoreExpanded(n.Children, expanded);
+        }
     }
 }

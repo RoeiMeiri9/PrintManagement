@@ -16,6 +16,18 @@
     x:Name="PageRoot"
     d:DataContext="{d:DesignInstance Type=local:CustomFiltersPage}"
     mc:Ignorable="d">
+    <Page.Resources>
+        <MenuFlyout x:Key="FilterMenu">
+            <MenuFlyoutItem Click="EditFilter_Click" Text="Edit Filter" />
+
+            <MenuFlyoutItem Click="DuplicateFilter_Click" Text="Duplicate Filter" />
+
+            <MenuFlyoutSeparator />
+
+            <MenuFlyoutItem Click="DeleteFilter_Click" Text="Remove Filter" />
+        </MenuFlyout>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -39,11 +51,19 @@
                 CornerRadius="0">
                 <Border.ContextFlyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Click="AddFilter_Click" Text="Add Filter">
+                        <MenuFlyoutItem Click="AddFilter_Printer_Click" Text="Add Printer Filter">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="{x:Bind res:Icons.Add.Font}" Glyph="{x:Bind res:Icons.Add.Glyph}" />
+                                <FontIcon FontFamily="{x:Bind res:Icons.Printer.Font}" Glyph="{x:Bind res:Icons.Printer.Glyph}" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+
+                        <MenuFlyoutItem Click="AddFilter_Driver_Click" Text="Add Driver Filter">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="{x:Bind res:Icons.Driver.Font}" Glyph="{x:Bind res:Icons.Driver.Glyph}" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                        <MenuFlyoutSeparator />
 
                         <MenuFlyoutItem Click="CollapseAllFilter_Click" Text="Collpse All Filter">
                             <MenuFlyoutItem.Icon>
@@ -56,6 +76,7 @@
                 <TreeView
                     x:Name="FiltersTree"
                     Margin="4,7,-3,8"
+                    ContextRequested="TreeViewItem_ContextRequested"
                     Expanding="FiltersTree_Expanding"
                     ItemsSource="{x:Bind FiltersList, Mode=OneWay}"
                     SelectionChanged="FiltersTree_SelectionChanged">
@@ -92,30 +113,9 @@
                                         Text="{x:Bind TotalItems, Mode=OneWay}"
                                         Visibility="{x:Bind DisplayTotalItems, Mode=OneWay}" />
                                 </Grid>
-
-                                <TreeViewItem.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem Click="EditFilter_Click" Text="Edit Filter">
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon FontFamily="{x:Bind res:Icons.Edit.Font}" Glyph="{x:Bind res:Icons.Edit.Glyph}" />
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-
-                                        <MenuFlyoutItem Click="DuplicateFilter_Click" Text="Duplicate Filter">
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon FontFamily="{x:Bind res:Icons.Copy.Font}" Glyph="{x:Bind res:Icons.Copy.Glyph}" />
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-
-                                        <MenuFlyoutSeparator />
-
-                                        <MenuFlyoutItem Click="DeleteFilter_Click" Text="Remove Filter">
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon FontFamily="{x:Bind res:Icons.Delete.Font}" Glyph="{x:Bind res:Icons.Delete.Glyph}" />
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-                                    </MenuFlyout>
-                                </TreeViewItem.ContextFlyout>
+                                <ToolTipService.ToolTip>
+                                    <ToolTip Content="{x:Bind Description, Mode=OneWay}" />
+                                </ToolTipService.ToolTip>
                             </TreeViewItem>
                         </DataTemplate>
                     </TreeView.ItemTemplate>
