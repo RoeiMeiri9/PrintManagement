@@ -48,9 +48,13 @@ public class Icons(string glyph, FontFamily? font = null)
     public static readonly Icons Driver = new("\U000F013D", font: ExtendedSegoeFluentFont_Regular);
     public static readonly Icons Driver_Filled = new("\U000F013C", font: ExtendedSegoeFluentFont_Filled);
 
+    // - Context Menu -
+    public static readonly Icons Edit = new("\uE70F");
+    public static readonly Icons Copy = new("\uE8C8");
+
     // --- Table ---
-    public static readonly Icons ChevronUp = new("\uE70D");
-    public static readonly Icons ChevronDown = new("\uE70E");
+    public static readonly Icons ChevronUp = new("\uE70E");
+    public static readonly Icons ChevronDown = new("\uE70D");
 
     // --- Settings ---
     public static readonly Icons ArrowOut = new("\uE10D", font: ExtendedSegoeFluentFont_Regular);

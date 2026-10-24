@@ -37,9 +37,26 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 CornerRadius="0">
+                <Border.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Click="AddFilter_Click" Text="Add Filter">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="{x:Bind res:Icons.Add.Font}" Glyph="{x:Bind res:Icons.Add.Glyph}" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                        <MenuFlyoutItem Click="CollapseAllFilter_Click" Text="Collpse All Filter">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="{x:Bind res:Icons.ChevronUp.Font}" Glyph="{x:Bind res:Icons.ChevronUp.Glyph}" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Border.ContextFlyout>
+
                 <TreeView
                     x:Name="FiltersTree"
                     Margin="4,7,-3,8"
+                    Expanding="FiltersTree_Expanding"
                     ItemsSource="{x:Bind FiltersList, Mode=OneWay}"
                     SelectionChanged="FiltersTree_SelectionChanged">
                     <TreeView.ItemTemplate>
@@ -75,6 +92,30 @@
                                         Text="{x:Bind TotalItems, Mode=OneWay}"
                                         Visibility="{x:Bind DisplayTotalItems, Mode=OneWay}" />
                                 </Grid>
+
+                                <TreeViewItem.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Click="EditFilter_Click" Text="Edit Filter">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon FontFamily="{x:Bind res:Icons.Edit.Font}" Glyph="{x:Bind res:Icons.Edit.Glyph}" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+
+                                        <MenuFlyoutItem Click="DuplicateFilter_Click" Text="Duplicate Filter">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon FontFamily="{x:Bind res:Icons.Copy.Font}" Glyph="{x:Bind res:Icons.Copy.Glyph}" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+
+                                        <MenuFlyoutSeparator />
+
+                                        <MenuFlyoutItem Click="DeleteFilter_Click" Text="Remove Filter">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon FontFamily="{x:Bind res:Icons.Delete.Font}" Glyph="{x:Bind res:Icons.Delete.Glyph}" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </TreeViewItem.ContextFlyout>
                             </TreeViewItem>
                         </DataTemplate>
                     </TreeView.ItemTemplate>

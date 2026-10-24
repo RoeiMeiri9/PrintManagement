@@ -121,6 +121,7 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
 
     private bool _isInitialized = false;
 
+    private bool _firstLeafSelection;
 
     public CustomFiltersPage()
     {
@@ -137,12 +138,13 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
 
     private bool _pageActive;
 
-    // in the constructor's Loaded handler, as the first line: _pageActive = true;
+    private object? _lastSelectedNodeData = null;
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
         _pageActive = true;
+        _firstLeafSelection = true;
         if (_isInitialized && !_isLoadingAll) StartWatcher();   // cached page coming back
     }
 
@@ -311,6 +313,7 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 FiltersTree.SelectedItem = selectedLeaf;
+                _lastSelectedNodeData = FiltersTree.SelectedItem;
             });
         }
     }
@@ -334,8 +337,15 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
 
     private void FiltersTree_SelectionChanged(TreeView sender, TreeViewSelectionChangedEventArgs e)
     {
+        _lastSelectedNodeData = FiltersTree.SelectedItem;
+
         if (e.AddedItems.FirstOrDefault() is FilterLeaf leaf)
         {
+            if (NavigationStateService.LastSelectedFilterID == leaf.ID && !_firstLeafSelection)
+            {
+                return;
+            }
+            _firstLeafSelection = false;
             var oldLeaf = e.RemovedItems.FirstOrDefault() as FilterLeaf;
 
             // מעדכנים את ההיסטוריה הנקייה
@@ -508,5 +518,38 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
     {
         try { await LoadAllAsync(); }
         catch (Exception ex) { Logger.Error(ex); }
+    }
+
+    private void AddFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+
+    }
+
+    private void CollapseAllFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        foreach (FilterLeaf leaf in FiltersList)
+        {
+            leaf.IsExpanded = false;
+        }
+    }
+
+    private void EditFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+
+    }
+
+    private void DuplicateFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+
+    }
+
+    private void DeleteFilter_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+
+    }
+
+    private void FiltersTree_Expanding(TreeView sender, TreeViewExpandingEventArgs args)
+    {
+        sender.SelectedItem = _lastSelectedNodeData;
     }
 }

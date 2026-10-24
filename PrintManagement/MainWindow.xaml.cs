@@ -194,7 +194,7 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         Add(TitleBarSearchBox);
 
         var source = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
-        source.SetRegionRects(NonClientRegionKind.Passthrough, rects.ToArray());
+        source.SetRegionRects(NonClientRegionKind.Passthrough, [.. rects]);
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

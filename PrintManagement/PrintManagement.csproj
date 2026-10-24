@@ -57,6 +57,7 @@
     <None Remove="Pages\CustomFilters\SubPages\PrintersFilter.xaml" />
     <None Remove="Pages\CustomFiltersPage.xaml" />
     <None Remove="Pages\SettingsPage\SettingsPage.xaml" />
+    <None Remove="SubWindows\AddFilters\AddFiltersWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -157,6 +158,12 @@
     <None Update="Assets\Icons\IconGroup51.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Page Update="Windows\AddFilters\AddFiltersWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Windows\AddFiltersWindow\AddFiltersWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Dialogs\CustomLoginDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -222,5 +229,9 @@
   
 	<ItemGroup>
 	  <PRIResource Remove="Controls\DataTable\**" />
+	</ItemGroup>
+  
+	<ItemGroup>
+	  <Folder Include="SubWindows\AddFilters\Pages\" />
 	</ItemGroup>
 </Project>

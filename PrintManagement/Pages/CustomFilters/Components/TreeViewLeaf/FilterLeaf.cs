@@ -30,7 +30,19 @@ public partial class FilterLeaf : INotifyPropertyChanged
     public string Name { get; set; } = string.Empty;
     public Icons LeafIcon { get; set; } = Icons.Filter;
     public Visibility DisplayTotalItems { get; set; } = Visibility.Collapsed;
-    public bool IsExpanded { get; set; } = false;
+    private bool _isExpended = false;
+    public bool IsExpanded
+    {
+        get => _isExpended;
+        set
+        {
+            if (_isExpended != value)
+            {
+                _isExpended = value;
+                OnPropertyChanged();
+            }
+        }
+    }
     public FilterPages FilterPage { get; set; } = FilterPages.PrinterPage;
     public ObservableCollection<FilterLeaf> Children { get; set; } = [];
     public bool IsRoot = false;
