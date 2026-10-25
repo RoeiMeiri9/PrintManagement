@@ -28,7 +28,7 @@ Things you can't do:
 
 ## Will it ever be "finished"?
 
-As I work on this project on my free time, I can't tell.
+As I work on this project on my free time, I can't tell. (Also there's no specific term for the word finish - I can take it as far as I wish...)
 
 I may be able to vibe code it to the end, but my problem with that is that I care deeply for writing good software which I will enjoy using and maintaining, and for that I need to be involved.
 
