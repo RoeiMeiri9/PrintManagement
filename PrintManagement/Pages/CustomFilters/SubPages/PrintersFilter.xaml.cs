@@ -23,6 +23,9 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    private BulkObservableCollection<PrinterModel>? _source;
+    private GenericFilterDefinition? _filter;
+
     private bool _isCompact = false;
 
     public bool IsCompact
@@ -84,24 +87,37 @@ public sealed partial class PrintersFilter : Page, INotifyPropertyChanged
         {
             DetachListHandlers();
 
-            PrinterModelList.ReplaceAll(FilterEngine.Apply(list, filter));
+            _source = list;
+            _filter = filter;
+            _source.CollectionChanged += Source_CollectionChanged;
+
             PrinterModelList.CollectionChanged += PrinterModelList_CollectionChanged;
             PrintersTable.TableReadyForAnimation += CallAnimateCurrentView;
 
-            RebuildItemModels();
+            Reapply();
         }
+    }
+
+    private void Source_CollectionChanged(object? s, NotifyCollectionChangedEventArgs e) => Reapply();
+
+    private void Reapply()
+    {
+        if (_source is null || _filter is null) return;
+        PrinterModelList.ReplaceAll(FilterEngine.Apply(_source, _filter));
+        RebuildItemModels();
+    }
+
+    private void DetachListHandlers()
+    {
+        _source?.CollectionChanged -= Source_CollectionChanged;
+        PrinterModelList?.CollectionChanged -= PrinterModelList_CollectionChanged;
+        PrintersTable.TableReadyForAnimation -= CallAnimateCurrentView;
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
         DetachListHandlers();
-    }
-
-    private void DetachListHandlers()
-    {
-        PrinterModelList?.CollectionChanged -= PrinterModelList_CollectionChanged;
-        PrintersTable.TableReadyForAnimation -= CallAnimateCurrentView;
     }
 
     private void CallAnimateCurrentView(object? sender, EventArgs e)

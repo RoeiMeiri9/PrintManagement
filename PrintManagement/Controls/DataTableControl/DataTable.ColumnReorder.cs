@@ -128,19 +128,15 @@ namespace PrintManagement.Controls.DataTableControl
                 if (col != target && col.DropPosition != ColumnDropPosition.None)
                     col.DropPosition = ColumnDropPosition.None;
 
-            if (target != null) target.DropPosition = position;
+            target?.DropPosition = position;
         }
 
         private void ResetColumnDrag()
         {
             _dragScrollTimer?.Stop();
             ShowDropIndicator(null, ColumnDropPosition.None);
-
-            if (_draggedColumn != null)
-            {
-                _draggedColumn.IsBeingDragged = false;
-                _draggedColumn = null;
-            }
+            _draggedColumn?.IsBeingDragged = false;
+            _draggedColumn = null;
         }
 
         // ---------- Auto-scroll while dragging near the left/right edge ----------

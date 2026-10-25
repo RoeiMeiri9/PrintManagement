@@ -12,7 +12,7 @@ internal interface INavigationCommands : INotifyPropertyChanged
     string BackTargetName { get; }
     string ForwardTargetName { get; }
     string UpTargetName { get; }
-    string RefereshTargetName { get; }
+    string RefreshTargetName { get; }
 
     void Refresh();
     void GoUp();

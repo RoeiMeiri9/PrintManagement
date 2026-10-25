@@ -154,7 +154,7 @@
                     Click="RefreshButton_Click"
                     IsEnabled="{x:Bind ((I:INavigationCommands)navFrame.Content).CanRefresh, Mode=OneWay, FallbackValue=True}">
                     <ToolTipService.ToolTip>
-                        <ToolTip Content="{x:Bind ((I:INavigationCommands)navFrame.Content).RefereshTargetName, Mode=OneWay, Converter={StaticResource FormatStringConverter}, ConverterParameter='Refresh {0}'}" />
+                        <ToolTip Content="{x:Bind ((I:INavigationCommands)navFrame.Content).RefreshTargetName, Mode=OneWay, Converter={StaticResource FormatStringConverter}, ConverterParameter='Refresh {0}'}" />
                     </ToolTipService.ToolTip>
                     <Button.KeyboardAccelerators>
                         <!--  F5  -->

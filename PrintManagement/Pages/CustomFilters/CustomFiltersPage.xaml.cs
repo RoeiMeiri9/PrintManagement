@@ -71,15 +71,15 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
 
     private readonly FilterNavigationHistory _navHistory = new();
 
-    public bool _canRefreshan = true;
+    public bool _canRefresh = true;
     public bool CanRefresh
     {
-        get => _canRefreshan;
+        get => _canRefresh;
         set
         {
-            if (_canRefreshan != value)
+            if (_canRefresh != value)
             {
-                _canRefreshan = value;
+                _canRefresh = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanRefresh)));
             }
         }
@@ -112,12 +112,11 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         set { if (_upTargetName != value) { _upTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UpTargetName))); } }
     }
 
-    private string _refreshTargetName = string.Empty;
-    public string RefereshTargetName
+    public string RefreshTargetName
     {
-        get => _refreshTargetName;
-        set { if (_refreshTargetName != value) { _refreshTargetName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RefereshTargetName))); } }
-    }
+        get;
+        set { if (field != value) { field = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RefreshTargetName))); } }
+    } = string.Empty;
 
     private static readonly string PrintersRootName = "Printers";
     private static readonly string DriversRootName = "Drivers";
@@ -197,11 +196,9 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
             IsLoading = false;
             CanRefresh = true;
             _isLoadingAll = false;
+            UpdateFilterCountsAfterDataLoaded();
+            StartWatcher();
         }
-
-        UpdateFilterCountsAfterDataLoaded();
-
-        StartWatcher();
     }
 
     private async Task LoadPrintersAsync()
@@ -417,9 +414,9 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         _recountTimer.IsRepeating = false;
         _recountTimer.Tick += (_, _) => UpdateFilterCountsAfterDataLoaded();
 
-        double refereshSpeed = SettingsService.ReadSetting(Settings<int>.RefreshSpeedSetting);
-        if (refereshSpeed == -1) return;
-        _watcher = new PrinterWatcher(_serverName, TimeSpan.FromSeconds(refereshSpeed));
+        double refreshSpeed = SettingsService.ReadSetting(Settings<int>.RefreshSpeedSetting);
+        if (refreshSpeed == -1) return;
+        _watcher = new PrinterWatcher(_serverName, TimeSpan.FromSeconds(refreshSpeed));
         _watcher.Changed += OnPrintersChanged;
 
         _watcherCts = new CancellationTokenSource();
@@ -474,7 +471,7 @@ public sealed partial class CustomFiltersPage : Page, INavigationCommands
         if (current is not null)
         {
             CanGoUp = !current.IsRoot;
-            RefereshTargetName = current.Name;
+            RefreshTargetName = current.Name;
             UpTargetName = current.IsRoot ? string.Empty : (current.FilterPage == FilterPages.PrinterPage ? PrintersRootName : DriversRootName);
         }
 
