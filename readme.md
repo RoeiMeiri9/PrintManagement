@@ -1,6 +1,5 @@
 # Print Management on WinUI 3
 
-
 The good old Print Management from the MMC toolset was rebuilt from the ground up using the latest WinUI 3 architecture, giving it a much needed fresh new look and overall better user experience.
 
 This project is a passion project made solely out of the appreciation to the original program and the frustration of using printers we all know and love to hate
@@ -16,6 +15,7 @@ As of right now, this program can:
 3. Has 4 different view mode
 4. Allows you to export the list of printers and drivers to `.txt`, `.csv` following the original Print Management conventions, and providing additional support to `.md` export.
 5. Technically (without being able to do that from the UI though) supports connection to remote servers, using the Windows Credential Manager to store user and password securely.
+6. Full support for Windows 10 2002 (for those who dislikes Windows 11)
 
 Things you can't do:
 
